@@ -1,8 +1,5 @@
-import "./globals.css";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-
-const geist = Geist({ subsets: ["latin"] });
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Create Turborepo",
@@ -16,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={geist.className}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
