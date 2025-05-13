@@ -1,0 +1,21 @@
+body{
+    height: 400px;
+    width: 400px;
+    margin: 2rem;
+    background-color: black;
+    color: salmon;
+    font-size: 1rem;
+}
+
+head{
+    display: flex;
+    justify-content: space-between;
+}
+
+#btn{
+    padding: 4px;
+    border-radius: 10px;
+    background-color: gainsboro;
+    color: black;
+    font-weight: 700;
+}
