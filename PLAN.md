@@ -1,36 +1,149 @@
-# Development Plan for the Project
+# Development Plan
 
-1. Reading list
-   - Create a database to store user reading history
-   - Implement a function to add new books to the reading list
-   - Implement a function to remove books from the reading list
-   - Implement a function to update the status of books (e.g., reading, completed, on hold)
-   - Implement a function to retrieve the reading list
+## Project Summary
 
-2. Book details
-   - Create a database to store book details
-   - Implement a function to add new books to the database
-   - Implement a function to update book details
-   - Implement a function to retrieve book details
-   - Implement a function to search for books by title, author, or genre
-   - Implement a function to retrieve book recommendations based on user preferences
+A cross-platform novel reader ecosystem that enhances web novels with improved visuals, accessibility, and reading management. The system consists of:
 
-3. 
+- A browser extension for in-page enhancements and tracking.
+- A web app for reading management, stats, and syncing.
+- A mobile app for on-the-go reading and management.
 
+## 1. Browser Extension Features
 
-## Tabs
+- **Tab Management**
 
-1. Reading list
-   - Create a tab to display the user's reading list
-   - Implement a function to filter the reading list by status (e.g., reading, completed, on hold)
-   - Implement a function to sort the reading list by title, author, or date added
+  - Track visited webnovel sites.
+  - Log time spent and scrolling activity per site.
+  - Show reading session summaries.
 
-2. History
-   - Create a tab to display the user's reading history
-   - Implement a function to filter the reading history by date or book title
-   - Implement a function to sort the reading history by date or book title
+- **Comment Assistant**
 
-3. Dashboard
-   - Create a dashboard to display the user's reading statistics (e.g., number of books read, average rating, most read genre)
-   - Implement a function to update the dashboard with new statistics
-   - Implement a function to display book recommendations based on user preferences
+  - Analyze comments before posting.
+  - Warn users about potential punishments or restrictions (e.g., trolling, spoilers).
+  - Suggest improvements for constructive engagement.
+
+- **Accessibility**
+
+  - Remove or reposition ads for better readability.
+  - Add read-aloud (voice-over) features for chapters.
+  - Provide a dictionary/repo of genre-specific terms (e.g., "face" in xianxia).
+  - Offer font, color, and layout customization for easier reading.
+
+- **Bookmarks**
+
+  - Allow users to bookmark novels and chapters.
+  - Curate a reading list accessible from extension and synced to web/mobile.
+
+- **Calendar Integration**
+  - (Optional) Link to Google Calendar to save novel release dates and set reminders.
+
+---
+
+## 2. Web App Features
+
+- **Landing Page**
+
+  - Project introduction, features, and documentation.
+  - Links to browser extension and mobile app.
+
+- **User Dashboard**
+
+  - View and manage reading list/bookmarks.
+  - See reading stats (time spent, chapters read, streaks).
+  - Continue reading from last position (sync with extension/mobile).
+
+- **Book/Novel Management**
+
+  - Search and add novels to reading list.
+  - View details, progress, and notes for each novel.
+  - Rate and review novels.
+
+- **History**
+
+  - Display reading history by date and title.
+  - Filter and sort history.
+
+- **Recommendations**
+
+  - Personalized suggestions based on reading habits and preferences.
+
+- **Account & Sync**
+  - User authentication (OAuth or email).
+  - Sync data between extension, web, and mobile.
+
+---
+
+## 3. Mobile App Features
+
+- **Reading List**
+
+  - Add, remove, and update books and their status (reading, completed, on hold).
+  - Offline access to reading list and progress.
+
+- **Book Details**
+
+  - View and search book details.
+  - Get recommendations based on preferences.
+  - Mark chapters as read.
+
+- **Dashboard**
+
+  - Display reading statistics (books read, average rating, most read genre).
+  - Show recommendations and recent activity.
+
+- **History**
+
+  - View and filter reading history.
+
+- **Notifications**
+
+  - Push notifications for new chapters, reminders, or reading streaks.
+
+- **Sync**
+  - Sync reading list and progress with web app and extension.
+
+---
+
+## 4. Technical Notes
+
+- **Monorepo Structure**
+
+  - Use a monorepo to share UI components and logic (e.g., reading list management) across web, extension, and mobile.
+  - Use TypeScript for type safety and maintainability.
+
+- **Data Storage & Sync**
+
+  - Use cloud database (e.g., Firebase, Supabase) for syncing user data.
+  - Local storage for offline support in extension and mobile.
+
+- **Authentication**
+
+  - OAuth (Google, GitHub) or email/password for user accounts.
+
+- **Accessibility**
+  - Ensure all platforms are accessible (screen reader support, color contrast, etc.).
+
+---
+
+## 5. Next Steps
+
+1. **Define MVP Scope**
+   - Prioritize features for first release (e.g., reading list, bookmarks, basic stats, sync).
+2. **Design UI/UX**
+   - Create wireframes for extension, web, and mobile.
+3. **Set Up Monorepo**
+   - Scaffold projects for extension, web app, and mobile app.
+   - Create shared package for UI/components.
+4. **Implement Core Features**
+   - Start with reading list and sync across platforms.
+5. **Test & Iterate**
+   - Gather feedback and refine features.
+
+---
+
+## 6. Future Enhancements
+
+- Social features (share progress, comments, recommendations).
+- Advanced analytics (reading speed, trends).
+- More integrations (other calendar providers, more novel sources).
+- Community-driven dictionary/repo for genre terms.

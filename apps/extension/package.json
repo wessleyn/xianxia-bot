@@ -1,6 +1,6 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "xianxia-bot",
+  "description": "A webnovel curator",
   "private": true,
   "version": "0.0.0",
   "type": "module",
