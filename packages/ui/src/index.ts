@@ -1,5 +1,5 @@
 // Export all UI components
-export { Card } from './components/card';
-export { Gradient } from './components/gradient';
-export { TurborepoLogo } from './components/turborepo-logo';
+export { Card } from './card';
+export { Gradient } from './gradient';
+export { TurborepoLogo } from './turborepo-logo';
 
