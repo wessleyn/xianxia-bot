@@ -9,7 +9,7 @@
     "dist"
   ],
   "exports": {
-    ".": "./dist/index.js",
+    "./components/*": "./dist/*/index.js",
     "./styles.css": "./dist/index.css",
     "./*": "./dist/*.js"
   },
