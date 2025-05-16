@@ -15,7 +15,7 @@ export default function HomeLayout({
     return (
         <>
             <Header />
-            <main>
+            <main className="bg-white dark:bg-gray-900">
                 {children}
             </main>
             <Footer />

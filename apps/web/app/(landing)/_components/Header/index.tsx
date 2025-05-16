@@ -1,7 +1,9 @@
+import Logo from '@assets/monk-man.svg'
 import ThemeToggle from "@repo/ui/components/ThemeToggle"
 import Image from "next/image"
 import Link from "next/link"
-import Logo from '../../_assets/monk-man.svg'
+import AuthBtn from './AuthBtn'
+import DynamicAuth from "./DynamicAuth"
 
 const links = [
     { original: 'platforms', xianxia: 'REALMS' },
@@ -10,6 +12,7 @@ const links = [
 ]
 
 const Header = () => {
+
     return (
         <header className="bg-white dark:bg-gray-800 rounded-lg shadow-md py-4 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 sticky top-0 z-50">
             <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
@@ -51,12 +54,7 @@ const Header = () => {
                             </div>
 
                             <div className="hidden sm:flex">
-                                <Link
-                                    className="rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 px-7 py-3 text-base font-medium text-white hover:from-purple-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
-                                    href="/login"
-                                >
-                                    CULTIVATE
-                                </Link>
+                               <AuthBtn/>
                             </div>
                         </div>
 
@@ -79,6 +77,9 @@ const Header = () => {
                     </div>
                 </div>
             </div>
+            
+            {/* Auth Modal */}
+            <DynamicAuth />
         </header>
     )
 }

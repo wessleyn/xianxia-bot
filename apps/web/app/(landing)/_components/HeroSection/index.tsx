@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import NovelCarousel from './NovelCarousel';
+import RegAuthBtn from './RegAuthBtn';
 
 const data = {
     title: "Xianxu",
@@ -9,7 +10,7 @@ const data = {
 
 const HeroSection = () => {
     return (
-        <section className="bg-white dark:bg-gray-900">
+        <section>
             <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-16">
                 <div className="container">
                     <div className="flex flex-col lg:flex-row items-center">
@@ -37,12 +38,7 @@ const HeroSection = () => {
                             </div>
 
                             <div className="actions flex items-center space-x-3">
-                                <Link
-                                    href="/signup"
-                                    className="Button brand bg-gradient-to-r from-purple-400 to-indigo-500 hover:from-purple-400 hover:to-indigo-600 text-white px-4 py-2 rounded-full font-medium transition-all text-sm whitespace-nowrap"
-                                >
-                                    Signup
-                                </Link>
+                                <RegAuthBtn />
                                 <Link
                                     href="/download/mobile"
                                     className="Button brand bg-gradient-to-r from-indigo-400 to-blue-500 hover:from-indigo-400 hover:to-blue-600 text-white px-4 py-2 rounded-full font-medium transition-all text-sm whitespace-nowrap"
