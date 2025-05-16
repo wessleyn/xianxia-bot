@@ -16,6 +16,8 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run build:styles && npm run build:components",
+    "ui:build": "npm run build:styles && npm run build:components",
+    "ui:dev": "npm run dev:styles && npm run dev:components",
     "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
     "build:components": "tsc",
     "check-types": "tsc --noEmit",
