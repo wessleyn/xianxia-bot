@@ -97,12 +97,14 @@ export const verifyOtp = async (formData: FormData) => {
 
 export async function signInWithSlack({ redirectTo }: { redirectTo: string }) {
     const supabase = await createClient();
+    console.log('signInWithSlack', redirectTo)
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'slack_oidc',
         options: {
             redirectTo
         }
     })
+    console.log('signInWithSlack', data, error)
 
     return {
         data,

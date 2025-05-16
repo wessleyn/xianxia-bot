@@ -1,0 +1,2 @@
+# Ignore NODE_ENV checks in callback routes
+app/(landing)/auth/callback/route.ts

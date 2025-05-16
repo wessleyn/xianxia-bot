@@ -1,11 +1,29 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "NODE_ENV",
+    "VERCEL_ENV"
+  ],
   "tasks": {
     "build": {
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["^build", "ui:build"]
+      "env": [
+        "NODE_ENV=production",
+        "TURBO_DEFAULT=1"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "dependsOn": [
+        "^build",
+        "ui:build"
+      ]
     },
     "ui:dev": {
       "cache": false,
@@ -17,6 +35,9 @@
     "dev": {
       "cache": false,
       "persistent": true,
+      "env": [
+        "NODE_ENV"
+      ],
       "dependsOn": [
         "ui:dev"
       ]

@@ -1,6 +1,5 @@
 'use client';
 
-import { useToastStore } from '../../hooks/useToastStore';
 import { Toast } from '../Toast';
 
 /**
@@ -8,11 +7,6 @@ import { Toast } from '../Toast';
  * to display the toast notifications
  */
 export const ToastContainer = () => {
-    // Extract the isVisible state to verify that the component is reactive to state changes
-    const isVisible = useToastStore(state => state.isVisible);
-
-    console.log('ToastContainer rendering, isVisible:', isVisible);
-
     return <Toast />;
 };
 
