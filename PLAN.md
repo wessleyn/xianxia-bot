@@ -41,11 +41,6 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
 
 ## 2. Web App Features
 
-- **Landing Page**
-
-  - Project introduction, features, and documentation.
-  - Links to browser extension and mobile app.
-
 - **User Dashboard**
 
   - View and manage reading list/bookmarks.
