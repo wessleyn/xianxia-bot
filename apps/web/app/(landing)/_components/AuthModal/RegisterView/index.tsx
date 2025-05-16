@@ -1,3 +1,5 @@
+import { signUpAction } from '@repo/auth';
+import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
 import OAuth from '../OAuth';
@@ -6,27 +8,48 @@ const RegisterView = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setView, setEmail: storeEmail, setName: storeName } = useAuthModalStore();
+  const {setIsNew, setView, setEmail: storeEmail, setName: storeName } = useAuthModalStore();
+  const toast = useToastStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !email.includes('@') || !name) {
+    if (!email || !email.includes('@')) {
+      toast.error('Invalid email address', 'Please provide a valid email');
+      return;
+    }
+
+    if (!name) {
+      toast.error('Name required', 'Please provide your cultivator name');
       return;
     }
 
     setIsLoading(true);
 
-    // Store values in zustand for later use
-    storeEmail(email);
-    storeName(name);
+    try {
+      // Store values in zustand for later use
+      storeEmail(email);
+      storeName(name);
 
-    // Simulate API call
-    setTimeout(() => {
+      const formData = new FormData
+      formData.append('email', email);
+      formData.append('name', name);
+      const data = await signUpAction(formData)
+
+      if (data.status === 'error') {
+        setIsLoading(false);
+        toast.error('Registration failed', data.message);
+      } else {
+        toast.success('Verification sent', 'Check your email for the verification code');
+        // Move to OTP verification view
+        setIsNew(true);
+        setView('otp');
+      }
+    } catch {
+      // Catch any errors and show a generic message
       setIsLoading(false);
-      // Move to OTP verification view
-      setView('otp');
-    }, 1000);
+      toast.error('Registration failed', 'An unexpected error occurred. Please try again.');
+    }
   };
 
   return (

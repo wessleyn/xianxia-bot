@@ -1,3 +1,5 @@
+import { signInAction } from '@repo/auth';
+import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
 import OAuth from '../OAuth';
@@ -6,25 +8,39 @@ const LoginView = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { setView, setEmail: storeEmail } = useAuthModalStore();
+  const toast = useToastStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !email.includes('@')) {
+      toast.error('Invalid email address', 'Please provide a valid email');
       return;
     }
 
     setIsLoading(true);
 
-    // Store email in zustand for OTP verification
-    storeEmail(email);
+    try {
+      // Store email in zustand for OTP verification
+      storeEmail(email);
+      const formData = new FormData()
+      formData.append('email', email);
 
-    // Simulate API call
-    setTimeout(() => {
+      const data = await signInAction(formData);
+
+      if (data.status === 'error') {
+        setIsLoading(false);
+        toast.error('Login failed', data.message);
+      } else {
+        toast.success('Verification sent', 'Check your email for the verification code');
+        // Move to OTP verification view
+        setView('otp');
+      }
+    } catch {
+      // Catch any errors and show a generic message
       setIsLoading(false);
-      // Move to OTP verification view
-      setView('otp');
-    }, 1000);
+      toast.error('Login failed', 'An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
@@ -63,7 +79,7 @@ const LoginView = () => {
         </div>
       </div>
 
-     <OAuth />
+      <OAuth />
       <div className="text-center text-sm text-gray-500 dark:text-gray-400">
         By continuing, you acknowledge that you have read and understand our
         <a href="#" className="font-semibold text-purple-600 dark:text-purple-400 hover:underline"> Privacy Policy</a>

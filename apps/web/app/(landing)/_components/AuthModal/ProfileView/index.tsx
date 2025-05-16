@@ -1,5 +1,6 @@
 'use client';
 
+import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
 
@@ -8,28 +9,41 @@ const ProfileView = () => {
     const [nameInput, setNameInput] = useState('');
     const [useConcealmentCloak, setUseConcealmentCloak] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const toast = useToastStore();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!nameInput && !useConcealmentCloak) {
+            toast.error('Name required', 'Please provide a name or use the concealment cloak option');
             return;
         }
 
         setIsLoading(true);
 
-        // Simulate API call to update user profile
-        setTimeout(() => {
+        try {
+            // Simulate API call to update user profile
+            // In a real implementation, this would call an API endpoint to update the user profile
+
             // If using concealment cloak, we don't save a name
             // Otherwise, save the provided name
             if (!useConcealmentCloak) {
                 setName(nameInput);
             }
 
+            // Add a small delay to simulate API call
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            toast.success('Profile updated', 'Your cultivation journey awaits!');
+
             // Move to success view
             setView('success');
             setIsLoading(false);
-        }, 1000);
+        } catch (error) {
+            console.log(error)
+            setIsLoading(false);
+            toast.error('Profile update failed', 'An unexpected error occurred. Please try again.');
+        }
     };
 
     return (

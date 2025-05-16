@@ -1,27 +1,72 @@
-import { IconBrandGoogle, IconBrandSlack } from '@tabler/icons-react';
+'use client'
 
+import { signInWithGoogle, signInWithSlack } from '@repo/auth';
+import { useToastStore } from '@repo/ui/hooks/useToastStore';
+import { useAuthModalStore } from '@store/useAuthModalStore';
+import { IconBrandGoogle, IconBrandSlack } from '@tabler/icons-react';
+import { useState } from 'react';
 
 const OAuth = () => {
-  return (
-      <div className="grid grid-cols-2 gap-3">
-          <button
-              type="button"
-              className="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all"
-          >
-              <IconBrandGoogle className="h-5 w-5" />
-              Google
-          </button>
+    const { redirectUrl } = useAuthModalStore();
+    const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+    const [isLoadingSlack, setIsLoadingSlack] = useState(false);
+    const toast = useToastStore();
 
-          <button
-              type="button"
-              className="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all"
-          >
-              <IconBrandSlack className="h-5 w-5" />
-              Slack
-          </button>
-      </div>
+    const handleAuth = async (provider: 'google' | 'slack') => {
+        try {
+            if (provider === 'google') {
+                setIsLoadingGoogle(true);
+                const { error } = await signInWithGoogle({ redirectTo: redirectUrl });
+                if (error) {
+                    setIsLoadingGoogle(false);
+                    toast.error('Google login failed', error.message);
+                }
+                // No need for success toast as redirection will happen automatically
+            } else {
+                setIsLoadingSlack(true);
+                const { error } = await signInWithSlack({ redirectTo: redirectUrl });
+                if (error) {
+                    setIsLoadingSlack(false);
+                    toast.error('Slack login failed', error.message);
+                }
+                // No need for success toast as redirection will happen automatically
+            }
+        } catch {
+            // Generic error handling without referencing the error object
+            toast.error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed`,
+                'An unexpected error occurred. Please try again.');
 
-)
+            if (provider === 'google') {
+                setIsLoadingGoogle(false);
+            } else {
+                setIsLoadingSlack(false);
+            }
+        }
+    };
+
+    return (
+        <div className="grid grid-cols-2 gap-3">
+            <button
+                type="button"
+                onClick={() => handleAuth('google')}
+                disabled={isLoadingGoogle || isLoadingSlack}
+                className={`flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all ${(isLoadingGoogle || isLoadingSlack) ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+                <IconBrandGoogle className="h-5 w-5" />
+                {isLoadingGoogle ? 'Connecting...' : 'Google'}
+            </button>
+
+            <button
+                onClick={() => handleAuth('slack')}
+                type="button"
+                disabled={isLoadingGoogle || isLoadingSlack}
+                className={`flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all ${(isLoadingGoogle || isLoadingSlack) ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+                <IconBrandSlack className="h-5 w-5" />
+                {isLoadingSlack ? 'Connecting...' : 'Slack'}
+            </button>
+        </div>
+    )
 }
 
 export default OAuth

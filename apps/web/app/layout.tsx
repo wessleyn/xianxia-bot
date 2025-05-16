@@ -1,4 +1,5 @@
 import ThemeProvider from "@repo/ui/components/ThemeProvider";
+import ToastContainer from "@repo/ui/components/ToastContainer";
 import "./_styles/globals.css";
 
 export default function RootLayout({
@@ -8,8 +9,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="relative">
         <ThemeProvider>
+          <ToastContainer />
           {children}
         </ThemeProvider>
       </body>
