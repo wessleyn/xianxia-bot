@@ -22,15 +22,12 @@ const ProfileView = () => {
         setIsLoading(true);
 
         try {
-            // Simulate API call to update user profile
-            // In a real implementation, this would call an API endpoint to update the user profile
-
             // If using concealment cloak, we don't save a name
             // Otherwise, save the provided name
             if (!useConcealmentCloak) {
                 setName(nameInput);
             }
-
+// TOFO: implement save feature here
             // Add a small delay to simulate API call
             await new Promise(resolve => setTimeout(resolve, 800));
 
