@@ -16,6 +16,7 @@ interface FeatureProps {
     imageSrcDark?: string;
     animationData?: object;
 }
+// TODO: Fix the lottie gradient to: clip bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-4
 
 const Feature = ({ title, description, imageSrc, imageAlt, imageSrcDark, animationData }: FeatureProps) => {
     return (
@@ -23,7 +24,7 @@ const Feature = ({ title, description, imageSrc, imageAlt, imageSrcDark, animati
             <div className="feature">
                 <div className="box rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all">
                     <h1 className="title text-xl font-bold mb-2">
-                        <span className="clip bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
+                        <span className="clip bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-400">
                             {title}
                         </span>
                     </h1>

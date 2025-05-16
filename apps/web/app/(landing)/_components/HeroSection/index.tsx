@@ -30,7 +30,7 @@ const HeroSection = () => {
                                 <div className="actions flex flex-wrap gap-4">
                                     <Link
                                         href="/download"
-                                        className="Button brand bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-8 py-3 rounded-full font-medium transition-all"
+                                        className="Button brand bg-gradient-to-r from-purple-400 to-indigo-500 hover:from-purple-400 hover:to-indigo-600 text-white px-8 py-3 rounded-full font-medium transition-all"
                                     >
                                         Download
                                     </Link>

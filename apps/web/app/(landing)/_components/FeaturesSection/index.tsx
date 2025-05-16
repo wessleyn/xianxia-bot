@@ -1,8 +1,8 @@
 import documentCloud from '../../../_assets/document-cloud.json';
 import documentDownload from '../../../_assets/document-download.json';
 import documentScan from '../../../_assets/document-scan.json';
+import documentSearch from '../../../_assets/document-search.json';
 import newspaper from '../../../_assets/newspaper.json';
-import sources from '../../../_assets/sources.json';
 import writeList from '../../../_assets/write-list.json';
 import Feature from './Feature';
 
@@ -13,7 +13,7 @@ const features = [
         imageSrc: "/img/feature-sources-light.webp",
         imageSrcDark: "/img/feature-sources-dark.webp",
         imageAlt: "Feature Sources",
-        animationData: sources
+        animationData: documentSearch
     },
     {
         title: "Customizable reader",
@@ -63,7 +63,7 @@ const FeaturesSection = () => {
             <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                 <div className="FeatureTitle text-center mb-16">
                     <div className="container">
-                        <p className="title text-xl font-medium text-purple-600 dark:text-purple-400 mb-2">What Xianxu can do?</p>
+                        <p className="title text-xl font-medium clip bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-400 mb-2">What Xianxu can do?</p>
                         <h1 className="subtitle text-3xl font-bold text-gray-900 dark:text-white">And here&apos;s what it does!</h1>
                     </div>
                 </div>

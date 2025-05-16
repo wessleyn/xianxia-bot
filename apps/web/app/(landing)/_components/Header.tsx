@@ -15,7 +15,7 @@ const Header = () => {
             <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-20 items-center justify-between">
                     <div className="md:flex md:items-center md:gap-12">
-                        <Link className="text-purple-600 dark:text-purple-400 flex items-center" href="#">
+                        <Link className="clip bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-4 flex items-center" href="#">
                             <span className="sr-only">Sanctuary</span>
                             <Image src={Logo} alt="logo" className="w-12 h-12" />
                             <div className="flex items-center ml-2">
