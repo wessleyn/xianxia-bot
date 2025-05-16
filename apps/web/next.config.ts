@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "www.novelupdates.com",
+        hostname: "api.qrserver.com",
         port: "",
         pathname: "/**",
       },

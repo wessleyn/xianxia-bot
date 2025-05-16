@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 const Footer = () => {
@@ -22,8 +23,15 @@ const Footer = () => {
                     </nav>
 
                     <div className="qrcode flex flex-col items-center">
-                        <div className="h-32 w-32 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center mb-2">
-                            QR Code Placeholder
+                        <div className="h-32 w-32 rounded-md mb-2 relative overflow-hidden">
+                            <Image
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://discord.gg/xianxu"
+                                alt="QR Code to Discord Community"
+                                fill
+                                className="object-cover"
+                                sizes="128px"
+                                priority
+                            />
                         </div>
                         <h4 className="qrcode__title font-medium text-gray-900 dark:text-white">Discord Community</h4>
                         <p className="qrcode__description text-sm text-gray-600 dark:text-gray-400">Join our community</p>

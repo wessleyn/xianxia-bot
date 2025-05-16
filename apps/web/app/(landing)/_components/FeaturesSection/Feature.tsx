@@ -1,4 +1,12 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
+
+// Dynamically import Lottie without SSR to avoid 'document is not defined' error
+const Lottie = dynamic(() => import('lottie-react'), {
+    ssr: false
+});
 
 interface FeatureProps {
     title: string;
@@ -6,9 +14,10 @@ interface FeatureProps {
     imageSrc: string;
     imageAlt: string;
     imageSrcDark?: string;
+    animationData?: object;
 }
 
-const Feature = ({ title, description, imageSrc, imageAlt, imageSrcDark }: FeatureProps) => {
+const Feature = ({ title, description, imageSrc, imageAlt, imageSrcDark, animationData }: FeatureProps) => {
     return (
         <div className="grid-6 item">
             <div className="feature">
@@ -22,7 +31,16 @@ const Feature = ({ title, description, imageSrc, imageAlt, imageSrcDark }: Featu
                         <p className="text-gray-600 dark:text-gray-300">{description}</p>
                     </div>
                     <div className="image mt-4">
-                        {imageSrcDark ? (
+                        {animationData ? (
+                            <div className="h-[200px] w-full">
+                                <Lottie
+                                    animationData={animationData}
+                                    loop={true}
+                                    autoplay={true}
+                                    className="w-full h-full"
+                                />
+                            </div>
+                        ) : imageSrcDark ? (
                             <>
                                 <Image
                                     src={imageSrc}

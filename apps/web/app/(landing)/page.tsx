@@ -1,9 +1,11 @@
-import MainSection from "./_components/MainSection";
+import FeaturesSection from "./_components/FeaturesSection";
+import HeroSection from "./_components/HeroSection";
 
 export default function HomePage() {
     return (
-        <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#0f172a] to-[#1e293b]">
-            <MainSection />
+        <div className="flex min-h-screen flex-col">
+            <HeroSection />
+            <FeaturesSection />
         </div>
     );
 }

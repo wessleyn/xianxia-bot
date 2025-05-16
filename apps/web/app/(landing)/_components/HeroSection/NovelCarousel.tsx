@@ -47,11 +47,11 @@ const NovelCarousel = () => {
     };
 
     return (
-        <div className="relative w-full max-w-[400px]aspect-[2/3] max-h-[500px]  mx-auto">
+        <div className="relative w-full max-w-[400px] mx-auto">
             <div className="overflow-hidden rounded-lg shadow-xl bg-white dark:bg-gray-800">
                 <div className="relative">
                     {/* Carousel content */}
-                    <div className="relative aspect-[2/3] max-h-[500px]">
+                    <div className="relative aspect-[3/3] max-h-[500px]">
                         {novels[currentIndex] && (
                             <>
                                 <Image
