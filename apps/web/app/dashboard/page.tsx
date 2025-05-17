@@ -2,19 +2,13 @@ import { getCurrentUser } from "@repo/auth/utils";
 
 export default async function Dashboard() {
     const user = await getCurrentUser();
+    const signedInAt = new Date(user.last_sign_in_at!);
     return (
-        <div>
-            <h1>Dashboard</h1>
-            <p>Welcome, {user.email}!</p>
-            <p>Your user ID is: {user.id}</p>
-            <p>Your user metadata is: {JSON.stringify(user.user_metadata)}</p>
-            <p>Your user app metadata is: {JSON.stringify(user.app_metadata)}</p>
-            <p>Your user created at: {user.created_at}</p>
-            <p>Your user updated at: {user.updated_at}</p>
-            <p>Your user email confirmed at: {user.email_confirmed_at}</p>
-            <p>Your user phone number: {user.phone}</p>
-            <p>Your user phone number confirmed at: {user.phone_confirmed_at}</p>
-            <p>Your user last sign in at: {user.last_sign_in_at}</p>
+        <div className="w-full h-full flex flex-col gap-2 justify-center items-center antialiased text-2xl">
+            <h1>Welcome, {user.email?.split("@")[0]}! </h1>
+            <h2>Your have been added to the waiting list</h2>
+            <h3> We&apos;ll notify you via your email: <span>{user.email}</span></h3>
+            <h4>You last check in at: {signedInAt.toLocaleString()}</h4>
         </div>
     )
 }
