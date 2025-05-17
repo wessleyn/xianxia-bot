@@ -2,6 +2,7 @@
 
 import { prisma } from ".."
 
+console.log(process.env)
 export async function createProfile(userId: string, name: string, isAnon?: boolean) { 
     const profile = await prisma.profiles.create({
         data: {
