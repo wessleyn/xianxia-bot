@@ -1,11 +1,12 @@
 'use client';
 
+import { createProfile } from '@repo/db/queries';
 import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
 
 const ProfileView = () => {
-    const { setView, setName } = useAuthModalStore();
+    const { setView, setName, userId } = useAuthModalStore();
     const [nameInput, setNameInput] = useState('');
     const [useConcealmentCloak, setUseConcealmentCloak] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -22,14 +23,17 @@ const ProfileView = () => {
         setIsLoading(true);
 
         try {
-            // If using concealment cloak, we don't save a name
-            // Otherwise, save the provided name
-            if (!useConcealmentCloak) {
-                setName(nameInput);
+            if (!userId) {
+                toast.error('Authentication error', 'User ID not found. Please try signing in again.');
+                return;
             }
-// TOFO: implement save feature here
-            // Add a small delay to simulate API call
-            await new Promise(resolve => setTimeout(resolve, 800));
+
+            if (!useConcealmentCloak) {
+                await createProfile(userId, nameInput);
+                setName(nameInput);
+            } else {
+                await createProfile(userId, '', true);
+            }
 
             toast.success('Profile updated', 'Your cultivation journey awaits!');
 

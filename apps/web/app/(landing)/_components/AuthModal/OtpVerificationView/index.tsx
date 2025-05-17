@@ -4,7 +4,7 @@ import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useEffect, useRef, useState } from 'react';
 
 const OtpVerificationView = () => {
-  const { email, setView, setIsNew } = useAuthModalStore();
+  const { email, setView, isNew, setUserId } = useAuthModalStore();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -56,25 +56,27 @@ const OtpVerificationView = () => {
         toast.error('Verification failed', data.message);
       } else {
         // Check if this is a new user or returning user
-        const isNewUser = data.data?.user?.user_metadata?.is_new_user || false;
         setIsLoading(false);
 
-        if (isNewUser) {
+        // Store the user ID from the verification response
+        if (data.data && data.data.user) {
+          setUserId(data.data.user.id);
+        }
+
+        if (isNew) {
           // If new user, mark as new and navigate to profile completion
           toast.success('Verification successful', 'Complete your profile to continue');
-          setIsNew(true);
           setView('profile');
         } else {
           // If existing user, go straight to success page
           toast.success('Welcome back', 'Authentication successful');
-          setIsNew(false);
           setView('success');
         }
       }
     } catch (error) {
       setIsLoading(false);
       console.log(error)
-      toast.error('Verification failed',  'An unexpected error occurred. Please try again.');
+      toast.error('Verification failed', 'An unexpected error occurred. Please try again.');
     }
   };
 

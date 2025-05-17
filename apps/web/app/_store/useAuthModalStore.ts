@@ -8,6 +8,7 @@ interface AuthModalStore {
   email: string;
   name: string;
   isNew: boolean;
+  userId: string;
   redirectUrl: string;
   canClose: boolean;
   openModal: (view?: AuthModalView) => void;
@@ -16,6 +17,7 @@ interface AuthModalStore {
   setEmail: (email: string) => void;
   setName: (name: string) => void;
   setIsNew: (isNew: boolean) => void;
+  setUserId: (userId: string) => void;
   setRedirectUrl: (url: string) => void;
   setCanClose: (canClose: boolean) => void;
 }
@@ -26,6 +28,7 @@ export const useAuthModalStore = create<AuthModalStore>((set) => ({
   email: '',
   name: '',
   isNew: false,
+  userId: '',
   redirectUrl: '/dashboard',
   canClose: true,
   openModal: (view = 'login') => set({ isOpen: true, view }),
@@ -37,7 +40,8 @@ export const useAuthModalStore = create<AuthModalStore>((set) => ({
         view: 'login',
         email: '',
         name: '',
-        isNew: false
+        isNew: false,
+        userId: ''
       };
     }
     return state;
@@ -46,6 +50,7 @@ export const useAuthModalStore = create<AuthModalStore>((set) => ({
   setEmail: (email) => set({ email }),
   setName: (name) => set({ name }),
   setIsNew: (isNew) => set({ isNew }),
+  setUserId: (userId) => set({ userId }),
   setRedirectUrl: (url) => set({ redirectUrl: url }),
   setCanClose: (canClose) => set({ canClose }),
 }));
