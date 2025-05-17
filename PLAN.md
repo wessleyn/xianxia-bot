@@ -111,28 +111,9 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
   - Use cloud database (e.g., Firebase, Supabase) for syncing user data.
   - Local storage for offline support in extension and mobile.
 
-- **Authentication**
-
-  - OAuth (Google, GitHub) or email/password for user accounts.
 
 - **Accessibility**
   - Ensure all platforms are accessible (screen reader support, color contrast, etc.).
-
----
-
-## 5. Next Steps
-
-1. **Define MVP Scope**
-   - Prioritize features for first release (e.g., reading list, bookmarks, basic stats, sync).
-2. **Design UI/UX**
-   - Create wireframes for extension, web, and mobile.
-3. **Set Up Monorepo**
-   - Scaffold projects for extension, web app, and mobile app.
-   - Create shared package for UI/components.
-4. **Implement Core Features**
-   - Start with reading list and sync across platforms.
-5. **Test & Iterate**
-   - Gather feedback and refine features.
 
 ---
 
