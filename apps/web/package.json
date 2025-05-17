@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@repo/auth": "*",
+    "@prisma/nextjs-monorepo-workaround-plugin": "6.6.0",
     "@repo/db": "^0.0.0",
     "@repo/ui": "*",
     "next": "^15.3.0",
