@@ -22,6 +22,9 @@ const ProfileView = dynamic(() => import('./ProfileView'), {
 const SuccessView = dynamic(() => import('./SuccessView'), {
   loading: () => <LoadingState message="Preparing your realm..." />
 });
+const AuthenticatingView = dynamic(() => import('./AuthenticatingView'), {
+  loading: () => <LoadingState message="Establishing connection to the heavenly dao..." />
+});
 
 const AuthModal = () => {
   const { isOpen, closeModal, view, canClose } = useAuthModalStore();
@@ -87,6 +90,7 @@ const AuthModal = () => {
                   {view === 'otp' && 'Transcend the Heavenly Tribulation'}
                   {view === 'profile' && 'Establish Your Identity'}
                   {view === 'success' && 'Cultivation Breakthrough Achieved'}
+                  {view === 'authenticating' && 'Communion with the Dao'}
                 </DialogTitle>
 
                 {view === 'login' && <LoginView />}
@@ -94,6 +98,7 @@ const AuthModal = () => {
                 {view === 'otp' && <OtpVerificationView />}
                 {view === 'profile' && <ProfileView />}
                 {view === 'success' && <SuccessView />}
+                {view === 'authenticating' && <AuthenticatingView />}
               </DialogPanel>
             </TransitionChild>
           </div>

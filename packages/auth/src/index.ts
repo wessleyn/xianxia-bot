@@ -75,13 +75,13 @@ export const verifyOtp = async (formData: FormData) => {
     const token = formData.get("otp") as string;
 
     const supabase = await createClient();
-    
+
     const { data, error, } = await supabase.auth.verifyOtp({
         type: 'email',
         email,
         token,
     })
-    
+
     if (error) {
         return {
             status: "error",
@@ -95,32 +95,41 @@ export const verifyOtp = async (formData: FormData) => {
     };
 };
 
-export async function signInWithSlack({ redirectTo }: { redirectTo: string }) {
+export async function signInWithSlack() {
     const supabase = await createClient();
-    console.log('signInWithSlack', redirectTo)
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'slack_oidc',
-        options: {
-            redirectTo
-        }
-    })
-    console.log('signInWithSlack', data, error)
+    });
 
-    return {
-        data,
-        error
+    if (error) {
+        return {
+            data,
+            error
+        }
+    } else {
+        redirect(data.url)
     }
-  }
-export async function signInWithGoogle({ redirectTo }: { redirectTo: string}) {
+}
+
+export async function signInWithGoogle() {
     const supabase = await createClient();
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-            redirectTo,
-        },
-      })
-    return {
-        data,
-        error
+    });
+    if (error) {
+        return {
+            data,
+            error
+        }
+    } else {
+        redirect(data.url)
     }
-  }
+}
+
+export async function authenticateCode(code: string) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    return error
+}

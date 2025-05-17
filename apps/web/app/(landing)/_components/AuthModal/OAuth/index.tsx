@@ -2,44 +2,28 @@
 
 import { signInWithGoogle, signInWithSlack } from '@repo/auth';
 import { useToastStore } from '@repo/ui/hooks/useToastStore';
-import { useAuthModalStore } from '@store/useAuthModalStore';
 import { IconBrandGoogle, IconBrandSlack } from '@tabler/icons-react';
 import { useState } from 'react';
 
 const OAuth = () => {
-    const { redirectUrl } = useAuthModalStore();
     const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
     const [isLoadingSlack, setIsLoadingSlack] = useState(false);
     const toast = useToastStore();
 
     const handleAuth = async (provider: 'google' | 'slack') => {
-        try {
-            if (provider === 'google') {
-                setIsLoadingGoogle(true);
-                const { error } = await signInWithGoogle({ redirectTo: redirectUrl });
-                if (error) {
-                    setIsLoadingGoogle(false);
-                    toast.error('Google login failed', error.message);
-                }
-                // No need for success toast as redirection will happen automatically
-            } else {
-                setIsLoadingSlack(true);
-                const { error } = await signInWithSlack({ redirectTo: redirectUrl });
-                if (error) {
-                    setIsLoadingSlack(false);
-                    toast.error('Slack login failed', error.message);
-                }
-                // No need for success toast as redirection will happen automatically
-            }
-        } catch {
-            // Generic error handling without referencing the error object
-            toast.error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed`,
-                'An unexpected error occurred. Please try again.');
-
-            if (provider === 'google') {
+        if (provider === 'google') {
+            setIsLoadingGoogle(true);
+            const { error } = await signInWithGoogle();
+            if (error) {
                 setIsLoadingGoogle(false);
-            } else {
+                toast.error('Google login failed', error.message);
+            }
+        } else {
+            setIsLoadingSlack(true);
+            const { error } = await signInWithSlack();
+            if (error) {
                 setIsLoadingSlack(false);
+                toast.error('Slack login failed', error.message);
             }
         }
     };

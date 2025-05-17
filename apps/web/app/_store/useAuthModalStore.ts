@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type AuthModalView = 'login' | 'register' | 'otp' | 'profile' | 'success';
+type AuthModalView = 'login' | 'register' | 'otp' | 'profile' | 'success' | 'authenticating';
 
 interface AuthModalStore {
   isOpen: boolean;
