@@ -4,4 +4,9 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   srcDir: 'src',
+  alias: {
+    '@': '/src',
+    '@assets': '/src/assets',
+    '@components': '/src/components',
+  }
 });

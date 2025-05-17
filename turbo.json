@@ -39,7 +39,7 @@
         "NODE_ENV"
       ],
       "dependsOn": [
-        "ui:dev"
+        "^ui:build"
       ]
     },
     "start": {
