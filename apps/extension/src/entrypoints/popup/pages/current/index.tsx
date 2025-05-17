@@ -49,8 +49,13 @@ const Current: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex-1">
-                        <h3 className="font-bold text-indigo-800 leading-tight line-clamp-1">{book.title}</h3>
+                    <div className="flex-1 relative">
+                        <div className="flex justify-between items-start">
+                            <h3 className="font-bold text-indigo-800 leading-tight line-clamp-1 pr-16">{book.title}</h3>
+                            <span className="absolute top-0 right-0 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">
+                                {book.lastReadDate}
+                            </span>
+                        </div>
                         <p className="text-gray-500 text-xs">{book.author}</p>
 
                         <div className="mt-1.5">
@@ -66,11 +71,23 @@ const Current: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="mt-2 flex justify-between items-center">
-                            <span className="text-xs text-gray-500">Last read {book.lastReadDate}</span>
-                            <button className="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs py-1 px-3 rounded transition-colors">
-                                Continue
-                            </button>
+                        <div className="mt-2 flex justify-end items-center">
+                            <div className="flex items-center gap-1.5">
+                                <button
+                                    className="text-gray-400 hover:text-indigo-600"
+                                    title="Download for offline reading"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-download" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                                        <path d="M7 11l5 5l5 -5"></path>
+                                        <path d="M12 4l0 12"></path>
+                                    </svg>
+                                </button>
+                                <button className="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs py-1 px-3 rounded transition-colors">
+                                    Continue
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
