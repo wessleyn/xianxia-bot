@@ -14,6 +14,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+#root{
+  @apply pt-0 mt-0;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -65,5 +69,57 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #54bc4ae0);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+@layer components {
+  .logo {
+    @apply h-[6rem] p-6 transition-all duration-300;
+  }
+
+  .logo:hover {
+    @apply filter drop-shadow-[0_0_0.5em_#54bc4ae0];
+  }
+
+  .logo.react:hover {
+    @apply filter drop-shadow-[0_0_0.5em_#61dafbaa];
   }
 }
