@@ -30,7 +30,7 @@
       "persistent": true
     },
     "ui:build": {
-      "cache": false
+      "cache": true
     },
     "dev": {
       "cache": false,
