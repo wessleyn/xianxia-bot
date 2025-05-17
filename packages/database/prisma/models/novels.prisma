@@ -1,0 +1,5 @@
+model Novel {
+  id String @id @default(cuid())
+
+  @@schema("public")
+}

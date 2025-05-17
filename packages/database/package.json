@@ -1,0 +1,37 @@
+{
+  "name": "@repo/db",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/index.ts",
+    "./generated/prisma": "./generated/prisma/index.js"
+  },
+  "prisma": {
+    "schema": "./prisma",
+    "seed": "tsx ./prisma/seed/seed.ts"
+  },
+  "scripts": {
+    "query": "tsx ./prisma/queries/index.ts",
+    "db:dev": "prisma dev",
+    "db:generate": "prisma generate",
+    "db:generate:prod": "prisma generate --no-engine",
+    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:deploy": "prisma migrate deploy",
+    "db:prebuild": "npm run db:generate:prod",
+    "db:predev": "npm run db:generate",
+    "db:studio": "prisma studio",
+    "db:push": "prisma db push",
+    "db:forcePush": "prisma db push  --accept-data-loss",
+    "db:seed": "npm run db:generate && npx prisma db seed",
+    "db:reset": "prisma migrate reset --force",
+    "postinstall": "prisma generate --no-engine"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "prisma": "^6.8.1",
+    "tsx": "^4.19.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.8.1"
+  }
+}
