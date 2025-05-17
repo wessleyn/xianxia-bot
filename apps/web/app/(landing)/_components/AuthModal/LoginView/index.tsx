@@ -7,7 +7,7 @@ import OAuth from '../OAuth';
 const LoginView = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setView, setEmail: storeEmail } = useAuthModalStore();
+  const { setView, setEmail: storeEmail, setIsNew } = useAuthModalStore();
   const toast = useToastStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,6 +34,9 @@ const LoginView = () => {
       } else {
         toast.success('Verification sent', 'Check your email for the verification code');
         // Move to OTP verification view
+        if (data.isNew) {
+          setIsNew(true)
+        }
         setView('otp');
       }
     } catch {
