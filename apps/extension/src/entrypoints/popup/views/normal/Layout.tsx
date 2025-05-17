@@ -1,9 +1,15 @@
 import { Logo } from '@components/Logo';
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, ReactNode, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
-const Layout: React.FC = () => {
+interface LayoutProps {
+  children?: ReactNode;
+  isNovelSite?: boolean;
+  novelTitle?: string;
+}
+
+const Layout: React.FC<LayoutProps> = ({ isNovelSite = false, novelTitle }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
 

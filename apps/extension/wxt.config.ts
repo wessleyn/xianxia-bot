@@ -10,6 +10,9 @@ export default defineConfig({
     action: {
       default_title: 'Xianxu',
     },
+    permissions: [
+      'storage'
+    ]
   },
   alias: {
     '@': '/src',
