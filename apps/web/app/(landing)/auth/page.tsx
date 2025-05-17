@@ -1,17 +1,18 @@
 import AutoAuth from "./_components/AutoAuth";
 
-export default function AuthPage({
+export default async function AuthPage({
     searchParams,
 }: {
-    searchParams: { [key: string]: string | string[] | undefined };
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     // Extract parameters from the URL
-    const callback = typeof searchParams.callback === 'string'
-        ? searchParams.callback
+    const params = await searchParams;
+    const callback = typeof params.callback === 'string'
+        ? params.callback
         : undefined;
 
-    const mode = typeof searchParams.mode === 'string'
-        ? searchParams.mode as 'login' | 'register'
+    const mode = typeof params.mode === 'string'
+        ? params.mode as 'login' | 'register'
         : 'login';
 
     return (
