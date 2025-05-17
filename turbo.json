@@ -30,6 +30,7 @@
       ],
       "dependsOn": [
         "^build",
+        "^db:generate",
         "ui:build"
       ]
     },
@@ -55,8 +56,19 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
       "dependsOn": [
+        "^db:generate",
         "ui:dev"
       ]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false,
+      "persistent": true
+    },
+    "db:deploy": {
+      "cache": false
     },
     "start": {
       "dependsOn": [
