@@ -8,6 +8,7 @@
     "dist"
   ],
   "exports": {
+    ".": "./dist/index.js",
     "./components/*": "./dist/components/*/index.js",
     "./hooks/*": "./dist/hooks/*/index.js",
     "./styles.css": "./dist/index.css"

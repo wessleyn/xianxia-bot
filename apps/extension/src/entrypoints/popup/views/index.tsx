@@ -1,10 +1,10 @@
 import React from 'react';
-import { useViewContext } from './context/ViewContext';
-import { ViewType } from './utils/pageDetection';
-import ChapterRouter from './views/chapter/ChapterRouter';
-import NormalRouter from './views/normal/NormalRouter';
-import NovelRouter from './views/novel/NovelRouter';
-import ToCRouter from './views/toc/ToCRouter';
+import { useViewContext } from '../context/ViewContext';
+import { ViewType } from '../utils/pageDetection';
+import ChapterRouter from './chapter/ChapterRouter';
+import NormalRouter from './normal/NormalRouter';
+import NovelRouter from './novel/NovelRouter';
+import ToCRouter from './toc/ToCRouter';
 
 /**
  * ViewRouter selects the appropriate router based on the current view type
@@ -17,7 +17,6 @@ const ViewRouter: React.FC = () => {
     console.log('ViewRouter: Current view type:', viewType);
     console.log('ViewRouter: Tab info:', tabInfo);
 
-    // Select the appropriate router based on the view type
     switch (viewType) {
         case ViewType.CHAPTER:
             return <ChapterRouter />;
