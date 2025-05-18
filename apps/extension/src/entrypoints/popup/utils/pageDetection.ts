@@ -41,29 +41,6 @@ export const useCurrentTabInfo = (): [TabInfo | null, () => void] => {
   const [tabInfo, setTabInfo] = useState<TabInfo | null>(null);
 
   const refreshTabInfo = () => {
-    // For demo/development purposes, check if we have a debug URL in localStorage
-    const debugView = localStorage.getItem('xianxu_debug_view');
-
-    if (debugView && process.env.NODE_ENV === 'development') {
-      let url = '';
-
-      switch (debugView) {
-        case 'chapter':
-          url = 'https://www.webnovel.com/novel/against-the-gods/chapter-123';
-          break;
-        case 'toc':
-          url = 'https://www.webnovel.com/novel/against-the-gods/table-of-contents';
-          break;
-        case 'novel':
-          url = 'https://www.webnovel.com/novel/against-the-gods';
-          break;
-        default:
-          url = 'https://www.example.com';
-      }
-
-      setTabInfo(detectPageType(url));
-      return;
-    }
 
     // Get page info from browser storage that was set by the background script
     // This will work when the extension is actually installed in the browser
@@ -84,8 +61,6 @@ export const useCurrentTabInfo = (): [TabInfo | null, () => void] => {
           }
         }).catch(error => {
           console.error("Error accessing browser storage:", error);
-          // Fallback to mock data for testing
-          fallbackToMockData();
         });
       }
       // Try to use the chrome API (Chrome-style callback-based)
@@ -102,8 +77,7 @@ export const useCurrentTabInfo = (): [TabInfo | null, () => void] => {
               isNovelToc: result.currentPageInfo.isNovelToc
             });
           } else {
-            fallbackToMockData();
-          }
+console.log('No currentPageInfo found in storage');      }
         });
       }
       // If no extension API is available, use fallback data

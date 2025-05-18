@@ -6,7 +6,6 @@ interface ViewContextType {
   tabInfo: TabInfo | null;
   viewType: ViewType;
   refreshTabInfo: () => void;
-  setDebugView: (view: 'normal' | 'chapter' | 'toc' | 'novel') => void;
 }
 
 // Create the context
@@ -55,14 +54,8 @@ export const ViewProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return undefined;
   }, []);
 
-  // Helper function to set debug view
-  const setDebugView = (view: 'normal' | 'chapter' | 'toc' | 'novel') => {
-    localStorage.setItem('xianxu_debug_view', view);
-    refreshTabInfo();
-  };
-
   return (
-    <ViewContext.Provider value={{ tabInfo, viewType, refreshTabInfo, setDebugView }}>
+    <ViewContext.Provider value={{ tabInfo, viewType, refreshTabInfo }}>
       {children}
     </ViewContext.Provider>
   );
