@@ -37,11 +37,11 @@ const Current: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-gray-800 pb-2 border-b border-gray-200">Current Readings</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 pb-2 border-b border-gray-200 dark:border-gray-700">Current Readings</h2>
 
             {currentReadings.map((book) => (
-                <div key={book.id} className="bg-white rounded-lg shadow-sm p-3 border border-gray-100 flex gap-3">
-                    <div className="w-14 h-20 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                <div key={book.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 border border-gray-100 dark:border-gray-700 flex gap-3">
+                    <div className="w-14 h-20 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex-shrink-0">
                         <img
                             src={book.coverUrl}
                             alt={`${book.title} cover`}
@@ -51,21 +51,21 @@ const Current: React.FC = () => {
 
                     <div className="flex-1 relative">
                         <div className="flex justify-between items-start">
-                            <h3 className="font-bold text-indigo-800 leading-tight line-clamp-1 pr-16">{book.title}</h3>
-                            <span className="absolute top-0 right-0 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">
+                            <h3 className="font-bold text-gray-800 dark:text-gray-100 leading-tight line-clamp-1 pr-16">{book.title}</h3>
+                            <span className="absolute top-0 right-0 text-xs bg-indigo-100 dark:bg-indigo-900/50 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full">
                                 {book.lastReadDate}
                             </span>
                         </div>
-                        <p className="text-gray-500 text-xs">{book.author}</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">{book.author}</p>
 
                         <div className="mt-1.5">
-                            <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                                 <span>Chapter {book.currentChapter}/{book.totalChapters}</span>
                                 <span>{book.progress}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                                 <div
-                                    className="bg-indigo-600 h-1.5 rounded-full"
+                                    className="bg-indigo-600 dark:bg-indigo-500 h-1.5 rounded-full"
                                     style={{ width: `${book.progress}%` }}
                                 ></div>
                             </div>
@@ -74,7 +74,7 @@ const Current: React.FC = () => {
                         <div className="mt-2 flex justify-end items-center">
                             <div className="flex items-center gap-1.5">
                                 <button
-                                    className="text-gray-400 hover:text-indigo-600"
+                                    className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400"
                                     title="Download for offline reading"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-download" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -84,7 +84,7 @@ const Current: React.FC = () => {
                                         <path d="M12 4l0 12"></path>
                                     </svg>
                                 </button>
-                                <button className="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs py-1 px-3 rounded transition-colors">
+                                <button className="bg-indigo-100 dark:bg-indigo-900/30 hover:bg-indigo-200 dark:hover:bg-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-xs py-1 px-3 rounded transition-colors">
                                     Continue
                                 </button>
                             </div>
@@ -94,7 +94,7 @@ const Current: React.FC = () => {
             ))}
 
             <div className="text-center mt-2">
-                <button className="bg-white hover:bg-gray-100 text-indigo-600 border border-gray-200 rounded-md px-4 py-2 text-sm transition-colors w-full">
+                <button className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md px-4 py-2 text-sm transition-colors w-full">
                     Browse Library
                 </button>
             </div>

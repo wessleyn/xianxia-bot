@@ -1,7 +1,6 @@
 import { Logo } from '@components/Logo';
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
-import { ThemeToggle } from '@repo/ui';
 import { useTheme } from 'next-themes';
 import React, { Fragment, ReactNode, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
