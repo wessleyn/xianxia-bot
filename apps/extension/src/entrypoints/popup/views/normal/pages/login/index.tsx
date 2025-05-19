@@ -63,9 +63,13 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSlackLogin = () => {
-    toast.error('Slack login is not implemented yet.');
-  };
+  const handleSlackLogin = async() => {
+    try {
+      setIsSlackLoading(true);
+      await useAuthStore.getState().loginWithSlack();
+    } finally {
+      setIsSlackLoading(false);
+    }  };
 
   // Handler for when OTP verification is successful
   const handleOtpVerifySuccess = () => {

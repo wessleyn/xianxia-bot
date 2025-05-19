@@ -1,9 +1,13 @@
 import createSupabaseClient from '@repo/auth/client';
 import { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import { browser } from 'wxt/browser';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const supabase = createSupabaseClient({})
+const supabase = createSupabaseClient({});
+
+const WEB_APP_URL = import.meta.env.WXT_NEXT_PUBLIC;
+
 interface AuthState {
     isLoggedIn: boolean;
     user: User | null;
@@ -12,9 +16,11 @@ interface AuthState {
     login: (email: string) => Promise<{ error: any | null; data: any | null }>;
     verifyOtp: (email: string, token: string) => Promise<{ error: any | null; data: any | null }>;
     loginWithGoogle: () => Promise<void>;
+    loginWithSlack: () => Promise<void>;
     logout: () => Promise<void>;
     checkSession: () => Promise<Session | null>;
     getUser: () => Promise<User | null>;
+    syncCookieSession: () => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -41,7 +47,6 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
-            // Verify OTP token
             verifyOtp: async (email: string, token: string) => {
                 try {
                     const { data, error } = await supabase.auth.verifyOtp({
@@ -66,12 +71,26 @@ export const useAuthStore = create<AuthState>()(
 
             // OAuth with Google
             loginWithGoogle: async () => {
-                await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: window.location.origin,
-                    },
-                });
+                try {
+                    await browser.tabs.create({
+                        url: `${WEB_APP_URL}/login?ext=true&provider=google`,
+                        active: true
+                    });
+                } catch (error) {
+                    console.error('Failed to open Google auth tab:', error);
+                }
+            },
+            
+            // OAuth with Slack
+            loginWithSlack: async () => {
+                try {
+                    await browser.tabs.create({
+                        url: `${WEB_APP_URL}/login?ext=true&provider=slack`,
+                        active: true
+                    });
+                } catch (error) {
+                    console.error('Failed to open Slack auth tab:', error);
+                }
             },
 
             // Sign out
@@ -100,15 +119,36 @@ export const useAuthStore = create<AuthState>()(
                     set({ user });
                 }
                 return user;
+            },
+            
+            // Sync session with cookie (for web extension integration)
+            syncCookieSession: async () => {
+                try {
+                    // Get session directly from Supabase which will use cookies
+                    const { data: { session } } = await supabase.auth.getSession();
+                    
+                    if (session) {
+                        set({
+                            isLoggedIn: true,
+                            user: session.user,
+                            session
+                        });
+                        console.log('Synced session from cookies');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error syncing session:', error);
+                }
+                return false;
             }
         }),
         {
             name: 'auth-storage',
-            partialize: (state) => ({
+            partialize: (state: AuthState) => ({
                 isLoggedIn: state.isLoggedIn,
                 user: state.user,
                 session: state.session
-            }),
+            })
         }
     )
 );

@@ -9,11 +9,11 @@ interface AutoAuthProps {
 }
 
 const AutoAuth = ({ mode = 'login', callback }: AutoAuthProps) => {
-  const { openModal, closeModal, setRedirectUrl, setCanClose } = useAuthModalStore()
-
+  const { openModal, closeModal, setRedirectUrl, setCanClose, isFromExtension } = useAuthModalStore()
+ console.log('In auth, isFromExtension:', isFromExtension)
   useEffect(() => {
-    // Set the redirect URL if provided
-    if (callback) {
+
+    if (!isFromExtension && callback) {
       setRedirectUrl(callback);
     }
 
@@ -21,7 +21,7 @@ const AutoAuth = ({ mode = 'login', callback }: AutoAuthProps) => {
     setCanClose(false);
 
     // Open modal with the specified mode
-    openModal(mode);
+    openModal(isFromExtension ? 'extension' : mode);
 
     // When component unmounts, allow modal closing again
     return () => {
@@ -29,7 +29,7 @@ const AutoAuth = ({ mode = 'login', callback }: AutoAuthProps) => {
       closeModal();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, callback])
+  }, [mode, callback, isFromExtension])
 
   return null;
 }

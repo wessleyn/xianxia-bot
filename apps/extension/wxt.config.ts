@@ -12,7 +12,15 @@ export default defineConfig({
     },
     permissions: [
       'storage',
-      'sessions'
+      'sessions',
+      'cookies',
+      'tabs',
+      'scripting'
+    ],
+    host_permissions: [
+      '*://*.wessleyn.me/*',
+      '*://*.google.com/*',
+      'http://localhost/*'
     ]
   },
   alias: {

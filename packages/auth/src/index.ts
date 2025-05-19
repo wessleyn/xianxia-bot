@@ -1,6 +1,7 @@
 'use server'
 
 import { createProfile } from "@repo/db/queries";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "./server";
 
@@ -113,11 +114,14 @@ export const verifyOtp = async (formData: FormData) => {
     };
 };
 
-export async function signInWithSlack() {
+export async function signInWithSlack(isExtension = false ) {
     const supabase = await createClient();
-
+    const origin = (await headers()).get("origin");
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'slack_oidc',
+        options: {
+            redirectTo: `${origin}/login${isExtension ? '?ext=true' : ''}`,
+        },
     });
 
     if (error) {
@@ -126,15 +130,20 @@ export async function signInWithSlack() {
             error
         }
     } else {
+
         redirect(data.url)
     }
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(isExtension = false) {
     const supabase = await createClient();
+    const origin = (await headers()).get("origin");
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+            redirectTo: `${origin}/login${isExtension ? '?ext=true' : ''}`,
+        },
     });
     if (error) {
         return {
@@ -142,6 +151,7 @@ export async function signInWithGoogle() {
             error
         }
     } else {
+        console.log(data.url)
         redirect(data.url)
     }
 }

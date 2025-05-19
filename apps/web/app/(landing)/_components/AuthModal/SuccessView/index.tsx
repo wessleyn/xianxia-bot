@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const SuccessView = () => {
-    const { name, redirectUrl, closeModal, isNew } = useAuthModalStore();
+    const { name, redirectUrl, closeModal, isNew, setIsAuthenticated } = useAuthModalStore();
     const router = useRouter();
     const [countdown, setCountdown] = useState(3);
 
@@ -20,9 +20,12 @@ const SuccessView = () => {
             setCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    // Redirect and close modal
-                    closeModal();
-                    router.push(redirectUrl);
+                    // Move state updates outside the setState callback
+                    setTimeout(() => {
+                        setIsAuthenticated(false);
+                        closeModal();
+                        router.push(redirectUrl);
+                    }, 0);
                     return 0;
                 }
                 return prev - 1;
@@ -30,7 +33,7 @@ const SuccessView = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [closeModal, redirectUrl, router]);
+    }, [closeModal, redirectUrl, router, setIsAuthenticated]);
 
     return (
         <div className="space-y-6 text-center">

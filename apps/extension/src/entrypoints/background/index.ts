@@ -1,3 +1,6 @@
+// Import our auth listener for cookie monitoring
+import './auth';
+
 // Page detection utilities
 const detectPageType = (url: string) => {
   // Simplified pattern matching for novel sites and content types
