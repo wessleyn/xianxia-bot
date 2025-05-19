@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useContext } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { TabInfo, ViewType, determineViewType, useCurrentTabInfo } from '../utils/pageDetection';
-
 // Define the context shape
 interface ViewContextType {
   tabInfo: TabInfo | null;
@@ -56,6 +56,7 @@ export const ViewProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   return (
     <ViewContext.Provider value={{ tabInfo, viewType, refreshTabInfo }}>
+     <Toaster />
       {children}
     </ViewContext.Provider>
   );
