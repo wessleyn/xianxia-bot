@@ -11,7 +11,8 @@ export default defineConfig({
       default_title: 'Xianxu',
     },
     permissions: [
-      'storage'
+      'storage',
+      'sessions'
     ]
   },
   alias: {
