@@ -1,41 +1,76 @@
-import React, { useState } from 'react';
+import LoginForm from '@repo/auth/components/LoginForm';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
-import EmailForm from './components/EmailForm';
 import OtpForm from './components/OtpForm';
-import { useEmailForm } from './hooks/useEmailForm';
 import { useOtpForm } from './hooks/useOtpForm';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { login, verifyOtp, checkSession } = useAuthStore();
 
-  // Track whether the email has been submitted
   const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
-
-  // Set up email form
-  const emailForm = useEmailForm();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSlackLoading, setIsSlackLoading] = useState(false);
+  const [email, setEmail] = useState('');
 
   // Set up OTP form with email
-  const otpForm = useOtpForm({ email: emailForm.email });
+  const otpForm = useOtpForm({ email });
 
-  // Handler for when email submission is successful
-  const handleEmailSubmitSuccess = () => {
-    setIsEmailSubmitted(true);
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkForExistingSession = async () => {
+      const session = await checkSession();
+      if (session) {
+        // User is already logged in, redirect to home
+        navigate('/');
+      }
+    };
+
+    checkForExistingSession();
+  }, [checkSession, navigate]);
+
+  // Login form handlers
+  const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await login(email);
+
+      if (error) {
+        toast.error(`Login failed: ${error.message}`);
+      } else {
+        setIsEmailSubmitted(true);
+        toast.success(`Verification code sent to ${email}`);
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setIsGoogleLoading(true);
+      await useAuthStore.getState().loginWithGoogle();
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleSlackLogin = () => {
+    toast.error('Slack login is not implemented yet.');
   };
 
   // Handler for when OTP verification is successful
   const handleOtpVerifySuccess = () => {
-    // Create mock user data
-    const mockUser = {
-      name: 'User',
-      email: emailForm.email
-    };
-
-    // Update auth state
-    login(mockUser);
-
-    // Navigate back to home
+    // Navigate back to home - the store will handle updating the auth state
+    toast.success('Login successful');
     navigate('/');
   };
 
@@ -53,17 +88,23 @@ const Login: React.FC = () => {
         </div>
 
         {!isEmailSubmitted ? (
-          <EmailForm
-            formState={emailForm}
-            onSubmitSuccess={handleEmailSubmitSuccess}
+          <LoginForm
+            email={email}
+            setEmail={setEmail}
+            handleSubmit={handleEmailSubmit}
+            handleGoogle={handleGoogleLogin}
+            handleSlack={handleSlackLogin}
+            isLoading={isLoading}
+            isGoogleLoading={isGoogleLoading}
+            isSlackLoading={isSlackLoading}
           />
         ) : (
           <OtpForm
             formState={otpForm}
-            email={emailForm.email}
+            email={email}
             onVerifySuccess={handleOtpVerifySuccess}
-            loading={otpForm.loading}
-            error={otpForm.error}
+            loading={isLoading}
+            error={otpForm.error || ""}
           />
         )}
       </div>

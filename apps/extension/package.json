@@ -15,6 +15,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@repo/auth": "^0.0.0",
     "@repo/ui": "*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

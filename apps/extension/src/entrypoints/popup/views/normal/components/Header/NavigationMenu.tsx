@@ -5,7 +5,7 @@ import { useAuthStore } from '../../../../../../stores/useAuthStore';
 import UserAvatar from './UserAvatar';
 
 const NavigationMenu: React.FC = () => {
-    const { isLoggedIn, toggleLoginState: toggleLogin, user } = useAuthStore();
+    const { isLoggedIn, logout, user } = useAuthStore();
     return (
         <div className="py-1">
             {isLoggedIn && (
@@ -13,8 +13,8 @@ const NavigationMenu: React.FC = () => {
                     <div className="flex items-center">
                         <UserAvatar size="md" />
                         <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">User</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">user@example.com</p>
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{user?.user_metadata.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
                         </div>
                     </div>
                 </div>
@@ -42,7 +42,7 @@ const NavigationMenu: React.FC = () => {
 
             {isLoggedIn && (
                 <button
-                    onClick={toggleLogin}
+                    onClick={logout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                     <div className="flex items-center">

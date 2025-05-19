@@ -1,11 +1,10 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
-import BrandLogo from './BrandLogo';
 import NavigationMenu from './NavigationMenu';
 
 const PopoverMenu = () => {
-    const { isLoggedIn } = useAuthStore();
+    const { isLoggedIn, user } = useAuthStore();
     return (
         <Popover className="relative">
             {({ open }) => (
@@ -14,7 +13,22 @@ const PopoverMenu = () => {
                         className="flex items-center focus:outline-none"
                         title={isLoggedIn ? "User Profile" : "Xianxu"}
                     >
-                        <BrandLogo />
+                        {/* TODO: change this for avatar support */}
+                        {
+                            isLoggedIn ? (
+                                <>
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-sm">
+                                        <span className="text-sm font-medium">{user!.email!.split('@')[0].charAt(0)}</span>
+                                    </div>
+                                    <span className="ml-2 text-lg font-medium">{ user!.email!.split('@')[0] }</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Logo />
+                                    <span className="ml-2 text-2xl font-bold">Xianxu</span>
+                                </>
+                            )
+                        }
                     </PopoverButton>
 
                     <Transition

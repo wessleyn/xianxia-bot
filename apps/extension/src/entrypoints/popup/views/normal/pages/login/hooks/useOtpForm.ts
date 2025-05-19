@@ -5,19 +5,16 @@ interface UseOtpFormProps {
 }
 
 export interface UseOtpFormReturn {
-    otp: string[];
     timer: number;
     loading: boolean;
     error: string;
-    handleOtpChange: (index: number, value: string) => void;
-    handleKeyDown: (index: number, e: React.KeyboardEvent) => void;
     handleVerify: (onSuccess: () => void) => Promise<void>;
     handleResend: () => Promise<void>;
     clearError: () => void;
 }
 
 export const useOtpForm = ({ email }: UseOtpFormProps): UseOtpFormReturn => {
-    const [otp, setOtp] = useState<string[]>(['', '', '', '']);
+    const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -44,7 +41,7 @@ export const useOtpForm = ({ email }: UseOtpFormProps): UseOtpFormReturn => {
         setOtp(newOtp);
 
         // Auto-focus next input
-        if (value !== '' && index < 3) {
+        if (value !== '' && index < 5) {
             const nextInput = document.getElementById(`otp-${index + 1}`);
             nextInput?.focus();
         }
@@ -95,12 +92,9 @@ export const useOtpForm = ({ email }: UseOtpFormProps): UseOtpFormReturn => {
     };
 
     return {
-        otp,
         timer,
         loading,
         error,
-        handleOtpChange,
-        handleKeyDown,
         handleVerify,
         handleResend,
         clearError: () => setError('')
