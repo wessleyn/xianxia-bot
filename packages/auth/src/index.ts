@@ -86,7 +86,7 @@ export const signInAction = async (formData: FormData) => {
 export const signOutAction = async () => {
     const supabase = await createClient();
     await supabase.auth.signOut();
-    return redirect("/auth");
+    return redirect("/login");
 };
 
 export const verifyOtp = async (formData: FormData) => {
