@@ -1,6 +1,6 @@
 import React from 'react';
 import { useViewContext } from '../../context/ViewContext';
-import Layout from '../normal/Layout';
+import Layout from '../normal/components/Layout';
 
 /**
  * Component for the Novel view when on a novel site, but not on a chapter or TOC page

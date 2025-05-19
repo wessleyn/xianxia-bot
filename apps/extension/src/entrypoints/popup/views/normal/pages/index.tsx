@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
-import Layout from '../Layout';
+import Layout from '../components/Layout';
 import Bookmarks from './bookmarks';
 import Current from './current';
 import Downloads from './downloads';
