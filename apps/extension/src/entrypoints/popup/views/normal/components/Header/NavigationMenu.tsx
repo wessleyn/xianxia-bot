@@ -5,7 +5,9 @@ import { useAuthStore } from '../../../../../../stores/useAuthStore';
 import UserAvatar from './UserAvatar';
 
 const NavigationMenu: React.FC = () => {
-    const { isLoggedIn, logout, user } = useAuthStore();
+    const { loginStatus, logout, user } = useAuthStore();
+
+    const isLoggedIn = loginStatus === 'success';
     return (
         <div className="py-1">
             {isLoggedIn && (

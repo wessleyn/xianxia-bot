@@ -10,7 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
-  const { isLoggedIn } = useAuthStore();
+  const { loginStatus } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSync = () => alert('Syncing data...');
@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
       {/* Theme Toggle Button */}
       <ThemeSelector />
       {
-        isLoggedIn ? (
+        loginStatus === 'success' ? (
           <button
             onClick={handleSync}
             className="flex items-center gap-1 px-3 py-1.5 bg-indigo-500/80 hover:bg-indigo-600/80 rounded-md transition-colors focus:outline-none shadow-sm"

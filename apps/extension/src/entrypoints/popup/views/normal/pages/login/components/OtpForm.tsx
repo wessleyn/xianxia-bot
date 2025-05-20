@@ -8,24 +8,18 @@ interface OtpFormProps {
     formState: UseOtpFormReturn;
     email: string;
     onVerifySuccess: () => void;
-    loading: boolean;
-    error: string;
 }
 
-const OtpForm: React.FC<OtpFormProps> = ({
-    formState,
-    email,
-    onVerifySuccess
-}) => {
+const OtpForm: React.FC<OtpFormProps> = ({ formState, email, onVerifySuccess }) => {
     const {
-        handleVerify,
-        handleResend,
         timer,
         loading,
-        error
+        error,
+        handleResend,
+        clearError
     } = formState;
 
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const handleChange = (index: number, value: string) => {
@@ -36,6 +30,9 @@ const OtpForm: React.FC<OtpFormProps> = ({
         // Only take the last character if someone pastes more than one character
         newOtp[index] = value.substring(value.length - 1);
         setOtp(newOtp);
+
+        // Clear any previous errors
+        clearError();
 
         // Move to next input if current one is filled
         if (value && index < 5) {
@@ -54,21 +51,21 @@ const OtpForm: React.FC<OtpFormProps> = ({
         e.preventDefault();
 
         if (otp.some(digit => !digit)) {
-            toast.error('Incomplete code. Please enter all 6 digits of your verification code');
+            toast.error('Please enter all 6 digits of your verification code');
             return;
         }
 
-        try {
-            // Pass the combined OTP digits as the token
-            const otpToken = otp.join('');
+        // Get the OTP token by joining the digits
+        const otpToken = otp.join('');
 
-            // Use the auth store's verifyOtp function
+        try {
+            // Use the auth store's verifyOtp function directly
             const { error } = await useAuthStore.getState().verifyOtp(email, otpToken);
 
             if (error) {
                 toast.error(`Verification failed: ${error.message}`);
             } else {
-                onVerifySuccess();
+              await onVerifySuccess();
             }
         } catch (error) {
             toast.error('Verification failed. An unexpected error occurred.');
@@ -150,7 +147,7 @@ const OtpForm: React.FC<OtpFormProps> = ({
                 ) : (
                     <button
                         type="button"
-                        onClick={handleResend}
+                        onClick={() => handleResend()}
                         disabled={loading}
                         className="text-purple-600 dark:text-purple-400 hover:underline"
                     >

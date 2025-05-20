@@ -8,6 +8,7 @@ import Login from './pages/login';
 import Stats from './pages/stats';
 
 const NormalRouter: React.FC = () => {
+
     return (
         <Routes>
             <Route path="/" element={<Layout />}>

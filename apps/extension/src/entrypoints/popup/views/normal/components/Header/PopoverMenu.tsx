@@ -4,7 +4,9 @@ import { useAuthStore } from '../../../../../../stores/useAuthStore';
 import NavigationMenu from './NavigationMenu';
 
 const PopoverMenu = () => {
-    const { isLoggedIn, user } = useAuthStore();
+    const { loginStatus, user } = useAuthStore();
+
+    const isLoggedIn = loginStatus === 'success';
     return (
         <Popover className="relative">
             {({ open }) => (
