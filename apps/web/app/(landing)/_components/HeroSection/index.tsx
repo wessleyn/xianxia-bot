@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { ExtensionDropdown } from './ExtensionsDropDown';
 import NovelCarousel from './NovelCarousel';
 import RegAuthBtn from './RegAuthBtn';
+
 
 const data = {
     title: "Xianxu",
@@ -45,12 +47,7 @@ const HeroSection = () => {
                                 >
                                     Mobile App
                                 </Link>
-                                <Link
-                                    href="/download/extension"
-                                    className="Button alt border-2 border-gray-300 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-4 py-2 rounded-full font-medium transition-all text-sm whitespace-nowrap"
-                                >
-                                    Extension
-                                </Link>
+                                <ExtensionDropdown />
                                 <Link
                                     href="/manuals"
                                     className="text-purple-600 dark:text-purple-400 hover:underline flex items-center text-sm whitespace-nowrap"
