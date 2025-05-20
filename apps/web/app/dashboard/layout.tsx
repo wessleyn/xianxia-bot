@@ -13,7 +13,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
-      <DashboardSidebar user={user} />
+      <DashboardSidebar />
 
       {/* Main Content Area */}
       <div className="flex flex-col flex-1 overflow-hidden">
