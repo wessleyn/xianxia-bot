@@ -1,4 +1,4 @@
-import OTPBtns from './OTPBtns';
+// import OTPBtns from './OTPBtns';
 
 interface LoginFormProps {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -48,12 +48,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ handleSubmit, handleGoogle, handl
                     <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">Or continue with</span>
                 </div>
             </div>
-            <OTPBtns
+            {/* FIXME: Implement web extension oauth*/}
+            {/* <OTPBtns
                 handleGoogle={handleGoogle}
                 handleSlack={handleSlack}
                 isGoogleLoading={isGoogleLoading}
                 isSlackLoading={isSlackLoading}
-            />
+            /> */}
             <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                 By continuing, you acknowledge that you have read and understand our
                 <a href="#" className="font-semibold text-purple-600 dark:text-purple-400 hover:underline"> Privacy Policy</a>
