@@ -1,5 +1,4 @@
 import AutoAuth from "./_components/AutoAuth";
-import HandleExtensionAuth from "./_components/HandleExtensionAuth";
 
 export default async function AuthPage({
     searchParams,
@@ -13,28 +12,28 @@ export default async function AuthPage({
         ? params.callback
         : undefined;
 
-    const isFromExtension = typeof params.ext === 'string'
-        ? !!params.ext
-        : false
+    // const isFromExtension = typeof params.ext === 'string'
+    //     ? !!params.ext
+    //     : false
 
-    const provider = typeof params.provider === 'string'
-        ? params.provider as 'google' | 'slack'
-        : undefined;
+    // const provider = typeof params.provider === 'string'
+    //     ? params.provider as 'google' | 'slack'
+    //     : undefined;
 
     const mode = typeof params.mode === 'string'
         ? params.mode as 'login' | 'register'
         : 'login';
 
-
-    const isValidExtension = isFromExtension && provider
+// FIXME: enable when fixing outh for ext
+    // const isValidExtension = false //isFromExtension && provider
 
     return (
         <div className="h-screen" >
-            {
+            {/* {
                 isValidExtension && (
                     <HandleExtensionAuth provider={provider} />
                 )
-            }
+            } */}
             <AutoAuth mode={mode} callback={callback}/>
         </div>
     )

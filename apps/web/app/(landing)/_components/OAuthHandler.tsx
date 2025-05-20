@@ -13,30 +13,25 @@ const OAuthHandler = () => {
     const { openModal, isFromExtension, setIsAuthenticated, setIsFromExtension } = useAuthModalStore();
     const toast = useToastStore();
 
-    // Get extension param from URL - this is critical for the auth flow
-    const extParam = searchParams.get('ext');
+    // const extParam = searchParams.get('ext');
 
-    // Use effect to update the isFromExtension flag based on URL parameter
     // This runs only once on component mount to avoid repeated state updates
-    useEffect(() => {
-        if (extParam === 'true') {
-            console.log('OAuthHandler detected ext=true in URL params, setting isFromExtension to true');
-            setIsFromExtension(true);
-        }
-    }, [extParam, setIsFromExtension]);
+    // useEffect(() => {
+    //     if (extParam === 'true') {
+    //         console.log('OAuthHandler detected ext=true in URL params, setting isFromExtension to true');
+    //         setIsFromExtension(true);
+    //     }
+    // }, [extParam, setIsFromExtension]);
 
-    console.log('In OAuthHandler, outside effect , isFromExtension:', isFromExtension);
     useEffect(() => {
-        console.log('In OAuthHandler, inside effect , isFromExtension:', isFromExtension);
         const code = searchParams.get('code');
 
-        console.log('In OAuthHandler, after getting code:', isFromExtension);
 
         const handleCode = async (code: string) => {
             // Get the extension status directly from URL param for consistency
-            const fromExtension = extParam === 'true';
+            // const fromExtension = extParam === 'true';
 
-            console.log('OAuthHandler processing auth code with fromExtension =', fromExtension);
+            // console.log('OAuthHandler processing auth code with fromExtension =', fromExtension);
 
             // Always show authenticating modal first
             openModal('authenticating');
@@ -57,18 +52,18 @@ const OAuthHandler = () => {
                     // Set authenticated state
                     setIsAuthenticated(true);
 
-                    console.log('Authentication successful, fromExtension =', fromExtension);
+                    // console.log('Authentication successful, fromExtension =', fromExtension);
 
                     // Use timeout to ensure state updates are processed
                     setTimeout(() => {
                         // Open the appropriate view based on whether this is from extension
-                        if (fromExtension) {
-                            console.log('Opening extension modal view');
-                            openModal('extension');
-                        } else {
+                        // if (fromExtension) {
+                        //     console.log('Opening extension modal view');
+                        //     openModal('extension');
+                        // } else {
                             console.log('Opening success modal view');
                             openModal('success');
-                        }
+                        // }//////
                     }, 10);
                 }
             } catch (err) {
@@ -83,7 +78,6 @@ const OAuthHandler = () => {
         };
 
         if (code) {
-            console.log('In OAuthHandler, before handleCode:', isFromExtension);
             handleCode(code);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
