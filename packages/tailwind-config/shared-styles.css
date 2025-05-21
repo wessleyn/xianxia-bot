@@ -65,3 +65,15 @@
 /* a {
   @apply text-[var(--color-muted)]
 } */
+
+:root {
+  --rt-color-white: #fff;
+  --rt-color-dark: var(--color-french-lilac-950);
+  --rt-color-success: #8dc572;
+  --rt-color-error: #be6464;
+  --rt-color-warning: #f0ad4e;
+  --rt-color-info: #337ab7;
+  --rt-opacity: 0.9;
+  --rt-transition-show-delay: 0.15s;
+  --rt-transition-closing-delay: 0.15s;
+}

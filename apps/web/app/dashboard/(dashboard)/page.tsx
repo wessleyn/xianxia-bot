@@ -1,4 +1,10 @@
 import { getCurrentUser } from "@repo/auth/utils";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Dashboard | Xianxu",
+    description: "Your personal dashboard for reading stats, recent novels, and more.",
+};
 
 export default async function Dashboard() {
     const user = await getCurrentUser();

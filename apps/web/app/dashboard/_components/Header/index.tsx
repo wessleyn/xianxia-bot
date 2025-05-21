@@ -1,21 +1,17 @@
 'use client';
 
 import ThemeToggle from '@components/ThemeToggle';
-import { User } from '@supabase/supabase-js';
 import {
-  IconBell,
   IconMenu2,
   IconSearch
 } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useResponsiveSidebar } from '../../_store/useSidebarStore';
+import NotificationsMenu from './NotificationsMenu';
 
-interface HeaderProps {
-  user: User | null;
-}
 
-export default function DashboardHeader({ user }: HeaderProps) {
+export default function DashboardHeader({ children }: { children: React.ReactNode }) {
   const [scrolled, setScrolled] = useState(false);
   const { toggleCollapsed } = useResponsiveSidebar()
 
@@ -46,7 +42,7 @@ export default function DashboardHeader({ user }: HeaderProps) {
           >
             <IconMenu2 size={24} />
           </button>
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white hidden xs:block">
             {formattedPageName}
           </h1>
         </div>
@@ -68,20 +64,8 @@ export default function DashboardHeader({ user }: HeaderProps) {
         {/* Right side actions */}
         <div className="flex items-center space-x-4">
           <ThemeToggle />
-
-          {/* Notifications */}
-          <button className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none relative">
-            <IconBell size={20} />
-            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
-          </button>
-
-
-          {/* Profile Menu */}
-          <div className=" items-center">
-            <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 uppercase font-semibold">
-              {user?.email?.[0] || 'U'}
-            </div>
-          </div>
+          <NotificationsMenu />
+          {children}
         </div>
       </div>
 

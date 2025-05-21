@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@repo/auth/utils';
 import { ReactNode } from 'react';
 import DashboardHeader from './_components/Header';
+import UserMenu from './_components/Header/UserMenu';
 import DashboardSidebar from './_components/Sidebar';
 
 export default async function DashboardLayout({
@@ -18,7 +19,9 @@ export default async function DashboardLayout({
       {/* Main Content Area */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Header */}
-        <DashboardHeader user={user} />
+        <DashboardHeader>
+          <UserMenu user={user} />
+        </DashboardHeader>
 
         {/* Main Content with Scroll */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
