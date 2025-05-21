@@ -4,12 +4,12 @@ import {
     IconBook,
     IconBookmark,
     IconClock,
-    IconCloudCheck,
     IconDevices,
     IconHome,
     IconPalette,
     IconSettings,
-    IconStar
+    IconStar,
+    IconWorldWww
 } from '@tabler/icons-react';
 import { NavItem } from './NavSection';
 
@@ -21,10 +21,10 @@ export const primaryNavigation: NavItem[] = [
         description: 'View your personalized dashboard and overview'
     },
     {
-        name: 'Updated',
-        href: '/dashboard/updated',
-        icon: IconCloudCheck,
-        description: 'Check recently updated chapters and stories'
+        name: 'Sources',
+        href: '/dashboard/sources',
+        icon: IconWorldWww,
+        description: 'View your subscribed sources and content feeds'
     },
     {
         name: 'Reading List',

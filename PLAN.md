@@ -10,7 +10,7 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
 
 ## 1. Browser Extension Features
 
-### 1. **Normal View (Default Popup)**
+### 1. **Normal View (Default Popup)** (Addd an option to customize tabs and their order)
 
 - Shown when user isn’t actively viewing a novel page
 - **Login/Register** (OAuth via web app)
@@ -51,29 +51,6 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
 
 > Popup is not needed here. Let the **content script** control the immersive reading experience.
 
----
-
-## **Flow Example**
-
-1. User opens novel on `novelupdates.com`
-2. Content script:
-
-   - Detects novel metadata
-   - Injects UI enhancements (theme, chapter tracker)
-3. User highlights a sentence → context menu: "Bookmark this quote"
-4. User clicks popup → sees quick stats & list of bookmarks
-5. All synced with web app backend for cross-device support
-
----
-
-## **Tech Stack Recommendation**
-
-- **Popup**: React (via Plasmo or WXT)
-- **Content Script**: DOM scraper + UI injector
-- **Storage**: Use `chrome.storage` + backend sync
-- **Backend**: Web app with Prisma DB, REST/GraphQL API
-- **Auth**: Use tokens, store in `chrome.storage.local`
-
 ## 2. Web App Features
 
 ### **1. Dashboard (Stats Overview)**
@@ -81,14 +58,14 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
 A visual snapshot of the user’s reading journey.
 
 - Total hours read
-- Most read genres/tags
-- Peak reading times
-- Favorite characters/themes
+- (later) Most read genres/tags
+- (later) Peak reading times
+- (later) Favorite characters/themes (based on bookmarks)
 - Cross-platform reading heatmap
 
 ---
 
-### **2. Updated (Live Feed)**
+### **2. Sources (Live Feed)**
 
 Dynamic feed of novels you’re actively reading:
 
