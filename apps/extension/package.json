@@ -16,10 +16,10 @@
   },
   "dependencies": {
     "@repo/auth": "^0.0.0",
-    "@repo/ui": "*",
     "@repo/ui-lib": "*",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.0"
   },
   "devDependencies": {
     "@repo/tailwind-config": "*",

@@ -56,7 +56,7 @@ export default function NavSection({ title, items }: NavSectionProps) {
                                     <Tooltip
                                         anchorSelect={`.${item.name.split(" ")[0]}`}
                                         content={item.description}
-                                        // place="left-end"
+                                    // place="left-end"
                                     />
                                 )
                             }
