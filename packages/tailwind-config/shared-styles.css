@@ -1,7 +1,67 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
-  --blue-1000: #2a8af6;
-  --purple-1000: #a853ba;
-  --red-1000: #e92a67;
+  /* French Lilac Color Palette */
+  --color-french-lilac-50: #faf5ff;
+  --color-french-lilac-100: #f4e8ff;
+  --color-french-lilac-200: #ead3ff;
+  --color-french-lilac-300: #dbb4fe;
+  --color-french-lilac-400: #c684fc;
+  --color-french-lilac-500: #b055f7;
+  --color-french-lilac-600: #9c33ea;
+  --color-french-lilac-700: #8622ce;
+  --color-french-lilac-800: #7121a8;
+  --color-french-lilac-900: #5d1c87;
+  --color-french-lilac-950: #3f0764;
+
+  /* Main Theme Colors - Light Mode */
+  --color-primary: var(--color-french-lilac-600);
+  --color-primary-hover: var(--color-french-lilac-700);
+  --color-primary-active: var(--color-french-lilac-800);
+
+  --color-background: var(--color-french-lilac-50);
+  --color-foreground: var(--color-french-lilac-950);
+
+  --color-accent: var(--color-french-lilac-400);
+  --color-accent-hover: var(--color-french-lilac-500);
+
+  --color-muted: var(--color-french-lilac-200);
+  --color-muted-foreground: var(--color-french-lilac-700);
+
+  --color-border: var(--color-french-lilac-200);
+  --color-input: var(--color-french-lilac-100);
+
+  --color-card: white;
+  --color-card-foreground: var(--color-french-lilac-950);
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: var(--color-french-lilac-500);
+}
+
+@custom-variant dark {
+  --color-primary: var(--color-french-lilac-500);
+  --color-primary-hover: var(--color-french-lilac-400);
+  --color-primary-active: var(--color-french-lilac-300);
+
+  --color-background: var(--color-french-lilac-950);
+  --color-foreground: var(--color-french-lilac-50);
+
+  --color-accent: var(--color-french-lilac-500);
+  --color-accent-hover: var(--color-french-lilac-400);
+
+  --color-muted: var(--color-french-lilac-800);
+  --color-muted-foreground: var(--color-french-lilac-300);
+
+  --color-border: var(--color-french-lilac-800);
+  --color-input: var(--color-french-lilac-900);
+
+  --color-card: var(--color-french-lilac-900);
+  --color-card-foreground: var(--color-french-lilac-50);
+}
+
+a {
+  @apply text-[var(--color-muted)]
 }

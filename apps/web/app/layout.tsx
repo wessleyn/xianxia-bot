@@ -1,4 +1,4 @@
-import ThemeProvider from "@repo/ui/components/ThemeProvider";
+import ThemeProvider from "@components/ThemeProvider";
 import { Toaster } from "react-hot-toast";
 import "./_styles/globals.css";
 
