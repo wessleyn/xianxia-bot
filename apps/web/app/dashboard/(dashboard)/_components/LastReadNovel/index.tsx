@@ -1,21 +1,9 @@
 import Image from "next/image";
+import { fetchLastReadNovel } from "./action";
 
 export async function LastReadNovel() {
 
-    // TODO: Uncomment and implement fetchLastReadNovel
-    // const novel = await fetchLastReadNovel();
-
-    const novel = {
-        id: "1",
-        title: "Novel Title",
-        coverImage: "https://example.com/cover.jpg",
-        author: "Author Name",
-        description: "Novel description goes here.",
-        currentChapter: "Chapter 1",
-        chapterNumber: 1,
-        lastRead: "2023-10-01",
-        progress: 50,
-    }
+    const novel = await fetchLastReadNovel();
 
     if (!novel) {
         return <div>No recent reading activity</div>;
