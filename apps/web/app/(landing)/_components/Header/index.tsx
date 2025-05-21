@@ -1,5 +1,4 @@
 import Logo from '@assets/monk-man.svg'
-// import ThemeToggle from "@repo/ui/components/ThemeToggle"
 import Image from "next/image"
 import Link from "next/link"
 import AuthBtn from './AuthBtn'

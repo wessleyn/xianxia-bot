@@ -7,20 +7,20 @@ interface AuthModalStore {
   isOpen: boolean;
   isFromExtension: boolean;
   isAuthenticated: boolean;
-  
+
   view: AuthModalView;
 
   email: string;
   name: string;
   isNew: boolean;
   userId: string;
-  
+
   redirectUrl: string;
-  
+
   canClose: boolean;
   openModal: (view?: AuthModalView) => void;
   closeModal: () => void;
-  
+
   setView: (view: AuthModalView) => void;
   setEmail: (email: string) => void;
   setName: (name: string) => void;
@@ -38,7 +38,7 @@ export const useAuthModalStore = create<AuthModalStore>()(
       isOpen: false,
       isFromExtension: false,
       isAuthenticated: false,
-      
+
       view: 'login' as AuthModalView,
       email: '',
       name: '',
@@ -59,7 +59,7 @@ export const useAuthModalStore = create<AuthModalStore>()(
             userId: '',
             isFromExtension: state.isFromExtension
           };
-          
+
           return resetState;
         }
         return state;
@@ -77,7 +77,7 @@ export const useAuthModalStore = create<AuthModalStore>()(
     {
       name: 'auth-modal-storage',
       partialize: (state) => ({
-        isOpen: state.isOpen,
+        // Don't persist isOpen to prevent modal auto-opening on page load
         isFromExtension: state.isFromExtension,
         isAuthenticated: state.isAuthenticated,
         view: state.view,

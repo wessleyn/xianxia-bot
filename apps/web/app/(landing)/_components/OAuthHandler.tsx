@@ -25,13 +25,13 @@ const OAuthHandler = () => {
     useEffect(() => {
         const code = searchParams.get('code');
 
-
         const handleCode = async (code: string) => {
             // Get the extension status directly from URL param for consistency
             // const fromExtension = extParam === 'true';
 
             // console.log('OAuthHandler processing auth code with fromExtension =', fromExtension);
 
+            // Only open the modal when we have an auth code to process
             // Always show authenticating modal first
             openModal('authenticating');
 
@@ -75,6 +75,7 @@ const OAuthHandler = () => {
             }
         };
 
+        // Only process if there's a code parameter
         if (code) {
             handleCode(code);
         }
