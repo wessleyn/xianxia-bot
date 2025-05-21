@@ -1,14 +1,13 @@
 import { signInAction, verifyOtp } from '@repo/auth';
-import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const OtpVerificationView = () => {
   const { email, setView, isNew, setUserId } = useAuthModalStore();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const toast = useToastStore();
 
   const handleChange = (index: number, value: string) => {
     // Only allow numbers
@@ -36,7 +35,7 @@ const OtpVerificationView = () => {
     e.preventDefault();
 
     if (otp.some(digit => !digit)) {
-      toast.error('Incomplete code', 'Please enter all 6 digits of your verification code');
+      toast.error('Please enter all 6 digits of your verification code');
       return;
     }
 
@@ -53,7 +52,7 @@ const OtpVerificationView = () => {
 
       if (data.status === 'error') {
         setIsLoading(false);
-        toast.error('Verification failed', data.message);
+        toast.error(data.message || 'Verification failed');
       } else {
         // Check if this is a new user or returning user
         setIsLoading(false);
@@ -65,18 +64,18 @@ const OtpVerificationView = () => {
 
         if (isNew) {
           // If new user, mark as new and navigate to profile completion
-          toast.success('Verification successful', 'Complete your profile to continue');
+          toast.success('Complete your profile to continue');
           setView('profile');
         } else {
           // If existing user, go straight to success page
-          toast.success('Welcome back', 'Authentication successful');
+          toast.success('Authentication successful');
           setView('success');
         }
       }
     } catch (error) {
       setIsLoading(false);
       console.log(error)
-      toast.error('Verification failed', 'An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -93,12 +92,12 @@ const OtpVerificationView = () => {
       const data = await signInAction(formData);
 
       if (data.status === 'error') {
-        toast.error('Failed to resend code', data.message);
+        toast.error(data.message || 'Failed to resend code');
       } else {
-        toast.info('Code resent', 'A new verification code has been sent to your email');
+        toast.success('A new verification code has been sent to your email');
       }
     } catch {
-      toast.error('Failed to resend code', 'An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 

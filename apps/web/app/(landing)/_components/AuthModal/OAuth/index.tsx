@@ -1,14 +1,13 @@
 'use client'
 
 import { signInWithGoogle, signInWithSlack } from '@repo/auth';
-import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { IconBrandGoogle, IconBrandSlack } from '@tabler/icons-react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const OAuth = () => {
     const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
     const [isLoadingSlack, setIsLoadingSlack] = useState(false);
-    const toast = useToastStore();
 
     const handleAuth = async (provider: 'google' | 'slack') => {
         if (provider === 'google') {
@@ -16,14 +15,14 @@ const OAuth = () => {
             const { error } = await signInWithGoogle();
             if (error) {
                 setIsLoadingGoogle(false);
-                toast.error('Google login failed', error.message);
+                toast.error(error.message || 'Google login failed');
             }
         } else {
             setIsLoadingSlack(true);
             const { error } = await signInWithSlack();
             if (error) {
                 setIsLoadingSlack(false);
-                toast.error('Slack login failed', error.message);
+                toast.error(error.message || 'Slack login failed');
             }
         }
     };

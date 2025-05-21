@@ -2,10 +2,24 @@
 
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const AuthenticatingView = () => {
     const { setCanClose } = useAuthModalStore();
     const [animationDots, setAnimationDots] = useState('.');
+
+    // Display toast notification when authentication starts
+    useEffect(() => {
+        toast.loading(
+            'Authenticating your cultivation spirit...',
+            { id: 'auth-loading', duration: Infinity }
+        );
+
+        // Clean up toast when component unmounts
+        return () => {
+            toast.dismiss('auth-loading');
+        };
+    }, []);
 
     // Disable closing the modal during authentication
     useEffect(() => {

@@ -3,7 +3,7 @@
 import { signOutAction } from '@repo/auth';
 import { IconLogout } from '@tabler/icons-react';
 import Image from 'next/image';
-import Logo from '../../_assets/monk-man.svg';
+import Logo from '../../../_assets/monk-man.svg';
 import { useResponsiveSidebar } from '../../_store/useSidebarStore';
 import { contentManagement, primaryNavigation, settingsNavigation } from './navigationData';
 import NavSection from './NavSection';

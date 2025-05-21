@@ -9,21 +9,24 @@
   ],
   "exports": {
     ".": "./dist/index.js",
+    "./components": "./dist/components/index.js",
     "./components/*": "./dist/components/*/index.js",
+    "./hooks": "./dist/hooks/index.js",
     "./hooks/*": "./dist/hooks/*/index.js",
     "./styles.css": "./dist/index.css"
   },
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:styles && npm run build:components",
-    "ui:build": "npm run build:styles && npm run build:components",
-    "ui:dev": "npm run dev:styles && npm run dev:components",
+    "build": "npm run generate-exports && npm run build:styles && npm run build:components",
+    "ui:build": "npm run generate-exports && npm run build:styles && npm run build:components",
+    "ui:dev": "npm run generate-exports && npm run dev:styles && npm run dev:components",
     "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
     "build:components": "tsc",
     "check-types": "tsc --noEmit",
     "dev:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css --watch",
     "dev:components": "tsc --watch",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0",
+    "generate-exports": "node scripts/generate-exports.js"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

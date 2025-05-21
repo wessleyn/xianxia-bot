@@ -1,5 +1,5 @@
 import Logo from '@assets/monk-man.svg'
-import ThemeToggle from "@repo/ui/components/ThemeToggle"
+// import ThemeToggle from "@repo/ui/components/ThemeToggle"
 import Image from "next/image"
 import Link from "next/link"
 import AuthBtn from './AuthBtn'
@@ -50,7 +50,7 @@ const Header = () => {
                     <div className="flex items-center gap-6">
                         <div className="sm:flex sm:gap-6 items-center">
                             <div className="flex justify-center">
-                                <ThemeToggle />
+                                {/* <ThemeToggle /> */}
                             </div>
 
                             <div className="hidden sm:flex">

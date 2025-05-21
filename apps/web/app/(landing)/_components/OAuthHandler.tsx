@@ -1,17 +1,16 @@
 'use client';
 
 import { authenticateCode } from "@repo/auth";
-import { useToastStore } from "@repo/ui/hooks/useToastStore";
 import { useAuthModalStore } from "@store/useAuthModalStore";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from 'react-hot-toast';
 
 const OAuthHandler = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const { openModal, isFromExtension, setIsAuthenticated, setIsFromExtension } = useAuthModalStore();
-    const toast = useToastStore();
+    const { openModal, setIsAuthenticated } = useAuthModalStore();
 
     // const extParam = searchParams.get('ext');
 
@@ -43,11 +42,11 @@ const OAuthHandler = () => {
                 if (error) {
                     // Handle authentication error
                     console.error('Error authenticating code:', error);
-                    toast.error('Authentication Failed', error.message || 'Please try again');
+                    toast.error(`Authentication Failed: Invalid Session.\nPlease try again.`);
                     openModal('login');
                 } else {
                     // Authentication was successful
-                    toast.success('Authentication Successful', 'Welcome to your cultivation journey!');
+                    toast.success('Authentication Successful.\nWelcome to your cultivation journey!');
 
                     // Set authenticated state
                     setIsAuthenticated(true);
@@ -61,15 +60,14 @@ const OAuthHandler = () => {
                         //     console.log('Opening extension modal view');
                         //     openModal('extension');
                         // } else {
-                            console.log('Opening success modal view');
-                            openModal('success');
+                        console.log('Opening success modal view');
+                        openModal('success');
                         // }//////
                     }, 10);
                 }
             } catch (err) {
                 console.error('Authentication process failed:', err);
-                const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-                toast.error('Authentication Error', errorMessage);
+                toast.error(`An unexpected error occurred.\nPlease Contact Support, if the issue persists.`);
                 openModal('login');
             } finally {
                 // Only replace the URL after authentication is complete
