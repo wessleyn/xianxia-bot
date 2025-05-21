@@ -1,11 +1,15 @@
 "use server";
 
+import { getCurrentUserId } from "@repo/auth/utils";
 import { prisma } from "@repo/db";
 
 export async function fetchSourcesData() {
     try {
         // Get all read streaks with their associated chapters and novels
         const readStreaks = await prisma.readStreak.findMany({
+            where: {
+                userId: await getCurrentUserId()
+            },
             include: {
                 chapter: {
                     include: {

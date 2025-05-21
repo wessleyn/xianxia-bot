@@ -13,6 +13,11 @@ export async function getCurrentUser() {
   return data.user
 }
 
+export async function getCurrentUserId() {
+  const data = await getCurrentUser()
+  return data.id
+}
+
 export async function logOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()

@@ -1,5 +1,6 @@
 "use server";
 
+import { getCurrentUserId } from "@repo/auth/utils";
 import { prisma } from "@repo/db";
 
 export async function fetchReadingStats() {
@@ -13,6 +14,7 @@ export async function fetchReadingStats() {
         const streakDays = await prisma.readStreak.groupBy({
             by: ['date'],
             where: {
+                userId: await getCurrentUserId(),
                 date: {
                     gte: oneWeekAgo
                 }

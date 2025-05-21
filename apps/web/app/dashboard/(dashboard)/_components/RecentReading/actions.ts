@@ -1,10 +1,14 @@
 "use server";
 
+import { getCurrentUserId } from "@repo/auth/utils";
 import { prisma } from "@repo/db";
 
 export async function fetchRecentNovels() {
     try {
         const novels = await prisma.readNovel.findMany({
+            where: {
+                userId: await getCurrentUserId()
+            },
             orderBy: {
                 lastReadAt: 'desc'
             },

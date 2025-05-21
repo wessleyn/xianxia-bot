@@ -1,11 +1,15 @@
 "use server";
 
+import { getCurrentUserId } from "@repo/auth/utils";
 import { prisma } from "@repo/db";
 
 export async function fetchLastReadNovel() {
     try {
         // Get the most recently read novel
         const lastRead = await prisma.readNovel.findFirst({
+            where: {
+                userId: await getCurrentUserId()
+            },
             orderBy: {
                 lastReadAt: 'desc'
             },
