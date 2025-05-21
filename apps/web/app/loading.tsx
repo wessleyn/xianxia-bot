@@ -30,18 +30,32 @@ export default function DashboardLayoutLoading() {
             {/* Main Content Area */}
             <div className="flex flex-col flex-1 overflow-hidden">
                 {/* Header Skeleton */}
-                <header className="flex h-16 items-center justify-between border-b bg-white dark:bg-gray-800 px-4 md:px-6">
-                    <div className="flex items-center">
-                        {/* Mobile menu button - only shows on mobile */}
-                        <div className="block md:hidden mr-4">
-                            <Skeleton className="h-8 w-8 rounded-md" />
+                <header className="flex flex-col border-b bg-white dark:bg-gray-800">
+                    {/* Top part of header */}
+                    <div className="flex h-16 items-center justify-between px-4 md:px-6">
+                        <div className="flex items-center">
+                            {/* Mobile menu button - only shows on mobile */}
+                            <div className="block md:hidden mr-4">
+                                <Skeleton className="h-8 w-8 rounded-md" />
+                            </div>
+                            <Skeleton className="h-8 w-[180px]" />
                         </div>
-                        <Skeleton className="h-8 w-[180px]" />
+
+                        {/* Desktop search bar */}
+                        <div className="hidden md:block flex-1 mx-10 max-w-xl">
+                            <Skeleton className="h-10 w-full rounded-md" />
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <Skeleton className="h-8 w-8 rounded-full" />
+                            <Skeleton className="h-8 w-8 rounded-full" />
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                        </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                        <Skeleton className="h-10 w-10 rounded-full" />
+
+                    {/* Mobile search bar */}
+                    <div className="md:hidden px-4 pb-4">
+                        <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                 </header>
 
