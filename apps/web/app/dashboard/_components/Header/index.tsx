@@ -1,6 +1,6 @@
 'use client';
 
-import ThemeToggle from '@repo/ui/components/ThemeToggle';
+import ThemeToggle from '@components/ThemeToggle';
 import { User } from '@supabase/supabase-js';
 import {
   IconBell,

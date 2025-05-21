@@ -9,7 +9,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@components/*": ["./app/(landing)/_components/*"],
+      "@components/*": ["./app/_components/*"],
       "@assets/*": ["./app/_assets/*"],
       "@store/*": ["./app/_store/*"],
       "@styles/*": ["./app/_styles/*"]
