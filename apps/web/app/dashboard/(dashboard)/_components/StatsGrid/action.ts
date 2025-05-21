@@ -5,6 +5,9 @@ import { prisma } from "@repo/db";
 
 export async function fetchReadingStats() {
     try {
+        const userId = await getCurrentUserId();
+        if (!userId) throw new Error("No user ID found");
+
         // Get streak (count of consecutive days with reading activity)
         const now = new Date();
         const oneWeekAgo = new Date(now);
@@ -14,7 +17,7 @@ export async function fetchReadingStats() {
         const streakDays = await prisma.readStreak.groupBy({
             by: ['date'],
             where: {
-                userId: await getCurrentUserId(),
+                userId,
                 date: {
                     gte: oneWeekAgo
                 }
@@ -42,7 +45,6 @@ export async function fetchReadingStats() {
             if (dateMap.has(checkDateStr)) {
                 streak++;
             } else if (streak > 0) {
-                // Break on first day with no reading after finding a streak
                 break;
             }
         }
@@ -50,6 +52,7 @@ export async function fetchReadingStats() {
         // Get total chapters read (count unique chapters with reading streaks)
         const chaptersRead = await prisma.readStreak.groupBy({
             by: ['chapterId'],
+            where: { userId },
             _count: {
                 id: true
             }
@@ -57,13 +60,16 @@ export async function fetchReadingStats() {
 
         // Get time spent reading (in minutes)
         const timeSpent = await prisma.readStreak.aggregate({
+            where: { userId },
             _sum: {
                 minutesRead: true
             }
         });
 
         // Get bookmarks count
-        const bookmarks = await prisma.bookmark.count();
+        const bookmarks = await prisma.bookmark.count({
+            where: { userId }
+        });
 
         return [
             {
