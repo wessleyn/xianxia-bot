@@ -30,8 +30,7 @@
       ],
       "dependsOn": [
         "^build",
-        "^db:generate",
-        "ui:build"
+        "^db:generate"
       ]
     },
     "ui:dev": {
@@ -56,7 +55,6 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
       "dependsOn": [
-        "^ui:build",
         "^db:generate"
       ]
     },
