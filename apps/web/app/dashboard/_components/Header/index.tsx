@@ -9,6 +9,7 @@ import {
 } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useResponsiveSidebar } from '../../_store/useSidebarStore';
 
 interface HeaderProps {
   user: User | null;
@@ -16,7 +17,7 @@ interface HeaderProps {
 
 export default function DashboardHeader({ user }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { toggleCollapsed } = useResponsiveSidebar()
 
   const pathname = usePathname();
   const currentPage = pathname.split('/').filter(Boolean)[1] || 'dashboard';
@@ -37,11 +38,11 @@ export default function DashboardHeader({ user }: HeaderProps) {
         } bg-white dark:bg-gray-800 sticky top-0 z-10 transition-shadow duration-300`}
     >
       <div className="px-4 md:px-6 py-4 flex items-center justify-between">
-        {/* Page Title and Mobile Menu */}
+        {/* Page Title and Sidebar TOggle */}
         <div className="flex items-center">
           <button
-            className="mr-3 md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="mr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            onClick={toggleCollapsed}
           >
             <IconMenu2 size={24} />
           </button>
@@ -66,7 +67,6 @@ export default function DashboardHeader({ user }: HeaderProps) {
 
         {/* Right side actions */}
         <div className="flex items-center space-x-4">
-          {/* Theme Toggle - Using component from UI package */}
           <ThemeToggle />
 
           {/* Notifications */}
@@ -75,8 +75,9 @@ export default function DashboardHeader({ user }: HeaderProps) {
             <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
           </button>
 
-          {/* User avatar - visible on desktop */}
-          <div className="hidden md:flex items-center">
+
+          {/* Profile Menu */}
+          <div className=" items-center">
             <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 uppercase font-semibold">
               {user?.email?.[0] || 'U'}
             </div>
@@ -98,12 +99,6 @@ export default function DashboardHeader({ user }: HeaderProps) {
         </div>
       </div>
 
-      {/* Mobile Menu - Shown when menu button is clicked */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-2 px-4">
-          {/* Mobile navigation items would go here */}
-        </div>
-      )}
     </header>
   );
 }
