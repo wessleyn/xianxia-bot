@@ -9,6 +9,7 @@
       "@/*": ["./src/*"],
       "@assets/*": ["./src/assets/*"],
       "@stores/*": ["./src/stores/*"],
+      "@utils/*": ["./src/utils/*"],
       "@components/*": ["./src/components/*"],
       "~/*": ["./*"]
     }

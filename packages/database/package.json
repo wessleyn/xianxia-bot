@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "exports": {
     ".": "./src/index.ts",
+    "./supabase": "./src/supabase/index.ts",
     "./types": "./src/index.ts",
     "./queries": "./src/queries/index.ts",
     "./generated/prisma": "./generated/prisma/index.js"

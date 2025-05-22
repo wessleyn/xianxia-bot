@@ -1,10 +1,9 @@
-import createSupabaseClient from '@repo/auth/client';
 import { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { browser } from 'wxt/browser';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const supabase = createSupabaseClient({});
+import supabase from '@utils/supabase';
 
 const WEB_APP_URL = import.meta.env.WXT_NEXT_PUBLIC;
 

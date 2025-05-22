@@ -27,5 +27,7 @@ export default defineConfig({
     '@': '/src',
     '@assets': '/src/assets',
     '@components': '/src/components',
+    '@utils': '/src/utils',
+    '@stores': '/src/stores',
   }
 });

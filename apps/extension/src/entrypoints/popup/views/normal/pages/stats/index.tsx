@@ -1,11 +1,48 @@
+import { searchNovels } from '@repo/db/supabase';
+import { useAuthStore } from '@stores/useAuthStore';
 import React from 'react';
+import useSwr from 'swr';
 import ReadingActivity from './components/ReadingActivity';
 import ReadingInsights from './components/ReadingInsights';
 import StatCard from './components/StatCard';
 import StatsHeader from './components/StatsHeader';
 import { ReadingStats } from './types';
 
+const fetchUserStats = async () => {
+    const { data, error } = await searchNovels('path');
+    if (error) {
+        console.error('Error fetching user stats:', error);
+        return null;
+    }
+    console.log('Fetched data:', data);
+    return data;
+}
+
 const Stats: React.FC = () => {
+    const { user } = useAuthStore();
+    const { data, error, isLoading } = useSwr('novels', fetchUserStats);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading stats</div>;
+    }
+
+    if (!data) {
+        return <div>No stats available</div>;
+    }
+
+    // return (
+    //     <div>
+    //         {
+    //             data.map(x => x.title)
+    //         }
+    //     </div>
+    // )
+
+
     // Mock reading statistics
     const stats: ReadingStats = {
         booksRead: 24,
