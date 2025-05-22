@@ -6,16 +6,16 @@ import type { Bookmark, Novel, NovelChapter, ReadNovel, ReadStreak } from '../..
 const supabase = createClient({})
 
 // Helper type to transform Prisma types for use with Supabase
-type SupabaseReturn<T> = {
+export type SupabaseReturn<T> = {
     data: T | null
     error: Error | null
 }
 
 // Utility type for Supabase query functions
-type SupabaseQuery<T> = Promise<SupabaseReturn<T>>
+export type SupabaseQuery<T> = Promise<SupabaseReturn<T>>
 
 // Helper function to type Supabase queries
-function query<T>() {
+export function query<T>() {
     return null as unknown as SupabaseQuery<T>
 }
 
@@ -28,9 +28,9 @@ function query<T>() {
 // Example functions using Prisma types with Supabase
 
 /**
- * Get a novel by ID
+ * Fetch One
  */
-export async function getNovel(novelId: string): SupabaseQuery<Novel> {
+ async function getNovel(novelId: string): SupabaseQuery<Novel> {
     return await supabase
         .from('Novel')
         .select('*')
@@ -39,9 +39,9 @@ export async function getNovel(novelId: string): SupabaseQuery<Novel> {
 }
 
 /**
- * Get all chapters for a novel
+ * Fetch All
  */
-export async function getNovelChapters(novelId: string): SupabaseQuery<NovelChapter[]> {
+ async function getNovelChapters(novelId: string): SupabaseQuery<NovelChapter[]> {
     return await supabase
         .from('NovelChapter')
         .select('*')
@@ -50,9 +50,9 @@ export async function getNovelChapters(novelId: string): SupabaseQuery<NovelChap
 }
 
 /**
- * Create a new bookmark
+ * Create One
  */
-export async function createBookmark(bookmark: Omit<Bookmark, 'id' | 'createdAt' | 'updatedAt'>): SupabaseQuery<Bookmark> {
+ async function createBookmark(bookmark: Omit<Bookmark, 'id' | 'createdAt' | 'updatedAt'>): SupabaseQuery<Bookmark> {
     return await supabase
         .from('Bookmark')
         .insert(bookmark)
@@ -61,42 +61,9 @@ export async function createBookmark(bookmark: Omit<Bookmark, 'id' | 'createdAt'
 }
 
 /**
- * Update user's reading progress
+ * Search 
  */
-export async function updateReadingProgress(
-    userId: string,
-    novelId: string,
-    currentChapterId: string
-): SupabaseQuery<ReadNovel> {
-    return await supabase
-        .from('ReadNovel')
-        .upsert({
-            userId,
-            novelId,
-            currentChapterId,
-            lastReadAt: new Date().toISOString()
-        })
-        .select()
-        .single()
-}
-
-/**
- * Record reading streak
- */
-export async function recordReadingStreak(
-    streak: Omit<ReadStreak, 'id' | 'createdAt' | 'updatedAt'>
-): SupabaseQuery<ReadStreak> {
-    return await supabase
-        .from('ReadStreak')
-        .insert(streak)
-        .select()
-        .single()
-}
-
-/**
- * Search novels by title or author
- */
-export async function searchNovels(searchTerm: string): SupabaseQuery<Novel[]> {
+ async function searchNovels(searchTerm: string): SupabaseQuery<Novel[]> {
     return await supabase
         .from('Novel')
         .select('*')
