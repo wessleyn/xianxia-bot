@@ -8,11 +8,21 @@
     "DIRECT_URL",
     "NEXT_PUBLIC_SUPABASE_URL",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    "VERCEL_ENV",
+    "DATABASE_URL",
+    "DIRECT_URL",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY"
   ],
   "tasks": {
     "build": {
       "env": [
         "NODE_ENV=production",
+        "TURBO_DEFAULT=1",
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
         "TURBO_DEFAULT=1",
         "DATABASE_URL",
         "DIRECT_URL",
@@ -48,6 +58,11 @@
       "cache": false,
       "persistent": true,
       "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
         "NODE_ENV",
         "DATABASE_URL",
         "DIRECT_URL",

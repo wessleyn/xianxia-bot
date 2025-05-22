@@ -63,6 +63,12 @@ const OtpVerificationView = () => {
         }
 
         if (isNew) {
+        // Store the user ID from the verification response
+        if (data.data && data.data.user) {
+          setUserId(data.data.user.id);
+        }
+
+        if (isNew) {
           // If new user, mark as new and navigate to profile completion
           toast.success('Complete your profile to continue');
           setView('profile');

@@ -26,6 +26,7 @@ interface AuthModalStore {
   setName: (name: string) => void;
   setIsNew: (isNew: boolean) => void;
   setUserId: (userId: string) => void;
+  setUserId: (userId: string) => void;
   setRedirectUrl: (url: string) => void;
   setCanClose: (canClose: boolean) => void;
   setIsFromExtension: (isFromExtension: boolean) => void;
