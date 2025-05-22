@@ -51,27 +51,12 @@ export const signInAction = async (formData: FormData) => {
     const email = formData.get("email") as string;
     const supabase = await createClient();
     let data, error, isNew = false;
-    let data, error, isNew = false;
 
-    ({ data, error } = await supabase.auth.signInWithOtp({
     ({ data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
             shouldCreateUser: false,
         },
-    }))
-
-    if (error) {
-        ({ data, error } = await supabase.auth.signInWithOtp({
-            email: email,
-            options: {
-                shouldCreateUser: true,
-            },
-        }))
-        if (!error) {
-            isNew = true;
-        }
-    }
     }))
 
     if (error) {
@@ -98,7 +83,6 @@ export const signInAction = async (formData: FormData) => {
     return {
         status: "success",
         data,
-        isNew,
         isNew,
     };
 };

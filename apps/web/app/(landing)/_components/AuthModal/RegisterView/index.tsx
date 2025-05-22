@@ -40,8 +40,8 @@ const RegisterView = () => {
         toast.error(data.message || 'Registration failed');
       } else {
         toast.success('Check your email for the verification code');
-        // Move to OTP verification view
-        setIsNew(true);
+        // this will just ask for name twice
+        setIsNew(false);
         setView('otp');
       }
     } catch {

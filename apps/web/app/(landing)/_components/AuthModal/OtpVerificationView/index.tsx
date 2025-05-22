@@ -63,19 +63,18 @@ const OtpVerificationView = () => {
         }
 
         if (isNew) {
-        // Store the user ID from the verification response
-        if (data.data && data.data.user) {
-          setUserId(data.data.user.id);
-        }
+          // Store the user ID from the verification response
+          if (data.data && data.data.user) {
+            setUserId(data.data.user.id);
+          }
 
-        if (isNew) {
-          // If new user, mark as new and navigate to profile completion
-          toast.success('Complete your profile to continue');
-          setView('profile');
-        } else {
-          // If existing user, go straight to success page
-          toast.success('Authentication successful');
-          setView('success');
+          if (isNew) {
+            toast.success('Complete your profile to continue');
+            setView('profile');
+          } else {
+            toast.success('Authentication successful');
+            setView('success');
+          }
         }
       }
     } catch (error) {
@@ -83,7 +82,7 @@ const OtpVerificationView = () => {
       console.log(error)
       toast.error('An unexpected error occurred. Please try again.');
     }
-  };
+  }
 
   const handleResend = async () => {
     try {

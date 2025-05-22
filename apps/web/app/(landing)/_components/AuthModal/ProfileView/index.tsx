@@ -1,5 +1,6 @@
 'use client';
 
+import { createProfile } from '@repo/db/queries';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -28,10 +29,7 @@ const ProfileView = () => {
 
             if (!useConcealmentCloak) {
                 await createProfile(userId, nameInput);
-                await createProfile(userId, nameInput);
                 setName(nameInput);
-            } else {
-                await createProfile(userId, '', true);
             } else {
                 await createProfile(userId, '', true);
             }

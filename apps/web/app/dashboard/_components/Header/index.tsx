@@ -9,9 +9,10 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useResponsiveSidebar } from '../../_store/useSidebarStore';
 import NotificationsMenu from './NotificationsMenu';
+import UserMenu from './UserMenu';
 
 
-export default function DashboardHeader({ children }: { children: React.ReactNode }) {
+export default function DashboardHeader() {
   const [scrolled, setScrolled] = useState(false);
   const { toggleCollapsed } = useResponsiveSidebar()
 
@@ -65,7 +66,7 @@ export default function DashboardHeader({ children }: { children: React.ReactNod
         <div className="flex items-center space-x-4">
           <ThemeToggle />
           <NotificationsMenu />
-          {children}
+          <UserMenu />
         </div>
       </div>
 

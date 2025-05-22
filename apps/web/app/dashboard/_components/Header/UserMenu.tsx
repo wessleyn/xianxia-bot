@@ -4,11 +4,30 @@ import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/r
 import { User } from '@supabase/supabase-js';
 import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
 import Link from 'next/link';
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
-import { logOut } from '@repo/auth/utils';
+import { Skeleton } from '@components/skeleton';
+import { getCurrentUser, logOut } from '@repo/auth/utils';
 
-const UserMenu = ({ user }: { user: User }) => {
+const UserMenu = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<User>();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await getCurrentUser()
+            setUser(user)
+            setIsLoading(false);
+        }
+
+        fetchUser()
+    }, [user]);
+
+    if (isLoading) {
+        return (
+          <Skeleton />
+        );
+    }
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>

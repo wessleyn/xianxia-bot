@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     description: "Your personal dashboard for reading stats, recent novels, and more.",
 };
 
+export const dynamic = "force-dynamic"; // Force revalidation on every request
+
 export default function Dashboard() {
     return (
         <div className="space-y-6">
