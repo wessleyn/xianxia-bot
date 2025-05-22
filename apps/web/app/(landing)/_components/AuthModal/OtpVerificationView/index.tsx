@@ -40,6 +40,8 @@ const OtpVerificationView = () => {
     }
 
     setIsLoading(true);
+    console.log('[DEBUG] Starting OTP verification with email:', email);
+    console.log('[DEBUG] isNew state:', isNew);
 
     try {
       // Prepare form data
@@ -47,34 +49,46 @@ const OtpVerificationView = () => {
       formData.append('email', email);
       formData.append('otp', otp.join(''));
 
+      console.log("[DEBUG] Form Data:", {email, otp: otp.join('')});
       // Call verification API
       const data = await verifyOtp(formData);
+      console.log('[DEBUG] Verification response:', data);
 
       if (data.status === 'error') {
         setIsLoading(false);
         toast.error(data.message || 'Verification failed');
+        console.error('[DEBUG] Verification error:', data.message);
       } else {
         // Check if this is a new user or returning user
         setIsLoading(false);
+        console.log('[DEBUG] Verification successful, user data:', data.data?.user);
 
         // Store the user ID from the verification response
         if (data.data && data.data.user) {
+          console.log('[DEBUG] Setting user ID:', data.data.user.id);
           setUserId(data.data.user.id);
         }
 
         if (isNew) {
           // Store the user ID from the verification response
           if (data.data && data.data.user) {
+            console.log('[DEBUG] Setting user ID again (duplicate code):', data.data.user.id);
             setUserId(data.data.user.id);
           }
 
           if (isNew) {
+            console.log('[DEBUG] Detected as new user, redirecting to profile completion');
             toast.success('Complete your profile to continue');
             setView('profile');
           } else {
+            console.log('[DEBUG] Not new user (this condition is unreachable)');
             toast.success('Authentication successful');
             setView('success');
           }
+        } else {
+          console.log('[DEBUG] isNew is false, redirecting to success page');
+          toast.success('Authentication successful');
+          setView('success');
         }
       }
     } catch (error) {

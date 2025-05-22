@@ -49,9 +49,12 @@ export const signUpAction = async (formData: FormData) => {
 
 export const signInAction = async (formData: FormData) => {
     const email = formData.get("email") as string;
+    console.log("[SERVER DEBUG] Starting signInAction for email:", email);
+    
     const supabase = await createClient();
     let data, error, isNew = false;
 
+    console.log("[SERVER DEBUG] Attempting to sign in existing user");
     ({ data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
@@ -60,6 +63,7 @@ export const signInAction = async (formData: FormData) => {
     }))
 
     if (error) {
+        console.log("[SERVER DEBUG] User doesn't exist, attempting to create:", error.message);
         ({ data, error } = await supabase.auth.signInWithOtp({
             email: email,
             options: {
@@ -68,18 +72,22 @@ export const signInAction = async (formData: FormData) => {
         }))
         if (!error) {
             isNew = true;
+            console.log("[SERVER DEBUG] User created successfully, setting isNew:", isNew);
         }
+    } else {
+        console.log("[SERVER DEBUG] Existing user found");
     }
 
-
     if (error) {
-        console.log('Error signing in', error)
+        console.log('[SERVER DEBUG] Error signing in', error);
         return {
             status: "error",
             message: error.message,
             data,
         }
     }
+    
+    console.log('[SERVER DEBUG] Sign in successful, isNew:', isNew);
     return {
         status: "success",
         data,
@@ -97,13 +105,26 @@ export const verifyOtp = async (formData: FormData) => {
     const email = formData.get("email") as string;
     const token = formData.get("otp") as string;
 
+    console.log("[SERVER DEBUG] Verifying OTP for email:", email, "token:", token);
+
     const supabase = await createClient();
 
-    const { data, error, } = await supabase.auth.verifyOtp({
+    console.log("[SERVER DEBUG] Calling Supabase verifyOtp");
+    const { data, error } = await supabase.auth.verifyOtp({
         type: 'email',
         email,
         token,
-    })
+    });
+    
+    console.log("[SERVER DEBUG] VerifyOtp response:", { 
+        success: !error,
+        error: error ? { code: error.code, message: error.message } : null,
+        userData: data?.user ? { 
+            id: data.user.id,
+            email: data.user.email,
+            isNew: data.user.app_metadata?.provider === 'email' && !data.user.user_metadata?.has_completed_profile
+        } : null
+    });
 
     if (error) {
         return {
