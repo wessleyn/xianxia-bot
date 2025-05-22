@@ -5,9 +5,10 @@
   "exports": {
     ".": "./src/index.ts",
     "./utils": "./src/utils.ts",
-    "./client": "./src/client.ts",
-    "./server": "./src/server.ts",
-    "./middleware": "./src/middleware.ts"
+    "./client": "./src/client/index.ts",
+    "./server/*": "./src/server/index.ts",
+    "./middleware": "./src/server/middleware.ts",
+    "./components/*": "./src/components/*.tsx"
   },
   "scripts": {
     "lint": "eslint ."
@@ -17,6 +18,8 @@
     "@supabase/supabase-js": "^2.49.4"
   },
   "dependencies": {
-    "@repo/db": "^0.0.0"
+    "@repo/db": "^0.0.0",
+    "@supabase/auth-ui-react": "^0.4.7",
+    "@supabase/auth-ui-shared": "^0.1.8"
   }
 }

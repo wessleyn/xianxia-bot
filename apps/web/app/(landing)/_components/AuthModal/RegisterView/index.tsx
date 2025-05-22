@@ -1,26 +1,25 @@
 import { signUpAction } from '@repo/auth';
-import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import OAuth from '../OAuth';
 
 const RegisterView = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const {setIsNew, setView, setEmail: storeEmail, setName: storeName } = useAuthModalStore();
-  const toast = useToastStore();
+  const { setIsNew, setView, setEmail: storeEmail, setName: storeName } = useAuthModalStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !email.includes('@')) {
-      toast.error('Invalid email address', 'Please provide a valid email');
+      toast.error('Please provide a valid email');
       return;
     }
 
     if (!name) {
-      toast.error('Name required', 'Please provide your cultivator name');
+      toast.error('Please provide your cultivator name');
       return;
     }
 
@@ -38,17 +37,17 @@ const RegisterView = () => {
 
       if (data.status === 'error') {
         setIsLoading(false);
-        toast.error('Registration failed', data.message);
+        toast.error(data.message || 'Registration failed');
       } else {
-        toast.success('Verification sent', 'Check your email for the verification code');
-        // Move to OTP verification view
-        setIsNew(true);
+        toast.success('Check your email for the verification code');
+        // this will just ask for name twice
+        setIsNew(false);
         setView('otp');
       }
     } catch {
       // Catch any errors and show a generic message
       setIsLoading(false);
-      toast.error('Registration failed', 'An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 

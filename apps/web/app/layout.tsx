@@ -1,5 +1,5 @@
-import ThemeProvider from "@repo/ui/components/ThemeProvider";
-import ToastContainer from "@repo/ui/components/ToastContainer";
+import ThemeProvider from "@components/ThemeProvider";
+import { Toaster } from "react-hot-toast";
 import "./_styles/globals.css";
 
 export default function RootLayout({
@@ -8,10 +8,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="relative">
         <ThemeProvider>
-          <ToastContainer />
+          <Toaster />
           {children}
         </ThemeProvider>
       </body>

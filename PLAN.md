@@ -10,61 +10,144 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
 
 ## 1. Browser Extension Features
 
-- **Tab Management**
+### 1. **Normal View (Default Popup)** (Addd an option to customize tabs and their order)
 
-  - Track visited webnovel sites.
-  - Log time spent and scrolling activity per site.
-  - Show reading session summaries.
+- Shown when user isn’t actively viewing a novel page
+- **Login/Register** (OAuth via web app)
+- Tabs:
 
-- **Comment Assistant**
+  - **Stats**: Total novels, time read this week, etc.
+  - **Current**: "Continue reading" list
+  - **Bookmarked**: Saved scenes or quotes
+  - **Downloads** *(Optional later)*
 
-  - Analyze comments before posting.
-  - Warn users about potential punishments or restrictions (e.g., trolling, spoilers).
-  - Suggest improvements for constructive engagement.
+### 2. **Novel Site View (User is on a novel homepage)**
 
-- **Accessibility**
+- Content script parses site metadata and sends it to popup
+- Popup shows:
 
-  - Remove or reposition ads for better readability.
-  - Add read-aloud (voice-over) features for chapters.
-  - Provide a dictionary/repo of genre-specific terms (e.g., "face" in xianxia).
-  - Offer font, color, and layout customization for easier reading.
+  - Site name, reputation score (based on user ratings)
+  - Button: "Add site to sources"
+  - Warning: "This site is low-rated" (if relevant)
+  - Pref toggles: "Auto-enhance pages from this site?"
 
-- **Bookmarks**
+### 3. **Novel TOC View (User is on a novel overview page)**
 
-  - Allow users to bookmark novels and chapters.
-  - Curate a reading list accessible from extension and synced to web/mobile.
+- Detected by content script or user clicking popup
+- Popup shows:
 
-- **Calendar Integration**
-  - (Optional) Link to Google Calendar to save novel release dates and set reminders.
+  - Title, cover, genres
+  - Match % to user preferences (e.g., "81% match")
+  - Rating (yours and community’s)
+  - Button: "Add novel to reading list"
 
----
+### 4. **Chapter View (User is reading a chapter)**
+
+- **Use content script to modify DOM**, not popup
+
+  - Inject custom UI overlay (progress bar, highlight/bookmark, font options)
+  - Auto-log scroll/last read position
+  - Highlight selection = context menu option to bookmark or comment
+
+> Popup is not needed here. Let the **content script** control the immersive reading experience.
 
 ## 2. Web App Features
 
-- **User Dashboard**
+### **1. Dashboard (Stats Overview)**
 
-  - View and manage reading list/bookmarks.
-  - See reading stats (time spent, chapters read, streaks).
-  - Continue reading from last position (sync with extension/mobile).
+A visual snapshot of the user’s reading journey.
 
-- **Book/Novel Management**
+- Total hours read
+- (later) Most read genres/tags
+- (later) Peak reading times
+- (later) Favorite characters/themes (based on bookmarks)
+- Cross-platform reading heatmap
 
-  - Search and add novels to reading list.
-  - View details, progress, and notes for each novel.
-  - Rate and review novels.
+---
 
-- **History**
+### **2. Sources (Live Feed)**
 
-  - Display reading history by date and title.
-  - Filter and sort history.
+Dynamic feed of novels you’re actively reading:
 
-- **Recommendations**
+- Recent chapter updates
+- Continuation suggestions
+- “You stopped here” markers
+- Quick jump back to chapter
 
-  - Personalized suggestions based on reading habits and preferences.
+---
 
-- **Account & Sync**
-  - User authentication (OAuth or email).
-  - Sync data between extension, web, and mobile.
+### **3. Reading List**
+
+The core reading hub.
+
+- List of **currently reading** titles
+- Chapter progress indicators
+- Last read time + device
+- Series metadata (tags, site, rating)
+- Priority tags (“high interest”, “dropping soon”)
+
+---
+
+### **4. Bookmarked**
+
+Granular bookmarks for obsessive readers.
+
+- Bookmarked **chapters**, **scenes**, or even **quotes**
+- Browser tab/bookmark imports (via extension sync)
+- Quick annotation or “Why I saved this” note field
+
+---
+
+### **5. History**
+
+A full chronological record of your reading journey.
+
+- Auto-logged based on site visits and activity
+- Searchable by keyword or date
+- Can resurface “forgotten gems”
+
+---
+
+### **6. Recommendations**
+
+AI-powered suggestions tailored to your reading habits.
+
+- Based on cross-platform trends, re-reads, genre shifts
+- Includes *"Readers like you also read..."*
+- Option to filter by vibe, length, update frequency, etc.
+
+---
+
+### **7. Devices / Platforms**
+
+Track where your reading happens.
+
+- Browser extension connections
+- Linked mobile sessions
+- Last activity logs per platform
+- Sync status & push notifications
+
+---
+
+### **8. Preferences**
+
+Reader behavior and comfort settings.
+
+- Preferred font size, line spacing, theme
+- Translation/dictionary support toggles
+- Enable/disable auto-scroll, split chapter detection
+- Customize recommendation engine filters
+
+---
+
+### **9. Settings**
+
+All things account-related.
+
+- Profile avatar, username, email
+- Connected accounts (e.g., Gmail, Discord)
+- API keys for advanced users
+- Data export/import tools
 
 ---
 
@@ -98,47 +181,3 @@ A cross-platform novel reader ecosystem that enhances web novels with improved v
   - Sync reading list and progress with web app and extension.
 
 ---
-
-## 4. Technical Notes
-
-- **Monorepo Structure**
-
-  - Use a monorepo to share UI components and logic (e.g., reading list management) across web, extension, and mobile.
-  - Use TypeScript for type safety and maintainability.
-
-- **Data Storage & Sync**
-
-  - Use cloud database (e.g., Firebase, Supabase) for syncing user data.
-  - Local storage for offline support in extension and mobile.
-
-- **Authentication**
-
-  - OAuth (Google, GitHub) or email/password for user accounts.
-
-- **Accessibility**
-  - Ensure all platforms are accessible (screen reader support, color contrast, etc.).
-
----
-
-## 5. Next Steps
-
-1. **Define MVP Scope**
-   - Prioritize features for first release (e.g., reading list, bookmarks, basic stats, sync).
-2. **Design UI/UX**
-   - Create wireframes for extension, web, and mobile.
-3. **Set Up Monorepo**
-   - Scaffold projects for extension, web app, and mobile app.
-   - Create shared package for UI/components.
-4. **Implement Core Features**
-   - Start with reading list and sync across platforms.
-5. **Test & Iterate**
-   - Gather feedback and refine features.
-
----
-
-## 6. Future Enhancements
-
-- Social features (share progress, comments, recommendations).
-- Advanced analytics (reading speed, trends).
-- More integrations (other calendar providers, more novel sources).
-- Community-driven dictionary/repo for genre terms.

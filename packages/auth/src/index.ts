@@ -1,6 +1,7 @@
 'use server'
 
 import { createProfile } from "@repo/db/queries";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "./server";
 
@@ -31,6 +32,10 @@ export const signUpAction = async (formData: FormData) => {
             message: error.message,
         };
     } else {
+        if (data.user) {
+            const user = data.user as { id: string };
+            await createProfile(user.id, name)
+        }
         if (data.user) {
             const user = data.user as { id: string };
             await createProfile(user.id, name)
@@ -85,7 +90,7 @@ export const signInAction = async (formData: FormData) => {
 export const signOutAction = async () => {
     const supabase = await createClient();
     await supabase.auth.signOut();
-    return redirect("/auth");
+    return redirect("/login");
 };
 
 export const verifyOtp = async (formData: FormData) => {
@@ -113,11 +118,14 @@ export const verifyOtp = async (formData: FormData) => {
     };
 };
 
-export async function signInWithSlack() {
+export async function signInWithSlack(isExtension = false ) {
     const supabase = await createClient();
-
+    const origin = (await headers()).get("origin");
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'slack_oidc',
+        options: {
+            redirectTo: `${origin}/login${isExtension ? '?ext=true' : ''}`,
+        },
     });
 
     if (error) {
@@ -126,15 +134,20 @@ export async function signInWithSlack() {
             error
         }
     } else {
+
         redirect(data.url)
     }
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(isExtension = false) {
     const supabase = await createClient();
+    const origin = (await headers()).get("origin");
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+            redirectTo: `${origin}/login${isExtension ? '?ext=true' : ''}`,
+        },
     });
     if (error) {
         return {
@@ -142,6 +155,7 @@ export async function signInWithGoogle() {
             error
         }
     } else {
+        console.log(data.url)
         redirect(data.url)
     }
 }

@@ -1,20 +1,19 @@
 import { signInAction } from '@repo/auth';
-import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import OAuth from '../OAuth';
 
 const LoginView = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { setView, setEmail: storeEmail, setIsNew } = useAuthModalStore();
-  const toast = useToastStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !email.includes('@')) {
-      toast.error('Invalid email address', 'Please provide a valid email');
+      toast.error('Please provide a valid email');
       return;
     }
 
@@ -30,10 +29,13 @@ const LoginView = () => {
 
       if (data.status === 'error') {
         setIsLoading(false);
-        toast.error('Login failed', data.message);
+        toast.error(data.message || 'Login failed');
       } else {
-        toast.success('Verification sent', 'Check your email for the verification code');
+        toast.success('Check your email for the verification code');
         // Move to OTP verification view
+        if (data.isNew) {
+          setIsNew(true)
+        }
         if (data.isNew) {
           setIsNew(true)
         }
@@ -42,7 +44,7 @@ const LoginView = () => {
     } catch {
       // Catch any errors and show a generic message
       setIsLoading(false);
-      toast.error('Login failed', 'An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 

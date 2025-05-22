@@ -25,6 +25,9 @@ const SuccessView = dynamic(() => import('./SuccessView'), {
 const AuthenticatingView = dynamic(() => import('./AuthenticatingView'), {
   loading: () => <LoadingState message="Establishing connection to the heavenly dao..." />
 });
+const ExtensionAuthView = dynamic(() => import('./ExtensionAuthView'), {
+  loading: () => <LoadingState message="Establishing connection with the heavenly dao..." />
+});
 
 const AuthModal = () => {
   const { isOpen, closeModal, view, canClose } = useAuthModalStore();
@@ -91,6 +94,7 @@ const AuthModal = () => {
                   {view === 'profile' && 'Establish Your Identity'}
                   {view === 'success' && 'Cultivation Breakthrough Achieved'}
                   {view === 'authenticating' && 'Communion with the Dao'}
+                  {view === 'extension' && 'Establishing Connection with the Heavenly Dao'}
                 </DialogTitle>
 
                 {view === 'login' && <LoginView />}
@@ -99,6 +103,7 @@ const AuthModal = () => {
                 {view === 'profile' && <ProfileView />}
                 {view === 'success' && <SuccessView />}
                 {view === 'authenticating' && <AuthenticatingView />}
+                {view === 'extension' && <ExtensionAuthView />}
               </DialogPanel>
             </TransitionChild>
           </div>

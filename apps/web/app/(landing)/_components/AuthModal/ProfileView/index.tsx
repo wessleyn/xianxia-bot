@@ -1,22 +1,21 @@
 'use client';
 
 import { createProfile } from '@repo/db/queries';
-import { useToastStore } from '@repo/ui/hooks/useToastStore';
 import { useAuthModalStore } from '@store/useAuthModalStore';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const ProfileView = () => {
     const { setView, setName, userId } = useAuthModalStore();
     const [nameInput, setNameInput] = useState('');
     const [useConcealmentCloak, setUseConcealmentCloak] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const toast = useToastStore();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!nameInput && !useConcealmentCloak) {
-            toast.error('Name required', 'Please provide a name or use the concealment cloak option');
+            toast.error('Please provide a name or use the concealment cloak option');
             return;
         }
 
@@ -24,7 +23,7 @@ const ProfileView = () => {
 
         try {
             if (!userId) {
-                toast.error('Authentication error', 'User ID not found. Please try signing in again.');
+                toast.error('User ID not found. Please try signing in again.');
                 return;
             }
 
@@ -35,7 +34,7 @@ const ProfileView = () => {
                 await createProfile(userId, '', true);
             }
 
-            toast.success('Profile updated', 'Your cultivation journey awaits!');
+            toast.success('Your cultivation journey awaits!');
 
             // Move to success view
             setView('success');
@@ -43,7 +42,7 @@ const ProfileView = () => {
         } catch (error) {
             console.log(error)
             setIsLoading(false);
-            toast.error('Profile update failed', 'An unexpected error occurred. Please try again.');
+            toast.error('An unexpected error occurred. Please try again.');
         }
     };
 

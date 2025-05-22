@@ -30,8 +30,7 @@
       ],
       "dependsOn": [
         "^build",
-        "^db:generate",
-        "ui:build"
+        "^db:generate"
       ]
     },
     "ui:dev": {
@@ -39,7 +38,7 @@
       "persistent": true
     },
     "ui:build": {
-      "cache": false,
+      "cache": true,
       "env": [
         "DATABASE_URL",
         "DIRECT_URL"
@@ -56,8 +55,7 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
       "dependsOn": [
-        "^db:generate",
-        "ui:dev"
+        "^db:generate"
       ]
     },
     "db:generate": {

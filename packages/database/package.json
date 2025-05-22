@@ -9,7 +9,7 @@
   },
   "prisma": {
     "schema": "./prisma",
-    "seed": "tsx ./prisma/seed/seed.ts"
+    "seed": "tsx ./prisma/seed/index.ts"
   },
   "scripts": {
     "query": "tsx ./prisma/queries/index.ts",
@@ -28,8 +28,10 @@
     "postinstall": "prisma generate --no-engine"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@types/node": "^22.15.2",
     "prisma": "^6.8.1",
+    "supabase": "^2.23.4",
     "tsx": "^4.19.3"
   },
   "dependencies": {

@@ -1,5 +1,42 @@
 model Novel {
   id String @id @default(cuid())
+  title String
+  author String
+  description String
+  coverImage String
+  genre String[]
+
+  chapters NovelChapter[]
+  readers ReadNovel[]
+
+  publishedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title], name: "idx_novel_title")
+  @@index([author], name: "idx_novel_author")
+
+  @@schema("public")
+}
+
+model NovelChapter {
+  id String @id @default(cuid())
+  
+  number Int
+  title String
+  content String
+
+  novelId String
+  novel Novel @relation(fields: [novelId], references: [id])
+
+  bookmarks Bookmark[]
+  readStreaks ReadStreak[] @relation("ReadChapter")
+
+  currentReads ReadNovel[] @relation("CurrentReadChapter")
+  previousReads ReadNovel[] @relation("PreviousReadChapter")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@schema("public")
 }
