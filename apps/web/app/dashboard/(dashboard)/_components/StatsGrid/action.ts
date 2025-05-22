@@ -6,7 +6,6 @@ import { prisma } from "@repo/db";
 export async function fetchReadingStats() {
     try {
         const userId = await getCurrentUserId();
-        if (!userId) throw new Error("No user ID found");
 
         // Get streak (count of consecutive days with reading activity)
         const now = new Date();

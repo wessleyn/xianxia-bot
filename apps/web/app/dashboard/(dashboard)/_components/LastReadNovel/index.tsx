@@ -16,6 +16,8 @@ export async function LastReadNovel() {
                 {/* Cover image */}
                 <div className="flex-shrink-0 h-[220px] w-[160px] rounded-md overflow-hidden">
                     <Image
+                        // TODO: change this when you support image via superbase
+                        // src={novel.coverImage}
                         src={'https://img.freepik.com/free-vector/bike-guy-wattpad-book-cover_23-2149452163.jpg?ga=GA1.1.1874701037.1742830195&semt=ais_hybrid&w=740'}
                         alt={`${novel.title} cover`}
                         width={160}

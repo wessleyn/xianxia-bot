@@ -37,7 +37,6 @@
     "react-dom": "19.0.0"
   },
   "dependencies": {
-    "react-router-dom": "^7.6.0",
-    "@repo/ui": "*"
+    "react-router-dom": "^7.6.0"
   }
 }

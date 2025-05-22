@@ -3,6 +3,15 @@
 import { redirect } from 'next/navigation'
 import { createClient } from './server'
 
+export async function hasActiveSession() {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getSession()
+  if (error || !data?.session) {
+    return false
+  }
+
+  return true
+}
 export async function getCurrentUser() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
