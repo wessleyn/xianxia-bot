@@ -1,0 +1,33 @@
+model NovelSource {
+    id String @id @default(uuid())
+
+    name String
+    url  String
+
+    stars Int // rating or reputation
+
+    novels   Novel[]
+    visitors UserProfile[]
+    visits SourceVisit[]
+
+    @@schema("public")
+}
+
+model SourceVisit {
+    id String @id @default(uuid())
+    
+    userId String
+    user UserProfile @relation(fields: [userId], references: [id])
+    
+    sourceId String
+    source NovelSource @relation(fields: [sourceId], references: [id])
+
+    count Int
+
+    startedAt DateTime @default(now())
+    lastVisted  DateTime @updatedAt
+
+    // no two tracking instances for the same site and user
+    @@unique([userId, sourceId]) 
+    @@schema("public")
+}

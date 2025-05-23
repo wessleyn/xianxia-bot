@@ -28,6 +28,8 @@ export default defineConfig({
     '@assets': '/src/assets',
     '@components': '/src/components',
     '@utils': '/src/utils',
+    '@constants': '/src/constants',
+    '@ctypes': '/src/ctypes',
     '@stores': '/src/stores',
   }
 });

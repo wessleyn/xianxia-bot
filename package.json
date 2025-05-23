@@ -1,5 +1,5 @@
 {
-  "name": "with-tailwind",
+  "name": "xianxu",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -13,6 +13,7 @@
     "start:docs": "turbo start --filter=docs",
     "start:web": "turbo start --filter=web",
     "start:ext": "turbo start --filter=ext",
+    "generate": "cd packages/database && npm run db:generate",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

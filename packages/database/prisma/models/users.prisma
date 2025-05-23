@@ -5,7 +5,10 @@ model UserProfile {
   isanon Boolean @default(true)
 
   user  users   @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  
   novels  ReadNovel[]
+  sources NovelSource[]
+  sourceVisits SourceVisit[]
 
   @@schema("public")
 }

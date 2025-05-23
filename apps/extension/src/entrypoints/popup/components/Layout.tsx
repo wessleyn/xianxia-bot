@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
+import useViewStore from '../stores/useViewStore';
 import Header from './Header';
 import NavigationTabs from './NavigationTabs';
 
@@ -20,23 +21,42 @@ const tabs = [
 const Layout: React.FC<LayoutProps> = () => {
   const location = useLocation();
   const { loginStatus } = useAuthStore();
+  const { currentView } = useViewStore()
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (loginStatus === 'pending') {
-      navigate('/login');
-    }
-  }, []);
+  console.log('Current view:', currentView);
 
-  const isLoginPage = location.pathname.includes('/login');
+  useEffect(() => {
+    switch (currentView) {
+      case 'novelSite':
+        navigate('novel')
+        break;
+      case 'novelToc':
+        navigate('toc')
+        break;
+      case 'novelCh':
+        navigate('chapter')
+        break;
+      default:
+        loginStatus === 'pending' && navigate('/login');
+
+    }
+  }, [currentView]);
+
+  const isDashTab = tabs.find((tab) => {
+    if (location.pathname === '/') {
+      return true
+    } else {
+      return tab.path.includes(location.pathname)
+    }
+  }) !== undefined
+  
   return (
     <div className="h-[450px] bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col">
-      <Header isLoginPage={isLoginPage} />
+      <Header isLoginPage={location.pathname.includes('/login')} />
 
-      {/* Only show navigation tabs if not on login page */}
-      {!isLoginPage && <NavigationTabs tabs={tabs} />}
-
-      <main className="flex-1 p-4 overflow-auto custom-scrollbar">
+      {isDashTab && <NavigationTabs tabs={tabs} />}
+      <main className={`flex-1 ${isDashTab ? 'p-4' : 'p-0'} overflow-auto custom-scrollbar`}>
         <Outlet />
       </main>
     </div>
