@@ -23,39 +23,73 @@ jobs:
       - name: Check for version change
         id: check_version
         run: |
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+          echo "Running version check..."
+          
+          # Debug info
+          git log --oneline -n 5
+          
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            if git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep -q '^package\.json$'; then
-              # Check if version actually changed in package.json
-              BASE_VERSION=$(git show ${{ github.event.pull_request.base.sha }}:package.json | jq -r .version || echo "none")
-              HEAD_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:package.json | jq -r .version || echo "none")
+            echo "Processing pull request..."
+            echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
+            echo "Head SHA: ${{ github.event.pull_request.head.sha }}"
+            
+            # Check if package.json was modified in the PR
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+            echo "Changed files: $CHANGED_FILES"
+            
+            if echo "$CHANGED_FILES" | grep -q "package.json"; then
+              echo "package.json was modified in this PR"
+              
+              # Extract versions
+              BASE_VERSION=$(git show ${{ github.event.pull_request.base.sha }}:package.json 2>/dev/null | jq -r .version || echo "none")
+              HEAD_VERSION=$(jq -r .version package.json)
+              
+              echo "Base version: $BASE_VERSION"
+              echo "Head version: $HEAD_VERSION"
+              
               if [ "$BASE_VERSION" != "$HEAD_VERSION" ]; then
+                echo "Version changed from $BASE_VERSION to $HEAD_VERSION"
                 VERSION_CHANGED=1
               else
+                echo "Version unchanged"
                 VERSION_CHANGED=0
               fi
             else
+              echo "package.json was not modified"
               VERSION_CHANGED=0
             fi
           else
+            echo "Processing direct push to master..."
             # For direct pushes to master
-            BEFORE_VERSION=$(git show HEAD~1:package.json | jq -r .version 2>/dev/null || echo "none")
+            BEFORE_COMMIT=$(git rev-parse HEAD~1)
+            echo "Previous commit: $BEFORE_COMMIT"
+            
+            BEFORE_VERSION=$(git show $BEFORE_COMMIT:package.json 2>/dev/null | jq -r .version || echo "none")
             AFTER_VERSION=$(jq -r .version package.json)
+            
+            echo "Previous version: $BEFORE_VERSION"
+            echo "Current version: $AFTER_VERSION"
+            
             if [ "$BEFORE_VERSION" != "$AFTER_VERSION" ]; then
+              echo "Version changed from $BEFORE_VERSION to $AFTER_VERSION"
               VERSION_CHANGED=1
             else
+              echo "Version unchanged"
               VERSION_CHANGED=0
             fi
           fi
+          
           echo "version_changed=$VERSION_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "Version check complete with result: $VERSION_CHANGED"
       - name: Get version
-        if: ${{ steps.check_version.outputs.version_changed == '1' }}
         id: get_version
         run: |
-          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            VERSION=$(git show ${{ github.event.pull_request.head.sha }}:package.json | jq -r .version)
-          else
-            VERSION=$(jq -r .version package.json)
-          fi
+          echo "Getting version..."
+          # Always get version from current working directory
+          # This works for both PR merges and direct pushes
+          VERSION=$(jq -r .version package.json)
+          echo "Detected version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   Submit:
