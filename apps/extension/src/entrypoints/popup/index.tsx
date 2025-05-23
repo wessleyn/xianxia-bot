@@ -24,8 +24,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="current" element={<Current />} />
             <Route path="bookmarks" element={<Bookmarks />} />
             <Route path="downloads" element={<Downloads />} />
-            <Route path="toc" element={<ToCView />} />
             <Route path="novel" element={<NovelView />} />
+            <Route path="toc" element={<ToCView />} />
             <Route path="chapter" element={<ChapterView />} />
           </Route>
         </Routes>

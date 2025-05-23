@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useAuthStore } from '../../../../../stores/useAuthStore';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import { UseOtpFormReturn } from '../hooks/useOtpForm';
 import SubmitButton from './SubmitButton';
 

@@ -1,15 +1,15 @@
 import { browser } from 'wxt/browser';
-import { useAuthStore } from '../../stores/useAuthStore';
+import { useAuthStore } from '../popup/stores/useAuthStore';
 
 // Listen for changes to the Supabase auth cookie
 browser.cookies.onChanged.addListener(({ cookie, removed }) => {
   // The cookie we saw in the screenshot is named like: sb-zqmoyqgwtaqduwdpqhh-auth-token
-  if (cookie.domain.includes('wessleyn.me') && 
-      cookie.name.startsWith('sb-') && 
-      cookie.name.includes('-auth-token')) {
-    
+  if (cookie.domain.includes('wessleyn.me') &&
+    cookie.name.startsWith('sb-') &&
+    cookie.name.includes('-auth-token')) {
+
     console.log(`Auth cookie ${cookie.name} was ${removed ? 'removed' : 'added/updated'}`);
-    
+
     if (!removed) {
       // Cookie was added or updated - sync the session
       syncAuthState();

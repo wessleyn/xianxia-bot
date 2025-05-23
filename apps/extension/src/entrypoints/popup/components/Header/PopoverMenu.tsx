@@ -1,6 +1,7 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useAuthStore } from '../../../../stores/useAuthStore';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { Logo } from '../Logo';
 import NavigationMenu from './NavigationMenu';
 
 const PopoverMenu = () => {

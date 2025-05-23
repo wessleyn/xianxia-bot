@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../../../../stores/useAuthStore';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import { useEmailForm } from './useEmailForm';
 import { useOtpForm } from './useOtpForm';
 
