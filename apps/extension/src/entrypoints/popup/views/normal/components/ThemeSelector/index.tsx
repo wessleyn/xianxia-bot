@@ -42,8 +42,8 @@ const ThemeSelector: React.FC = () => {
             leaveTo="opacity-0 translate-y-1"
           >
             <PopoverPanel className="fixed left-1/2 transform -translate-x-1/2 z-10 mt-2 w-64 rounded-md shadow-lg">
-              <div className="bg-white dark:bg-gray-800 rounded-md py-1 border border-gray-200 dark:border-gray-700 shadow-md text-gray-800 dark:text-gray-200 overflow-hidden">
-                <div className="p-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50">
+              <div className="bg-white dark:bg-gray-800 rounded-md pb-1 border border-gray-200 dark:border-gray-700 shadow-md text-gray-800 dark:text-gray-200 overflow-hidden">
+                <div className="p-3 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50">
                   <div className="flex justify-between items-center">
                     <h4 className="font-semibold text-sm text-indigo-800 dark:text-indigo-300">Theme Settings</h4>
                   </div>

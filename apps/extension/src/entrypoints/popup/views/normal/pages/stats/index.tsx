@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
+import useDashStore from '../../stores/useDashStore';
 import { DEFAULT_STATS, getStatsFromStorage, recalculateStats } from './action';
 import ReadingActivity from './components/ReadingActivity';
 import ReadingInsights from './components/ReadingInsights';
@@ -10,6 +11,7 @@ import StatsSkeleton from './skeleton';
 
 const Stats: React.FC = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const { isSyncing }  = useDashStore()
     const { data: stats = DEFAULT_STATS, error, isLoading, mutate } = useSWR('reading-stats', getStatsFromStorage, {
         revalidateOnFocus: false,
         onError: (err) => {
@@ -52,7 +54,7 @@ const Stats: React.FC = () => {
     if (error) toast.error(error);
 
 
-    return (isLoading || isRefreshing) ? <StatsSkeleton />
+    return (isLoading || isRefreshing || isSyncing) ? <StatsSkeleton />
         :
         <div className="flex flex-col gap-4">
             <StatsHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />

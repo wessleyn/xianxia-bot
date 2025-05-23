@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookmarkData } from '../types';
+import { BookmarkData } from '../../action';
 
 interface BookmarkCardProps {
     bookmark: BookmarkData;

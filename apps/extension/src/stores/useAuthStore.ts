@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import supabase from '@utils/supabase';
-
+import toast from 'react-hot-toast';
 const WEB_APP_URL = import.meta.env.WXT_NEXT_PUBLIC;
 
 export type LOGIN_STATUS = 'initaiting' | 'pending' | 'error' | 'success';
@@ -115,8 +115,11 @@ export const useAuthStore = create<AuthState>()(
 
             // Sign out
             logout: async () => {
+                const loadingToast = toast.loading('Logging out...');
                 await supabase.auth.signOut();
                 set({ loginStatus: 'initaiting', user: null, session: null, email: null });
+                toast.dismiss(loadingToast);
+                toast.success('Logged out successfully');
             },
 
             // Check for existing session

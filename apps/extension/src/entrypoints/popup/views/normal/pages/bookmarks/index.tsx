@@ -1,63 +1,67 @@
-import React from 'react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import useSWR from 'swr';
+import useDashStore from '../../stores/useDashStore';
+import { DEFAULT_CURRENT_BOOKMARKS, getBookmarksFromStorage, reCalcBookmarks } from './action';
 import BookmarkCard from './components/BookmarkCard';
 import BookmarkHeader from './components/BookmarkHeader';
+import BookMarksSkeleton from './skeleton';
 
-const Bookmarks: React.FC = () => {
-    // Mock data for bookmarks
-    const bookmarks = [
-        {
-            id: 1,
-            novel: "Against the Gods",
-            chapter: 341,
-            chapterTitle: "Heavenly Profound Treasure",
-            excerpt: "The Overlord Pellet was known as the number one pellet within the Blue Wind Empire...",
-            dateAdded: "2025-05-12",
-            color: "bg-red-100",
-            textColor: "text-red-700"
-        },
-        {
-            id: 2,
-            novel: "Martial World",
-            chapter: 984,
-            chapterTitle: "Divine Phoenix Island",
-            excerpt: "The ancient Phoenix was a mythical divine beast, said to be unrivaled under the heavens...",
-            dateAdded: "2025-05-10",
-            color: "bg-blue-100",
-            textColor: "text-blue-700"
-        },
-        {
-            id: 3,
-            novel: "Desolate Era",
-            chapter: 155,
-            chapterTitle: "The Bloodcloud Hall",
-            excerpt: "The Diremonsters were divided into nine separate grades, just like magic treasures...",
-            dateAdded: "2025-05-08",
-            color: "bg-green-100",
-            textColor: "text-green-700"
-        },
-        {
-            id: 4,
-            novel: "Martial World",
-            chapter: 982,
-            chapterTitle: "The Final Trial",
-            excerpt: "The divine tree had nine branches and nine roots, symbolizing the nine heavens and nine earths...",
-            dateAdded: "2025-05-06",
-            color: "bg-purple-100",
-            textColor: "text-purple-700"
-        },
-    ];
+const Bookmarks = () => {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const { isSyncing } = useDashStore()
+    const { data: bookmarks = DEFAULT_CURRENT_BOOKMARKS, error, isLoading, mutate } = useSWR('current-bookmarks', getBookmarksFromStorage, {
+        revalidateOnFocus: false,
+        onError: (err) => {
+            console.error('Error loading current bookmarks:', err);
+            toast.error('Failed to load current bookmarks');
+        }
+    });
 
-    return (
+    const handleRefresh = async () => {
+        try {
+            setIsRefreshing(true);
+
+            // Use mutate to update the data
+            await mutate(async () => {
+                const result = await reCalcBookmarks();
+                if (result.error) {
+                    toast.error(result.error);
+                    return bookmarks; // Return previous bookmarks on error
+                }
+
+                // Compare new data with previous data
+                const isDataChanged = JSON.stringify(result.data) !== JSON.stringify(bookmarks);
+
+                if (isDataChanged) {
+                    toast.success('Current bookmarks updated successfully');
+                } else {
+                    toast.success('Current bookmarks already up to date');
+                }
+
+                return result.data;
+            }, {
+                revalidate: false // We don't need to revalidate since we're already updating the data
+            });
+        } catch (err) {
+            toast.error('Error refreshing current bookmarks: ' + (err instanceof Error ? err.message : 'Unknown error'));
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
+    if (error) toast.error(String(error));
+
+    return (isLoading || isRefreshing || isSyncing) ? <BookMarksSkeleton />
+        :
         <div className="flex flex-col gap-4">
-            <BookmarkHeader />
-
+            <BookmarkHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
             <div className="space-y-4">
                 {bookmarks.map((bookmark) => (
                     <BookmarkCard key={bookmark.id} bookmark={bookmark} />
                 ))}
             </div>
         </div>
-    );
 };
 
 export default Bookmarks;

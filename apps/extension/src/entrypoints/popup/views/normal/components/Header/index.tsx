@@ -1,7 +1,8 @@
+import { useAuthStore } from '@stores/useAuthStore';
 import { IconRefresh, IconUserCircle } from '@tabler/icons-react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../../../../../stores/useAuthStore';
+import useDashStore from '../../stores/useDashStore';
 import ThemeSelector from '../ThemeSelector';
 import PopoverMenu from './PopoverMenu';
 
@@ -11,9 +12,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
   const { loginStatus } = useAuthStore();
+  const { handleSync, isSyncing } = useDashStore()
   const navigate = useNavigate();
-
-  const handleSync = () => alert('Syncing data...');
 
   return (
     <header className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-indigo-800 to-purple-700 dark:from-indigo-900 dark:to-purple-900 text-white shadow-md">
@@ -23,16 +23,21 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
       {/* Theme Toggle Button */}
       <ThemeSelector />
       {
+        // IF LOGGED IN, SHOW SYNC BUTTON
         loginStatus === 'success' ? (
           <button
             onClick={handleSync}
             className="flex items-center gap-1 px-3 py-1.5 bg-indigo-500/80 hover:bg-indigo-600/80 rounded-md transition-colors focus:outline-none shadow-sm"
             title="Sync data and logout"
           >
-            <IconRefresh size={16} stroke={2} />
-            <span className="text-xs font-medium">Sync</span>
+            <IconRefresh size={16} stroke={2} className={`${isSyncing ? 'animate-spin' : ''}`} />
+            <span className="text-xs font-medium">{
+              isSyncing ? 'Syncing...' : 'Sync'
+            }</span>
           </button>
-        ) : isLoginPage ?
+        )
+          : // IF NOT LOGGED IN AND  YOU'RE TO ON THE LOGIN PAGE, SHOW BACK BUTTON (back to dash)
+          isLoginPage ?
           (
             <button
               onClick={() => navigate('/')}
@@ -44,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
               </svg>
               <span className="font-medium text-sm">Back</span>
             </button>
-          ) : (
+          ) : ( // ELSE IF NOT LOGGED IN, JUST SHOW LOGIN BUTTON
             <Link
               to="/login"
               className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-md transition-colors shadow-sm"

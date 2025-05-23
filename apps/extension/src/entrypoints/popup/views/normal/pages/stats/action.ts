@@ -1,4 +1,5 @@
 import { storage } from '#imports';
+import { delay } from '../../../../../../utils/common';
 
 export interface ReadingStats {
   booksRead: number;
@@ -58,6 +59,8 @@ export const saveStatsToStorage = async (stats: ReadingStats): Promise<void> => 
  * Fetch user stats from API and update local storage
  */
 export const recalculateStats = async (): Promise<{ data: ReadingStats, error: string | null }> => {
+   await delay(2)
+  
   try {
     // TODO: Calculate stats based on users reading habits 
     const stats: ReadingStats = {

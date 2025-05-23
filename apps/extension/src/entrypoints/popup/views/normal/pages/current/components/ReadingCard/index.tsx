@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReadingData } from '../types';
+import { ReadingData } from '../../action';
 
 interface ReadingCardProps {
     book: ReadingData;
