@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../../../../stores/useAuthStore';
-import Header from '../components/Header';
-import NavigationTabs from '../components/NavigationTabs';
+import { useAuthStore } from '../../../stores/useAuthStore';
+import Header from './Header';
+import NavigationTabs from './NavigationTabs';
 
 interface LayoutProps {
   children?: ReactNode;
@@ -21,7 +21,7 @@ const Layout: React.FC<LayoutProps> = () => {
   const location = useLocation();
   const { loginStatus } = useAuthStore();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (loginStatus === 'pending') {
       navigate('/login');

@@ -1,4 +1,4 @@
-import { delay } from "../../../../../../utils/common";
+import { delay } from "../../../../utils/common";
 
 export interface BookmarkData {
     id: number;
@@ -48,7 +48,7 @@ export const saveBookmarksToStorage = async (bookmarks: BookmarkData[]): Promise
  * Fetch current bookmarks from API and update local storage
  */
 export const reCalcBookmarks = async (): Promise<{ data: BookmarkData[], error: string | null }> => {
- await delay(2)
+    await delay(2)
     try {
         // Mock data for current bookmarks
         const bookmarks: BookmarkData[] = [

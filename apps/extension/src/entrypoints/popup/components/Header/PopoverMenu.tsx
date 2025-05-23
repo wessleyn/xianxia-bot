@@ -1,6 +1,6 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useAuthStore } from '../../../../../../stores/useAuthStore';
+import { useAuthStore } from '../../../../stores/useAuthStore';
 import NavigationMenu from './NavigationMenu';
 
 const PopoverMenu = () => {
@@ -22,7 +22,7 @@ const PopoverMenu = () => {
                                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-sm">
                                         <span className="text-sm font-medium">{user!.email!.split('@')[0].charAt(0)}</span>
                                     </div>
-                                    <span className="ml-2 text-lg font-medium">{ user!.email!.split('@')[0] }</span>
+                                    <span className="ml-2 text-lg font-medium">{user!.email!.split('@')[0]}</span>
                                 </>
                             ) : (
                                 <>

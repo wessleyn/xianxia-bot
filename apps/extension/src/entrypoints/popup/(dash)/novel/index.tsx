@@ -1,15 +1,14 @@
 import React from 'react';
-import { useViewContext } from '../../context/ViewContext';
-import Layout from '../normal/components/Layout';
-
 /**
  * Component for the Novel view when on a novel site, but not on a chapter or TOC page
  */
 const NovelView: React.FC = () => {
-    const { tabInfo } = useViewContext();
+    const tabInfo = {
+        title: 'Novel Site Detected',
+        description: 'This appears to be a novel site. You can now:'
+    };
 
     return (
-        <Layout isNovelSite={true} novelTitle={tabInfo?.title}>
             <div className="flex flex-col items-center justify-center space-y-6 p-4 text-center">
                 <div className="text-2xl font-bold text-indigo-700">
                     {tabInfo?.title || 'Novel Site Detected'}
@@ -54,7 +53,6 @@ const NovelView: React.FC = () => {
                     </button>
                 </div>
             </div>
-        </Layout>
     );
 };
 

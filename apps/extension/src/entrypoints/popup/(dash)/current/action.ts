@@ -1,5 +1,5 @@
 import { storage } from '#imports';
-import { delay } from '../../../../../../utils/common';
+import { delay } from '../../../../utils/common';
 export interface ReadingData {
     id: number;
     title: string;
@@ -48,7 +48,7 @@ export const saveCurrentReadingsToStorage = async (readings: ReadingData[]): Pro
  */
 export const recalculateCurrentReadings = async (): Promise<{ data: ReadingData[], error: string | null }> => {
     await delay(2)
-   
+
     try {
         // Mock data for current readings
         const readings: ReadingData[] = [

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useAuthStore } from '../../../../../../../stores/useAuthStore';
+import { useAuthStore } from '../../../../../stores/useAuthStore';
 import { UseOtpFormReturn } from '../hooks/useOtpForm';
 import SubmitButton from './SubmitButton';
 
@@ -65,7 +65,7 @@ const OtpForm: React.FC<OtpFormProps> = ({ formState, email, onVerifySuccess }) 
             if (error) {
                 toast.error(`Verification failed: ${error.message}`);
             } else {
-              await onVerifySuccess();
+                await onVerifySuccess();
             }
         } catch (error) {
             toast.error('Verification failed. An unexpected error occurred.');
