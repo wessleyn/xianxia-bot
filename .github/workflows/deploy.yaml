@@ -1,140 +1,42 @@
-env:
-  DIRECTORY: .output
-  PROJECT_NAME: Xianxu
-
-name: Deploy
+name: Release
 
 on:
-  push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
+  workflow_dispatch:
 
 jobs:
-  Version:
+  submit:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
-      version_changed: ${{ steps.check_version.outputs.version_changed }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Check for version change
-        id: check_version
-        run: |
-          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
-          echo "Running version check..."
-          
-          # Debug info
-          git log --oneline -n 5
-          
-          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            echo "Processing pull request..."
-            echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
-            echo "Head SHA: ${{ github.event.pull_request.head.sha }}"
-            
-            # Check if package.json was modified in the PR
-            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-            echo "Changed files: $CHANGED_FILES"
-            
-            if echo "$CHANGED_FILES" | grep -q "package.json"; then
-              echo "package.json was modified in this PR"
-              
-              # Extract versions
-              BASE_VERSION=$(git show ${{ github.event.pull_request.base.sha }}:package.json 2>/dev/null | jq -r .version || echo "none")
-              HEAD_VERSION=$(jq -r .version package.json)
-              
-              echo "Base version: $BASE_VERSION"
-              echo "Head version: $HEAD_VERSION"
-              
-              if [ "$BASE_VERSION" != "$HEAD_VERSION" ]; then
-                echo "Version changed from $BASE_VERSION to $HEAD_VERSION"
-                VERSION_CHANGED=1
-              else
-                echo "Version unchanged"
-                VERSION_CHANGED=0
-              fi
-            else
-              echo "package.json was not modified"
-              VERSION_CHANGED=0
-            fi
-          else
-            echo "Processing direct push to master..."
-            # For direct pushes to master
-            BEFORE_COMMIT=$(git rev-parse HEAD~1)
-            echo "Previous commit: $BEFORE_COMMIT"
-            
-            BEFORE_VERSION=$(git show $BEFORE_COMMIT:package.json 2>/dev/null | jq -r .version || echo "none")
-            AFTER_VERSION=$(jq -r .version package.json)
-            
-            echo "Previous version: $BEFORE_VERSION"
-            echo "Current version: $AFTER_VERSION"
-            
-            if [ "$BEFORE_VERSION" != "$AFTER_VERSION" ]; then
-              echo "Version changed from $BEFORE_VERSION to $AFTER_VERSION"
-              VERSION_CHANGED=1
-            else
-              echo "Version unchanged"
-              VERSION_CHANGED=0
-            fi
-          fi
-          
-          echo "version_changed=$VERSION_CHANGED" >> "$GITHUB_OUTPUT"
-          echo "Version check complete with result: $VERSION_CHANGED"
-      - name: Get version
-        id: get_version
-        run: |
-          echo "Getting version..."
-          # Always get version from current working directory
-          # This works for both PR merges and direct pushes
-          VERSION=$(jq -r .version package.json)
-          echo "Detected version: $VERSION"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-  Submit:
-    needs: Version
-    if: ${{ needs.Version.outputs.version_changed == '1' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      - name: Build extensions with Turbo
+
+      - name: Build extension
         run: npm run build:ext
+
       - name: Zip extensions
+        working-directory: apps/extension
         run: |
-          cd apps/extension && npm run zip && npm run zip:fox
+          npm run zip
+          npm run zip:fox
+
       - name: Submit to stores
         working-directory: apps/extension
         run: |
           npx wxt submit \
-            # --chrome-zip ${{ env.DIRECTORY }}/xianxu-${{ needs.Version.outputs.version }}-chrome.zip \
-            --firefox-zip ${{ env.DIRECTORY }}/xianxu-${{ needs.Version.outputs.version }}-firefox.zip \
-            --firefox-sources-zip ${{ env.DIRECTORY }}/xianxu-${{ needs.Version.outputs.version }}-sources.zip
+            # --chrome-zip .output/*-chrome.zip \
+            --firefox-zip .output/*-firefox.zip --firefox-sources-zip .output/*-sources.zip
         env:
-          #   CHROME_EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
-          #   CHROME_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          #   CHROME_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          #   CHROME_REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          # CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          # CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          # CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          # CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        with:
-          tag_name: "v${{ needs.Version.outputs.version }}"
-          name: "v${{ needs.Version.outputs.version }}"
-          draft: false
-          prerelease: true
-          files: |
-            # ${{ env.DIRECTORY }}/xianxu-${{ needs.Version.outputs.version }}-chrome.zip
-            ${{ env.DIRECTORY }}/xianxu-${{ needs.Version.outputs.version }}-firefox.zip
-            ${{ env.DIRECTORY }}/xianxu-${{ needs.Version.outputs.version }}-sources.zip
