@@ -6,7 +6,7 @@ name: Deploy
 
 on:
   push:
-    branches: ["master", "hotfix/*"]
+    branches: ["master"]
   pull_request:
     branches: ["master"]
 
@@ -38,7 +38,7 @@ jobs:
 
   Submit:
     needs: Version
-    if: ${{ needs.Version.outputs.version_changed == '1' }}
+    if: ${{ needs.Version.outputs.version_changed == '1' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
