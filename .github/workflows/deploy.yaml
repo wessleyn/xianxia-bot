@@ -8,7 +8,7 @@ on:
   push:
     branches: ["master", "hotfix/*"]
   pull_request:
-    branches: ["master", "hotfix/*"]
+    branches: ["master"]
 
 jobs:
   Version:
@@ -49,11 +49,9 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Build extensions with Turbo
-        run: npm run build:ext
       - name: Zip extensions
         run: |
-          cd apps/extension && npm run zip && npm run zip:fox
+          cd apps/extension && npm run zip:fox
       - name: Submit to stores
         working-directory: apps/extension
         run: |
