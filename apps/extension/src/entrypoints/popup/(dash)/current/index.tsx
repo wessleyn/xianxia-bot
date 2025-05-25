@@ -59,7 +59,7 @@ const Current: React.FC = () => {
     return (isLoading || isRefreshing || isSyncing) ? (
         <CurrentSkeleton />
     ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col h-full justify-between gap-4">
             <CurrentHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
 
             {currentReadings.length > 0 ? (

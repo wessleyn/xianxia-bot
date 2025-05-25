@@ -5,7 +5,7 @@ import { ReadingCardSkeleton } from './components/ReadingCard/skeleton';
 
 const CurrentSkeleton: React.FC = () => {
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col h-full justify-between gap-4">
             <HeaderSkeleton />
 
             {Array.from({ length: 3 }).map((_, index) => (

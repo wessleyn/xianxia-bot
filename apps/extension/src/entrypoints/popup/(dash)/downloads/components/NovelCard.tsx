@@ -1,5 +1,12 @@
+import {
+    IconBook,
+    IconBookmark,
+    IconChevronDown,
+    IconTrash
+} from '@tabler/icons-react';
+import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
-import { NovelData } from '../types';
+import { NovelData } from '../action';
 import NovelChaptersList from './NovelChaptersList';
 
 interface NovelCardProps {
@@ -9,6 +16,15 @@ interface NovelCardProps {
 }
 
 const NovelCard: React.FC<NovelCardProps> = ({ novel, toggleExpand, deleteDownload }) => {
+    // Calculate download date based on most recent chapter if available
+    const downloadDate = novel.chapters?.length
+        ? new Date(novel.chapters[novel.chapters.length - 1].downloadDate || Date.now())
+        : null;
+
+    const formattedDate = downloadDate
+        ? formatDistanceToNow(downloadDate, { addSuffix: true })
+        : "Recently";
+
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-3 flex gap-3">
@@ -31,15 +47,11 @@ const NovelCard: React.FC<NovelCardProps> = ({ novel, toggleExpand, deleteDownlo
 
                     <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                         <div className="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-book mr-1" width="14" height="14" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"></path>
-                                <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"></path>
-                                <path d="M3 6l0 13"></path>
-                                <path d="M12 6l0 13"></path>
-                                <path d="M21 6l0 13"></path>
-                            </svg>
+                            <IconBook size={14} className="mr-1 text-indigo-600 dark:text-indigo-300" />
                             <span className="text-indigo-600 dark:text-indigo-300 font-medium">{novel.downloadedChapters} chapters</span>
+                        </div>
+                        <div className="flex items-center justify-end">
+                            <span className="text-gray-500 dark:text-gray-400"> {formattedDate}</span>
                         </div>
                     </div>
 
@@ -49,9 +61,10 @@ const NovelCard: React.FC<NovelCardProps> = ({ novel, toggleExpand, deleteDownlo
                             className="text-xs bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded flex items-center gap-1 transition-colors"
                         >
                             {novel.isExpanded ? 'Hide chapters' : 'Show chapters'}
-                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform ${novel.isExpanded ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
+                            <IconChevronDown
+                                size={14}
+                                className={`transition-transform ${novel.isExpanded ? 'rotate-180' : ''}`}
+                            />
                         </button>
 
                         <div className="flex gap-2">
@@ -59,27 +72,14 @@ const NovelCard: React.FC<NovelCardProps> = ({ novel, toggleExpand, deleteDownlo
                                 className="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-800/70 text-indigo-600 dark:text-indigo-300 rounded-md transition-colors"
                                 title="Read offline"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-book-2" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M19 4v16h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12z"></path>
-                                    <path d="M19 16h-12a2 2 0 0 0 -2 2"></path>
-                                    <path d="M9 8h6"></path>
-                                    <path d="M9 12h6"></path>
-                                </svg>
+                                <IconBookmark size={16} />
                             </button>
                             <button
                                 onClick={() => deleteDownload(novel.id)}
                                 className="p-1.5 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 rounded-md transition-colors"
                                 title="Delete download"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-trash" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M4 7l16 0"></path>
-                                    <path d="M10 11l0 6"></path>
-                                    <path d="M14 11l0 6"></path>
-                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-                                </svg>
+                                <IconTrash size={16} />
                             </button>
                         </div>
                     </div>

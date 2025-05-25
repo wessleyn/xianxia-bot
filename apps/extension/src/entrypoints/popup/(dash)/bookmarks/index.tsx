@@ -56,11 +56,32 @@ const Bookmarks = () => {
         :
         <div className="flex flex-col gap-4">
             <BookmarkHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
-            <div className="space-y-4">
-                {bookmarks.map((bookmark) => (
-                    <BookmarkCard key={bookmark.id} bookmark={bookmark} />
-                ))}
-            </div>
+            {bookmarks.length > 0 ? (
+                <div className="space-y-4">
+                    {bookmarks.map((bookmark) => (
+                        <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9 4h6a2 2 0 0 1 2 2v14l-5 -3l-5 3v-14a2 2 0 0 1 2 -2" />
+                        </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">No Bookmarks Found</h3>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Start adding bookmarks to your favorite novels<br />so you can easily find them later.
+                    </p>
+                    <button
+                        className="mt-6 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors"
+                        onClick={handleRefresh}
+                    >
+                        Refresh Bookmarks
+                    </button>
+                </div>
+            )}
         </div>
 };
 

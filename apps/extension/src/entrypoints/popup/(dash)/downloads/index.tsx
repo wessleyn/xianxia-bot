@@ -1,47 +1,82 @@
+import { IconRefresh } from '@tabler/icons-react';
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import useSWR from 'swr';
+import useDashStore from '../../stores/useDashStore';
+import { DEFAULT_STATE, deleteDownloadedNovel, getDownloadedNovelsFromStorage, NovelData, recalculateDownloadedNovels } from './action';
+import DownloadSkeleton from './components/DownloadSkeleton';
 import EmptyState from './components/EmptyState';
 import FilterBar from './components/FilterBar';
 import NovelCard from './components/NovelCard';
 import StorageUsage from './components/StorageUsage';
-import { NovelData } from './types';
 
 const Downloads: React.FC = () => {
     const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'size'>('all');
-    const [novels, setNovels] = useState<NovelData[]>([
-        {
-            id: 1,
-            title: "Against the Gods",
-            author: "Mars Gravity",
-            coverUrl: "https://via.placeholder.com/60x80/6366F1/FFFFFF?text=ATG",
-            downloadedChapters: 530,
-            totalSize: "24.5 MB",
-            isExpanded: false,
-            downloadOrder: 2 // More recently downloaded (higher number means more recent)
-        },
-        {
-            id: 2,
-            title: "Martial World",
-            author: "Cocooned Cow",
-            coverUrl: "https://via.placeholder.com/60x80/8B5CF6/FFFFFF?text=MW",
-            downloadedChapters: 214,
-            totalSize: "9.8 MB",
-            isExpanded: false,
-            downloadOrder: 1 // Less recently downloaded
-        }
-    ]);
+    const { isSyncing } = useDashStore();
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const totalStorageUsed = novels.reduce((acc, novel) => {
-        return acc + parseFloat(novel.totalSize);
-    }, 0);
+    const { data: novels = DEFAULT_STATE.novels, error, isLoading, mutate } = useSWR('downloaded-novels', getDownloadedNovelsFromStorage, {
+        revalidateOnFocus: false,
+        onError: (err) => {
+            console.error('Error loading downloaded novels:', err);
+            toast.error('Failed to load downloads');
+        }
+    });
 
     const toggleExpand = (id: number) => {
-        setNovels(novels.map(novel =>
-            novel.id === id ? { ...novel, isExpanded: !novel.isExpanded } : novel
-        ));
+        mutate(
+            novels.map((novel: NovelData) =>
+                novel.id === id ? { ...novel, isExpanded: !novel.isExpanded } : novel
+            ),
+            { revalidate: false }
+        );
     };
 
-    const deleteDownload = (id: number) => {
-        setNovels(novels.filter(novel => novel.id !== id));
+    const deleteDownload = async (id: number) => {
+        try {
+            const result = await deleteDownloadedNovel(id);
+            if (result.success) {
+                mutate(novels.filter((novel: NovelData) => novel.id !== id), { revalidate: false });
+                toast.success('Novel deleted successfully');
+            } else {
+                toast.error(result.error || 'Failed to delete novel');
+            }
+        } catch (err) {
+            toast.error('Error deleting novel');
+            console.error('Error deleting novel:', err);
+        }
+    };
+
+    const handleRefresh = async () => {
+        try {
+            setIsRefreshing(true);
+
+            // Use mutate to update the data
+            await mutate(async () => {
+                const result = await recalculateDownloadedNovels();
+                if (result.error) {
+                    toast.error(result.error);
+                    return novels; // Return previous downloads on error
+                }
+
+                // Compare new data with previous data
+                const isDataChanged = JSON.stringify(result.data) !== JSON.stringify(novels);
+
+                if (isDataChanged) {
+                    toast.success('Downloaded novels updated successfully');
+                } else {
+                    toast.success('Downloaded novels already up to date');
+                }
+
+                return result.data;
+            }, {
+                revalidate: false // We don't need to revalidate since we're already updating the data
+            });
+        } catch (err) {
+            toast.error('Error refreshing downloads: ' + (err instanceof Error ? err.message : 'Unknown error'));
+        } finally {
+            setIsRefreshing(false);
+        }
     };
 
     const filteredNovels = () => {
@@ -59,17 +94,36 @@ const Downloads: React.FC = () => {
         }
     }
 
+    if (error) toast.error(String(error));
+
+    if (isLoading || isRefreshing || isSyncing) {
+        return <DownloadSkeleton />;
+    }
+
     return (
         <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Downloaded Novels</h2>
-                <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleRefresh}
+                        className="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                        disabled={isRefreshing}
+                    >
+                        <IconRefresh
+                            className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`}
+                            strokeWidth={1.5} stroke="currentColor"
+
+                        />
+                    </button>
+                    <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+                </div>
             </div>
 
             <div className="flex-1 overflow-auto pr-1 custom-scrollbar">
                 {novels.length > 0 ? (
                     <div className="space-y-3">
-                        {filteredNovels().map((novel) => (
+                        {filteredNovels().map((novel: NovelData) => (
                             <NovelCard
                                 key={novel.id}
                                 novel={novel}
@@ -77,13 +131,13 @@ const Downloads: React.FC = () => {
                                 deleteDownload={deleteDownload}
                             />
                         ))}
-
-                        {novels.length > 0 && <StorageUsage totalStorageUsed={totalStorageUsed} />}
                     </div>
                 ) : (
                     <EmptyState />
                 )}
             </div>
+
+            {novels.length > 0 && <StorageUsage />}
         </div>
     );
 };
