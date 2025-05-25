@@ -6,8 +6,8 @@ import {
 } from '@tabler/icons-react';
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
-import { NovelData } from '../action';
-import NovelChaptersList from './NovelChaptersList';
+import { NovelData } from '../../action';
+import NovelChaptersList from '../NovelChaptersList';
 
 interface NovelCardProps {
     novel: NovelData;

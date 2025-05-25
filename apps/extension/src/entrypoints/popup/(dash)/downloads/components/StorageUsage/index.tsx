@@ -1,6 +1,6 @@
 import React from 'react';
 import useSWR from 'swr';
-import { DEFAULT_STORAGE_USAGE, calculateStorageUsage } from '../action';
+import { DEFAULT_STORAGE_USAGE, calculateStorageUsage } from '../../action';
 
 const StorageUsage: React.FC = () => {
     const { data: storageData = DEFAULT_STORAGE_USAGE } = useSWR('downloaded-novels-storage', calculateStorageUsage, {

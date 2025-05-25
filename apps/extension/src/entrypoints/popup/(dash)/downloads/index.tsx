@@ -1,16 +1,17 @@
 import { IconRefresh } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
 import { DEFAULT_STATE, deleteDownloadedNovel, getDownloadedNovelsFromStorage, NovelData, recalculateDownloadedNovels } from './action';
-import DownloadSkeleton from './components/DownloadSkeleton';
 import EmptyState from './components/EmptyState';
 import FilterBar from './components/FilterBar';
 import NovelCard from './components/NovelCard';
 import StorageUsage from './components/StorageUsage';
+import StorageUsageSkeleton from './components/StorageUsage/skeleton';
+import DownloadSkeleton from './skeleton';
 
-const Downloads: React.FC = () => {
+const Downloads = () => {
     const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'size'>('all');
     const { isSyncing } = useDashStore();
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -96,50 +97,51 @@ const Downloads: React.FC = () => {
 
     if (error) toast.error(String(error));
 
-    if (isLoading || isRefreshing || isSyncing) {
-        return <DownloadSkeleton />;
-    }
+    return (isLoading || isRefreshing || isSyncing) ?
+        <DownloadSkeleton />
+        : 
+            <div className="flex flex-col h-full">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Downloaded Novels</h2>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleRefresh}
+                            className="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                            disabled={isRefreshing}
+                        >
+                            <IconRefresh
+                                className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`}
+                                strokeWidth={1.5} stroke="currentColor"
 
-    return (
-        <div className="flex flex-col h-full">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Downloaded Novels</h2>
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={handleRefresh}
-                        className="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
-                        disabled={isRefreshing}
-                    >
-                        <IconRefresh
-                            className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`}
-                            strokeWidth={1.5} stroke="currentColor"
-
-                        />
-                    </button>
-                    <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
-                </div>
-            </div>
-
-            <div className="flex-1 overflow-auto pr-1 custom-scrollbar">
-                {novels.length > 0 ? (
-                    <div className="space-y-3">
-                        {filteredNovels().map((novel: NovelData) => (
-                            <NovelCard
-                                key={novel.id}
-                                novel={novel}
-                                toggleExpand={toggleExpand}
-                                deleteDownload={deleteDownload}
                             />
-                        ))}
+                        </button>
+                        <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
                     </div>
-                ) : (
-                    <EmptyState />
-                )}
-            </div>
+                </div>
 
-            {novels.length > 0 && <StorageUsage />}
-        </div>
-    );
+                <div className="flex-1 overflow-auto pr-1 custom-scrollbar">
+                    {novels.length > 0 ? (
+                        <div className="space-y-3">
+                            {filteredNovels().map((novel) => (
+                                <NovelCard
+                                    key={novel.id}
+                                    novel={novel}
+                                    toggleExpand={toggleExpand}
+                                    deleteDownload={deleteDownload}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptyState />
+                    )}
+                </div>
+
+            {novels.length > 0 && (
+                <Suspense fallback={<StorageUsageSkeleton />}>
+                    <StorageUsage />
+                </Suspense>
+            )}
+            </div>
 };
 
 export default Downloads;

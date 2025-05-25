@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import { NovelData, getNovelChapters, getRecentNovelChapters } from '../action';
+import { NovelData, getNovelChapters, getRecentNovelChapters } from '../../action';
 
 interface NovelChaptersListProps {
     novel: NovelData;
