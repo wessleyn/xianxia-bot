@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt';
+import { novelPatterns } from './src/novelPatterns';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -18,10 +19,10 @@ export default defineConfig({
       'scripting'
     ],
     host_permissions: [
-      '*://*.wessleyn.me/*',
-      '*://*.google.com/*',
-      'http://localhost/*'
-    ]
+      // '*://*.wessleyn.me/*',
+      'http://localhost/*',
+    ].concat(novelPatterns.map(pattern => `*://${pattern.homepage}/*`)),
+
   },
   alias: {
     '@': '/src',

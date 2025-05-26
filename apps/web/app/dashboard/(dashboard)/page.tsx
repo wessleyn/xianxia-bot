@@ -27,7 +27,6 @@ export default function Dashboard() {
                 <StatsGrid />
             </Suspense>
             <Suspense fallback={<SourcesHeatmapSkeleton />}>
-
                 <SourcesHeatmap />
             </Suspense>
             <Suspense fallback={<RecentReadingSkeleton />}>

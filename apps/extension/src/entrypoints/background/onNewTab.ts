@@ -1,20 +1,55 @@
 import { detectPage } from "@utils/detectPage";
-import { localTabView } from "../../constants/storage";
+import { localSettings, localSources, localTabView } from "../../constants/storage";
+import sync from "../../utils/sync";
 
 export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tabs.TabChangeInfo, tab: globalThis.Browser.tabs.Tab) => {
+    const settings = await localSettings.getValue();
+    const sources = await localSources.getValue()
 
     if (changeInfo.status === 'complete' && tab.url) {
-        const url = new URL(tab.url);
-        const info = detectPage(url.href);
+        const url = new URL(tab.url)
+        const newInfo = detectPage(url.href)
 
-        const currentView = await localTabView.getValue();
-        console.log('Current view:', currentView);
-        console.log('Detected page type:', info.type);
-        if (currentView !== info.type) {
-            localTabView.setValue(info.type);
-            console.log('Updated view to:', info.type);
+        let currentView = await localTabView.getValue()
+        currentView !== newInfo.type && localTabView.setValue(newInfo.type)
+        currentView = await localTabView.getValue() // guarantees latest view is selected
+
+        const sourceIndex = sources.findIndex(source => source.name.includes(newInfo.name))
+
+        if (sourceIndex !== -1) { // is found
+            switch (currentView) {
+                case 'novelSite':
+                    const updatedSources = [...sources]
+                    updatedSources[sourceIndex] = {
+                        ...updatedSources[sourceIndex],
+                        visits: (updatedSources[sourceIndex].visits || 0) + 1,
+                        lastVisited: new Date().toISOString()
+                    }
+                    await localSources.setValue(updatedSources)
+
+                    settings.autoSync && await sync('sources')
+                    break;
+                default:
+                    break;
+            }
+
         } else {
-            console.log('No update needed, current view is already:', currentView);
+            switch (currentView) {
+                case 'novelSite':
+                    const newSource = {
+                        name: newInfo.name,
+                        url: url.origin,
+                        visits: 1,
+                        added: new Date().toISOString(),
+                        lastVisited: new Date().toISOString()
+                    }
+                    await localSources.setValue([...sources, newSource])
+                    settings.autoSync && await sync('sources')
+
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
