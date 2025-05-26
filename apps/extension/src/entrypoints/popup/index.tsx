@@ -20,7 +20,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Stats />} />
-zz
+            <Route path="login" element={<Login />} />
+            <Route path="current" element={<Current />} />
+            <Route path="bookmarks" element={<Bookmarks />} />
+            <Route path="downloads" element={<Downloads />} />
+            <Route path="novel" element={<NovelView />} />
+            <Route path="toc" element={<ToCView />} />
+            <Route path="chapter" element={<ChapterView />} />
           </Route>
         </Routes>
       </Router>
