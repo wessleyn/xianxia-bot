@@ -13,10 +13,13 @@ export const localTabView = storage.defineItem<PopView>(VIEW_STORAGE_KEY, {
  * Stores all the extension settings 
  */
 export const SETTINGS_STORAGE_KEY = 'local:settings'
+export const DEFAULT_SETTINGS: ExtensionSettings = {
+    autoSync: false,
+    readingProgress: true,
+    theme: 'system'
+};
 export const localSettings = storage.defineItem<ExtensionSettings>(SETTINGS_STORAGE_KEY, {
-    fallback: {
-        autoSync: false
-    },
+    fallback: DEFAULT_SETTINGS,
 })
 
 /**

@@ -1,51 +1,69 @@
+import { useOnboardingStore } from '@stores/useOnboardingStore';
 import { IconArrowLeft, IconArrowRight, IconCheck } from '@tabler/icons-react';
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface NavigationButtonsProps {
-    showBack?: boolean;
-    showNext?: boolean;
-    showFinish?: boolean;
-    onBack?: () => void;
-    onNext?: () => void;
-    onFinish?: () => void;
-}
+const NavigationButtons = () => {
+    const navigate = useNavigate();
+    const {
+        isLastStep,
+        isCurrentStepCompleted,
+        navigateToStep,
+        currentStep,
+        completeOnboarding
+    } = useOnboardingStore();
 
-const NavigationButtons: React.FC<NavigationButtonsProps> = ({
-    showBack = false,
-    showNext = true,
-    showFinish = false,
-    onBack,
-    onNext,
-    onFinish
-}) => {
+    const isStepComplete = isCurrentStepCompleted();
+    const isLastStepValue = isLastStep();
+
+    const handleBack = () => {
+        navigateToStep((path) => navigate(path), 'prev');
+    };
+
+    const handleNext = () => {
+        navigateToStep((path) => navigate(path), 'next');
+    };
+
+    const handleFinish = () => {
+        alert("Window will now close");
+        completeOnboarding();
+        window.close();
+    };
+
     return (
         <div className="flex justify-between mt-4">
-            {showBack && (
-                <button
-                    onClick={onBack}
-                    className="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium px-6 py-2 rounded-md transition-colors flex items-center"
-                >
-                    <IconArrowLeft className="mr-2" size={16} stroke={2} />
-                    Back
-                </button>
-            )}
+            {
+                currentStep > 1 && (
+                    <button
+                        onClick={handleBack}
+                        className="border border-[var(--color-border)] hover:bg-[var(--color-muted)] text-[var(--color-foreground)] font-medium px-6 py-2 rounded-md transition-colors flex items-center"
+                    >
+                        <IconArrowLeft className="mr-2" size={16} stroke={2} />
+                        Back
+                    </button>
 
-            <div className="flex-grow"></div>
-
-            {showNext && (
+                )
+            }
+            <div className="flex-1 flex-grow"></div>
+            {!isLastStepValue && (
                 <button
-                    onClick={onNext}
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center"
+                    onClick={handleNext}
+                    className={`${isStepComplete
+                        ? 'bg-teal-600 hover:bg-teal-700'
+                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
+                        } text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
                 >
-                    Next
+                    Continue
                     <IconArrowRight className="ml-2" size={16} stroke={2} />
                 </button>
             )}
 
-            {showFinish && (
+            {isLastStepValue && (
                 <button
-                    onClick={onFinish}
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center"
+                    onClick={handleFinish}
+                    className={`${isStepComplete
+                        ? 'bg-teal-600 hover:bg-teal-700'
+                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
+                        } text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
                 >
                     Finish
                     <IconCheck className="ml-2" size={16} stroke={2} />

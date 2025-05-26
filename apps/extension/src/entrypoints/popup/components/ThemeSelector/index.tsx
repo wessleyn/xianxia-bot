@@ -1,10 +1,11 @@
+import { ReadingTheme } from '@ctypes/index';
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
+import { useSettingsStore } from '@stores/useSettingsStore';
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
-import { useTheme } from 'next-themes';
 import React, { Fragment, useEffect, useState } from 'react';
 
 const ThemeSelector: React.FC = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useSettingsStore();
   const [mounted, setMounted] = useState(false);
 
   // When mounted on client, now we can show the UI
@@ -15,9 +16,9 @@ const ThemeSelector: React.FC = () => {
   }
 
   const themeOptions = [
-    { name: 'Light', value: 'light', icon: IconSun },
-    { name: 'Dark', value: 'dark', icon: IconMoon },
-    { name: 'System', value: 'system', icon: IconDeviceDesktop },
+    { name: 'Light', value: 'light' as ReadingTheme, icon: IconSun },
+    { name: 'Dark', value: 'dark' as ReadingTheme, icon: IconMoon },
+    { name: 'System', value: 'system' as ReadingTheme, icon: IconDeviceDesktop },
   ];
 
   return (

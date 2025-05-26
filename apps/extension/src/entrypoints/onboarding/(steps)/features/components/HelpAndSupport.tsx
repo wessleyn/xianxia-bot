@@ -8,7 +8,7 @@ interface HelpLinkProps {
 }
 
 const HelpLink: React.FC<HelpLinkProps> = ({ text, icon, href = "#" }) => (
-    <a href={href} className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+    <a href={href} className="inline-flex items-center text-[var(--color-primary)] hover:underline">
         <span className="mr-2">{text}</span>
         {icon}
     </a>
@@ -16,15 +16,15 @@ const HelpLink: React.FC<HelpLinkProps> = ({ text, icon, href = "#" }) => (
 
 const HelpAndSupport: React.FC = () => {
     return (
-        <section className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Need Help?</h2>
+        <section className="mb-8 bg-[var(--color-card)] p-6 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4 text-[var(--color-card-foreground)]">Need Help?</h2>
             <div className="flex flex-wrap gap-4">
                 <HelpLink
-                    text="View Documentation"
+                    text="View Manual"
                     icon={<IconBook2 size={16} />}
                 />
                 <HelpLink
-                    text="Get Support"
+                    text="Get Guidance"
                     icon={<IconHelp size={16} />}
                 />
                 <HelpLink

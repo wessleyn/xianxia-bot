@@ -29,6 +29,15 @@ export default async function sync(type: syncType) {
 
             break;
         case 'all':
+            const status = await Promise.all([
+                syncSources({ userId }),
+
+            ]);
+            
+            if (status.some(s => s === false)) {
+                toast.error('Sync failed for some items');
+                return false; 
+            }
     }
     return true; 
 }

@@ -1,27 +1,19 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useOnboardingStore } from '../../../../stores/useOnboardingStore';
-import NavigationButtons from '../../components/NavigationButtons';
+import { useOnboardingStore } from '@stores/useOnboardingStore';
+import React, { useEffect } from 'react';
 import AccountSetup from './components/AccountSetup';
 import Introduction from './components/Introduction';
 
 const Welcome: React.FC = () => {
-    const navigate = useNavigate();
-    const { nextStep } = useOnboardingStore();
+    const {  completeWelcomeStep } = useOnboardingStore();
 
-    const handleNext = () => {
-        nextStep();
-        navigate('/settings');
-    };
+    useEffect(() => {
+        completeWelcomeStep();
+    }, []);
 
     return (
         <>
             <Introduction />
             <AccountSetup />
-            <NavigationButtons
-                showNext={true}
-                onNext={handleNext}
-            />
         </>
     );
 };

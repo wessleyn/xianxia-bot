@@ -1,35 +1,23 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useOnboardingStore } from '../../../../stores/useOnboardingStore';
-import NavigationButtons from '../../components/NavigationButtons';
+import { useOnboardingStore } from '@stores/useOnboardingStore';
+import { useEffect } from 'react';
 import HelpAndSupport from './components/HelpAndSupport';
 import QuickStartFeatures from './components/QuickStartFeatures';
 
-const Features: React.FC = () => {
-    const navigate = useNavigate();
-    const { prevStep, completeOnboarding } = useOnboardingStore();
+const Features = () => {
+    const { markFeaturesComplete } = useOnboardingStore();
 
-    const handleFinish = () => {
-        completeOnboarding();
-        // TODO: implement redirection to popup or close onboarding tab upon completion
-        alert("Onboarding complete! You're all set to use Xianxu!");
-    };
+    // Mark the features step as completed when the user views it
+    // TODO: change this later
+    useEffect(() => {
+        markFeaturesComplete();
+    }, []);
 
-    const handlePrev = () => {
-        prevStep();
-        navigate('/settings');
-    };
+
 
     return (
         <>
             <QuickStartFeatures />
             <HelpAndSupport />
-            <NavigationButtons
-                showBack={true}
-                showFinish={true}
-                onBack={handlePrev}
-                onFinish={handleFinish}
-            />
         </>
     );
 };

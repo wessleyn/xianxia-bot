@@ -8,9 +8,12 @@ export interface NovelPattern {
 }
 
 export type PopView = 'dashboard' | 'novelSite' | 'novelToc' | 'novelCh';
+export type ReadingTheme = 'light' | 'dark' | 'system';
 
 export interface ExtensionSettings {
     autoSync: boolean;
+    readingProgress: boolean
+    theme: ReadingTheme;
 }
 
 export interface LocalSource {
