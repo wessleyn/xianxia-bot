@@ -5,10 +5,13 @@ import React from 'react';
 
 const EssentialSettings: React.FC = () => {
     const { toggleAutoSync, autoSync, readingProgress, toggleReadingProgress, } = useSettingsStore();
-    const {markEssentialSettingsComplete} = useOnboardingStore()
-    const isCompleted = autoSync && readingProgress
+    const { markEssentialSettingsComplete } = useOnboardingStore()
+    const [isCompleted, setisCompleted] = useState(autoSync && readingProgress);
 
-     markEssentialSettingsComplete(isCompleted)
+    useEffect(() => { 
+        setisCompleted(autoSync && readingProgress);
+        markEssentialSettingsComplete(autoSync && readingProgress);
+    }, [autoSync, readingProgress]);
 
 
     

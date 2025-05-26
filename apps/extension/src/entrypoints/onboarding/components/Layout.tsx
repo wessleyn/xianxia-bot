@@ -1,11 +1,19 @@
 import { STEP_PATHS, useOnboardingStore } from '@stores/useOnboardingStore';
 import '@styles/globals.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import NavigationButtons from './NavigationButtons';
 import OnboardingTimeline from './OnboardingTimeline';
 
 const Layout = () => {
+    const navigate = useNavigate();
+    const location = useLocation()
     const { currentStep } = useOnboardingStore();
+    useEffect(() => {
+        console.log('Current Step:', currentStep, 'Step Path:', STEP_PATHS[currentStep]);
+        navigate(STEP_PATHS[currentStep] || '/');
+        console.log('Location:', location.pathname);
+    }, [currentStep])
+
 
     return (
         <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)]">

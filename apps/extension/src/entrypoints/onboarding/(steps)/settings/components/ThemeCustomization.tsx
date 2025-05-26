@@ -6,13 +6,13 @@ import { useOnboardingStore } from '../../../../../stores/useOnboardingStore';
 
 const ThemeCustomization: React.FC = () => {
     const { theme, setTheme } = useSettingsStore();
-    const [isToggled, setIsToggled] = useState(false)
-    const {markEssentialSettingsComplete} = useOnboardingStore()
+    const [isToggled, setIsToggled] = useState(false);
+    const { markThemeToggled } = useOnboardingStore();
 
     const handleThemeChange = (selectedTheme: ReadingTheme) => {
         setTheme(selectedTheme);
         setIsToggled(true);
-        markEssentialSettingsComplete(true);
+        markThemeToggled(true);
     };
 
     return (

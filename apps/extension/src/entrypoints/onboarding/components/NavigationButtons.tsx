@@ -1,31 +1,31 @@
 import { useOnboardingStore } from '@stores/useOnboardingStore';
 import { IconArrowLeft, IconArrowRight, IconCheck } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const NavigationButtons = () => {
-    const navigate = useNavigate();
     const {
         isLastStep,
         isCurrentStepCompleted,
         navigateToStep,
         currentStep,
-        completeOnboarding
+        completionCriteria,
     } = useOnboardingStore();
 
-    const isStepComplete = isCurrentStepCompleted();
-    const isLastStepValue = isLastStep();
+    const [isStepComplete, setisStepComplete] = useState(false);
+    const [isLastStepValue, setIsLastStepValue] = useState(false);
 
-    const handleBack = () => {
-        navigateToStep((path) => navigate(path), 'prev');
-    };
+    useEffect(() => {
+        setisStepComplete(isCurrentStepCompleted());
+        setIsLastStepValue(isLastStep());
+        console.log('reacted')
+    }, [completionCriteria, currentStep]);
 
-    const handleNext = () => {
-        navigateToStep((path) => navigate(path), 'next');
-    };
+    const handleBack = () => navigateToStep('prev');
+
+    const handleNext = () => navigateToStep('next');
 
     const handleFinish = () => {
-        alert("Window will now close");
-        completeOnboarding();
+        alert('Onboarding completed! You can now start using Xianxu.');
         window.close();
     };
 
@@ -51,6 +51,7 @@ const NavigationButtons = () => {
                         ? 'bg-teal-600 hover:bg-teal-700'
                         : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
                         } text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
+                    // disabled={!isStepComplete}
                 >
                     Continue
                     <IconArrowRight className="ml-2" size={16} stroke={2} />
@@ -64,6 +65,7 @@ const NavigationButtons = () => {
                         ? 'bg-teal-600 hover:bg-teal-700'
                         : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
                         } text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
+                    disabled={!isStepComplete}
                 >
                     Finish
                     <IconCheck className="ml-2" size={16} stroke={2} />
