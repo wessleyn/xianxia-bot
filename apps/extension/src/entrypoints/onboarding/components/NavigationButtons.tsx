@@ -35,7 +35,7 @@ const NavigationButtons = () => {
                 currentStep > 1 && (
                     <button
                         onClick={handleBack}
-                        className="border border-[var(--color-border)] hover:bg-[var(--color-muted)] text-[var(--color-foreground)] font-medium px-6 py-2 rounded-md transition-colors flex items-center"
+                        className="border border-[var(--color-border)] dark:border-gray-600 hover:bg-[var(--color-muted)] dark:hover:bg-gray-700 text-[var(--color-foreground)] dark:text-gray-200 font-medium px-6 py-2 rounded-md transition-colors flex items-center"
                     >
                         <IconArrowLeft className="mr-2" size={16} stroke={2} />
                         Back
@@ -48,10 +48,10 @@ const NavigationButtons = () => {
                 <button
                     onClick={handleNext}
                     className={`${isStepComplete
-                        ? 'bg-teal-600 hover:bg-teal-700'
-                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
-                        } text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
-                    // disabled={!isStepComplete}
+                        ? 'bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600'
+                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] dark:bg-purple-600 dark:hover:bg-purple-700'
+                        } text-white dark:text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
+                // disabled={!isStepComplete}
                 >
                     Continue
                     <IconArrowRight className="ml-2" size={16} stroke={2} />
@@ -62,9 +62,9 @@ const NavigationButtons = () => {
                 <button
                     onClick={handleFinish}
                     className={`${isStepComplete
-                        ? 'bg-teal-600 hover:bg-teal-700'
-                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
-                        } text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
+                        ? 'bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600'
+                        : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] dark:bg-purple-600 dark:hover:bg-purple-700'
+                        } text-white dark:text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center`}
                     disabled={!isStepComplete}
                 >
                     Finish
