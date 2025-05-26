@@ -1,10 +1,8 @@
-import createSupabaseClient from '@repo/auth/client';
 import { Session, SupabaseClient, User } from '@supabase/supabase-js';
-import { browser } from 'wxt/browser';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { localUserInfo } from '../constants/storage';
 
-const supabase = createSupabaseClient({});
 
 const WEB_APP_URL = import.meta.env.WXT_NEXT_PUBLIC;
 
@@ -82,6 +80,12 @@ export const useAuthStore = create<AuthState>()(
                             user: data.user,
                             session: data.session
                         });
+                        localUserInfo.setValue({
+                            id: data.session.user.id,
+                            email: data.session.user.email!,
+                            lastLoginTime: Date.now(),
+                            isAuthenticated: true
+                        });
                     }
 
                     return { data, error };
@@ -129,6 +133,12 @@ export const useAuthStore = create<AuthState>()(
                         user: session.user,
                         session
                     });
+                    localUserInfo.setValue({
+                        id: session.user.id,
+                        email: session.user.email!,
+                        lastLoginTime: Date.now(),
+                        isAuthenticated: true
+                    });
                 }
                 return session;
             },
@@ -153,6 +163,12 @@ export const useAuthStore = create<AuthState>()(
                             loginStatus: 'success',
                             user: session.user,
                             session
+                        });
+                        localUserInfo.setValue({
+                            id: session.user.id,
+                            email: session.user.email!,
+                            lastLoginTime: Date.now(),
+                            isAuthenticated: true
                         });
                         console.log('Synced session from cookies');
                         return true;

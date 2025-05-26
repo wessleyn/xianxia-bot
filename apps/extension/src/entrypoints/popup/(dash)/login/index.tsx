@@ -1,8 +1,8 @@
 import LoginForm from '@repo/auth/components/LoginForm';
+import { useAuthStore } from '@stores/useAuthStore';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/useAuthStore';
 import OtpForm from './components/OtpForm';
 import { useOtpForm } from './hooks/useOtpForm';
 

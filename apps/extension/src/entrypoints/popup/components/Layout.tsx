@@ -1,6 +1,6 @@
+import { useAuthStore } from '@stores/useAuthStore';
 import React, { ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../stores/useAuthStore';
 import useViewStore from '../stores/useViewStore';
 import Header from './Header';
 import NavigationTabs from './NavigationTabs';

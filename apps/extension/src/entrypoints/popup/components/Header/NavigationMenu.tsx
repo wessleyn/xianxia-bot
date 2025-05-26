@@ -1,7 +1,7 @@
+import { useAuthStore } from '@stores/useAuthStore';
 import { IconDownload, IconLogin, IconLogout, IconSettings } from '@tabler/icons-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '../../stores/useAuthStore';
 import UserAvatar from './UserAvatar';
 
 const NavigationMenu: React.FC = () => {

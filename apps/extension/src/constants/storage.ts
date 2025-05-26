@@ -29,3 +29,23 @@ export const NOVEL_SOURCES_STORAGE_KEY = 'local:sources'
 export const localSources = storage.defineItem<LocalSource[]>(NOVEL_SOURCES_STORAGE_KEY, {
     fallback: []
 })
+
+/**
+ * Stores the current user information
+ */
+export const USER_STORAGE_KEY = 'local:currentUser'
+export interface StoredUserInfo {
+    id: string | null;
+    email: string | null;
+    lastLoginTime: number | null;
+    isAuthenticated: boolean;
+}
+export const DEFAULT_USER_INFO: StoredUserInfo = {
+    id: null,
+    email: null,
+    lastLoginTime: null,
+    isAuthenticated: false
+};
+export const localUserInfo = storage.defineItem<StoredUserInfo>(USER_STORAGE_KEY, {
+    fallback: DEFAULT_USER_INFO,
+})

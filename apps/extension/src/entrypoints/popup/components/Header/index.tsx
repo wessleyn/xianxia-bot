@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/entrypoints/popup/stores/useAuthStore';
+import { useAuthStore } from '@stores/useAuthStore';
 import { stripedClass } from '@components/StripedBg';
 import { IconRefresh, IconUserCircle } from '@tabler/icons-react';
 import React from 'react';

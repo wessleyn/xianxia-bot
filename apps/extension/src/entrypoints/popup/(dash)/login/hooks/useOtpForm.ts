@@ -1,5 +1,5 @@
+import { useAuthStore } from '@stores/useAuthStore';
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '../../../stores/useAuthStore';
 
 interface UseOtpFormProps {
     email: string;

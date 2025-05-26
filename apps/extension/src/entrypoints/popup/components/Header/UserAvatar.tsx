@@ -1,5 +1,5 @@
+import { useAuthStore } from '@stores/useAuthStore';
 import React from 'react';
-import { useAuthStore } from '../../stores/useAuthStore';
 
 interface UserAvatarProps {
     size?: 'sm' | 'md' | 'lg';

@@ -1,14 +1,20 @@
 import createSupabaseClient from "@repo/auth/client";
+import { localUserInfo } from "../constants/storage";
 
 const supabase = createSupabaseClient({})
 
 export const getLoggedInUser = async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) {
-        console.error('Error checking user:', error);
-        return null;
+    const data = await localUserInfo.getValue()
+    if (data.id && data.isAuthenticated) {
+        return {
+            id: data.id,
+            email: data.email,
+            lastLoginTime: data.lastLoginTime,
+        }
+    } else {
+        console.error('user Not logged in')
+       return null;
     }
-    return user;
 };
 
 export const getUserId = async (): Promise<string | null> => {
@@ -16,7 +22,7 @@ export const getUserId = async (): Promise<string | null> => {
     if (!user) {
         console.warn('No user is logged in');
         return null;
-    } 
+    }
     return user.id;
 };
 
