@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/entrypoints/popup/stores/useAuthStore';
+import { stripedClass } from '@components/StripedBg';
 import { IconRefresh, IconUserCircle } from '@tabler/icons-react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,11 +17,15 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
   const navigate = useNavigate();
 
   return (
-    <header className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-indigo-800 to-purple-700 dark:from-indigo-900 dark:to-purple-900 text-white shadow-md">
-      {/* Brand/Logo Section */}
+    <header
+      className={`
+        flex items-center justify-between p-4 border-b 
+        text-white shadow-md  
+        ${loginStatus === 'success' ? 'bg-gradient-to-r from-indigo-800 to-purple-700 dark:from-indigo-900 dark:to-purple-900' : ''}`}
+      style={loginStatus !== 'success' ? { backgroundImage: stripedClass('#6366f1', '#a855f7', 20, -45) } : undefined}
+    >
       <PopoverMenu />
 
-      {/* Theme Toggle Button */}
       <ThemeSelector />
       {
         // IF LOGGED IN, SHOW SYNC BUTTON
@@ -30,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage = false }) => {
             className="flex items-center gap-1 px-3 py-1.5 bg-indigo-500/80 hover:bg-indigo-600/80 rounded-md transition-colors focus:outline-none shadow-sm"
             title="Sync data and logout"
           >
-            <IconRefresh size={16} stroke={2} className={`${isSyncing ? 'animate-spin' : ''}`} />
+            <IconRefresh size={16} stroke={2} className={`${isSyncing ? 'animate-spin' : ''} `} />
             <span className="text-xs font-medium">{
               isSyncing ? 'Syncing...' : 'Sync'
             }</span>
