@@ -13,6 +13,7 @@
       "@components/*": ["./src/components/*"],
       "@constants/*": ["./src/constants/*"],
       "@ctypes/*": ["./src/ctypes/*"],
+      "@styles/*": ["./src/styles/*"],
       "~/*": ["./*"]
     }
   }

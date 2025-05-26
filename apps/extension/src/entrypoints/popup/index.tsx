@@ -1,7 +1,6 @@
-import { ThemeProvider } from 'next-themes';
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import Provider from '../../components/Provider';
 import Bookmarks from './(dash)/bookmarks';
 import Current from './(dash)/current';
 import Downloads from './(dash)/downloads';
@@ -11,25 +10,19 @@ import ChapterView from './(novel)/chapter';
 import NovelView from './(novel)/novel';
 import ToCView from './(novel)/toc';
 import Layout from './components/Layout';
-import './globals.css';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Stats />} />
-            <Route path="login" element={<Login />} />
-            <Route path="current" element={<Current />} />
-            <Route path="bookmarks" element={<Bookmarks />} />
-            <Route path="downloads" element={<Downloads />} />
-            <Route path="novel" element={<NovelView />} />
-            <Route path="toc" element={<ToCView />} />
-            <Route path="chapter" element={<ChapterView />} />
-          </Route>
-        </Routes>
-      </Router>
-    </ThemeProvider>
-  </React.StrictMode>,
+  <Provider>
+    <Route path="/" element={<Layout />}>
+      <Route index element={<Stats />} />
+      <Route path="login" element={<Login />} />
+      <Route path="current" element={<Current />} />
+      <Route path="bookmarks" element={<Bookmarks />} />
+      <Route path="downloads" element={<Downloads />} />
+      <Route path="novel" element={<NovelView />} />
+      <Route path="toc" element={<ToCView />} />
+      <Route path="chapter" element={<ChapterView />} />
+    </Route>
+  </Provider>
 );

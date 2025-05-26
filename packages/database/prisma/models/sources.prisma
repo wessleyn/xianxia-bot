@@ -16,7 +16,7 @@ model NovelSource {
 model SourceVisit {
     id String @id @default(uuid())
     
-    userId String
+    userId String @db.Uuid
     user UserProfile @relation(fields: [userId], references: [id])
     
     sourceId String

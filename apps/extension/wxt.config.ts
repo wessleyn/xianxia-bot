@@ -18,6 +18,12 @@ export default defineConfig({
       'tabs',
       'scripting'
     ],
+    web_accessible_resources: [
+      {
+        resources: ['/onboarding.html', '/upboarding.html'],
+        matches: ['<all_urls>'],
+      },
+    ],
     host_permissions: [
       // '*://*.wessleyn.me/*',
       'http://localhost/*',
@@ -32,5 +38,6 @@ export default defineConfig({
     '@constants': '/src/constants',
     '@ctypes': '/src/ctypes',
     '@stores': '/src/stores',
+    '@styles': '/src/styles',
   }
 });

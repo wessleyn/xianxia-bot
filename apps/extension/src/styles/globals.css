@@ -3,15 +3,7 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-body {
-  @apply w-[450px] m-0 flex flex-col min-h-screen rounded-lg overflow-hidden;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
 
-#root {
-  @apply pt-0 mt-0 w-full;
-}
 
 /* Hide scrollbar for all elements */
 * {
