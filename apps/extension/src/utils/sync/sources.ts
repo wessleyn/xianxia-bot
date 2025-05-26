@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { localSources } from '../../constants/storage';
 import supabase from '../supabase';
 
@@ -6,10 +7,13 @@ import supabase from '../supabase';
  * @returns {Promise<boolean>} Success status of the sync operation
  */
 export async function syncSources({ userId }: { userId: string }) {
+    console.log('Syncing sources for user:', userId);
     try {
         // Get local sources
         const sources = await localSources.getValue();
         if (!sources || sources.length === 0) {
+            toast.success('No sources to sync');
+            console.info('No sources to sync');
             return true; // Nothing to sync
         }
 
@@ -31,9 +35,10 @@ export async function syncSources({ userId }: { userId: string }) {
                 const { data: newSource, error: createError } = await supabase
                     .from('NovelSource')
                     .insert({
+                        id: crypto.randomUUID(),
                         name: source.name,
                         url: source.url,
-                        stars: 0 
+                        stars: 0
                     })
                     .select('id')
                     .single();
@@ -52,6 +57,7 @@ export async function syncSources({ userId }: { userId: string }) {
             const { error: visitError } = await supabase
                 .from('SourceVisit')
                 .upsert({
+                    id: crypto.randomUUID(),
                     userId: userId,
                     sourceId: sourceId,
                     count: source.visits,
@@ -65,7 +71,8 @@ export async function syncSources({ userId }: { userId: string }) {
                 console.error('Error updating visit count:', visitError);
             }
         }
-
+        console.log('Sources synced successfully');
+        toast.success('Sources synced successfully');
         return true;
     } catch (error) {
         console.error('Error syncing sources:', error);

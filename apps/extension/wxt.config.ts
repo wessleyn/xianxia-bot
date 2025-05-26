@@ -20,7 +20,9 @@ export default defineConfig({
     ],
     web_accessible_resources: [
       {
-        resources: ['/onboarding.html', '/upboarding.html'],
+        resources: ['/onboarding.html',
+          '/upboarding.html'
+        ],
         matches: ['<all_urls>'],
       },
     ],

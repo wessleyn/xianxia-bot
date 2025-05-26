@@ -37,6 +37,8 @@ export default async function sync(type: syncType) {
             if (status.some(s => s === false)) {
                 toast.error('Sync failed for some items');
                 return false; 
+            } else {
+                toast.success('Sync completed successfully');
             }
     }
     return true; 

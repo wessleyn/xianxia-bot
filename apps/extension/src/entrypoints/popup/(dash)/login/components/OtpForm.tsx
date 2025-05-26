@@ -20,6 +20,7 @@ const OtpForm: React.FC<OtpFormProps> = ({ formState, email, onVerifySuccess }) 
     } = formState;
 
     const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+    const { setLoginStatus } = useAuthStore()
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const handleChange = (index: number, value: string) => {
@@ -158,7 +159,7 @@ const OtpForm: React.FC<OtpFormProps> = ({ formState, email, onVerifySuccess }) 
 
             <div className="text-center text-sm">
                 <button
-                    onClick={() => window.history.back()}
+                    onClick={() => setLoginStatus('initaiting')}
                     className="text-gray-600 dark:text-gray-400 hover:underline"
                     disabled={loading}
                 >

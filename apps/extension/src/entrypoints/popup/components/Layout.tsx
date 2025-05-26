@@ -24,8 +24,6 @@ const Layout: React.FC<LayoutProps> = () => {
   const { currentView } = useViewStore()
   const navigate = useNavigate();
 
-  console.log('Current view:', currentView);
-
   useEffect(() => {
     switch (currentView) {
       case 'novelSite':
