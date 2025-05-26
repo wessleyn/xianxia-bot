@@ -1,14 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const DEBUG = true; // Toggle for debug logs
-
-// Helper function to log debug messages
-const debugLog = (message: string, data?: any) => {
-    if (DEBUG) {
-        console.log(`[Onboarding] ${message}`, data || '');
-    }
-};
 
 export const STEP_PATHS = {
     1: '/', // welcome step
@@ -59,7 +51,6 @@ export const useOnboardingStore = create<OnboardingState>()(
             // UI helpers
             isCurrentStepCompleted: () => {
                 const { currentStep, completionCriteria } = get();
-                debugLog(`Checking if step ${currentStep} is completed`);
 
                 let isCompleted = false;
                 switch (currentStep) {
@@ -70,20 +61,17 @@ export const useOnboardingStore = create<OnboardingState>()(
                     default: isCompleted = false;
                 }
 
-                debugLog(`Step ${currentStep} completion status: ${isCompleted}`);
                 return isCompleted;
             },
 
             isLastStep: () => {
                 const result = get().currentStep === 3;
-                debugLog(`Checking if current step is last step: ${result}`);
                 return result;
             },
 
             // Navigation helpers
             navigateToStep: (direction = 'next') => {
                 const { currentStep } = get();
-                debugLog(`Navigation requested: ${direction} from current step ${currentStep}`);
 
                 let targetStep: OnboardingStep;
 
@@ -95,12 +83,10 @@ export const useOnboardingStore = create<OnboardingState>()(
                     targetStep = Math.max(currentStep - 1, 1) as OnboardingStep;
                 }
 
-                debugLog(`Navigating from step ${currentStep} to step ${targetStep}`);
                 set({ currentStep: targetStep });
             },
 
             completeWelcomeStep: () => {
-                debugLog('Completing welcome step');
                 set(state => ({
                     completionCriteria: {
                         ...state.completionCriteria,
@@ -110,7 +96,6 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             markEssentialSettingsComplete: (value) => {
-                debugLog(`Setting essential settings completion: ${value}`);
                 set(state => ({
                     completionCriteria: {
                         ...state.completionCriteria,
@@ -123,7 +108,6 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             markThemeToggled: (value) => {
-                debugLog(`Setting theme toggled: ${value}`);
                 set(state => ({
                     completionCriteria: {
                         ...state.completionCriteria,
@@ -136,7 +120,6 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             markFeaturesComplete: () => {
-                debugLog('Marking features step complete');
                 set(state => ({
                     completionCriteria: {
                         ...state.completionCriteria,
