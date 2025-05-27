@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt';
+import { novelPatterns } from './src/novelPatterns';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -17,15 +18,28 @@ export default defineConfig({
       'tabs',
       'scripting'
     ],
+    web_accessible_resources: [
+      {
+        resources: ['/onboarding.html',
+          '/upboarding.html'
+        ],
+        matches: ['<all_urls>'],
+      },
+    ],
     host_permissions: [
-      '*://*.wessleyn.me/*',
-      '*://*.google.com/*',
-      'http://localhost/*'
-    ]
+      // '*://*.wessleyn.me/*',
+      'http://localhost/*',
+    ].concat(novelPatterns.map(pattern => `*://${pattern.homepage}/*`)),
+
   },
   alias: {
     '@': '/src',
     '@assets': '/src/assets',
     '@components': '/src/components',
+    '@utils': '/src/utils',
+    '@constants': '/src/constants',
+    '@ctypes': '/src/ctypes',
+    '@stores': '/src/stores',
+    '@styles': '/src/styles',
   }
 });

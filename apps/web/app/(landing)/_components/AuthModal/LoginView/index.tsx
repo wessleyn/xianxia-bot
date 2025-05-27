@@ -36,6 +36,9 @@ const LoginView = () => {
         if (data.isNew) {
           setIsNew(true)
         }
+        if (data.isNew) {
+          setIsNew(true)
+        }
         setView('otp');
       }
     } catch {

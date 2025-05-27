@@ -2,50 +2,45 @@
 
 import { getCurrentUserId } from "@repo/auth/utils";
 import { prisma } from "@repo/db";
+import { toast } from 'react-hot-toast';
 
 export async function fetchSourcesData() {
     try {
-        // Get all read streaks with their associated chapters and novels
-        const readStreaks = await prisma.readStreak.findMany({
+        const sourcesData = await prisma.sourceVisit.findMany({
             where: {
                 userId: await getCurrentUserId()
             },
-            include: {
-                chapter: {
-                    include: {
-                        novel: true
+            select: {
+                count: true,
+                source: {
+                    select: {
+                        name: true,
+                        url: true
                     }
                 }
-            }
+            },
+            orderBy: {
+                count: 'desc'
+            },
+            take: 8
         });
 
-        // Count by novel title to create a heatmap of reading activity
-        const novelCounts: { [key: string]: number } = {};
-
-        readStreaks.forEach(streak => {
-            const novelTitle = streak.chapter.novel.title;
-            novelCounts[novelTitle] = (novelCounts[novelTitle] || 0) + 1;
-        });
-
-        // Convert to array and sort by count
-        const sortedNovels = Object.entries(novelCounts)
-            .map(([site, visits]) => ({ site, visits }))
-            .sort((a, b) => b.visits - a.visits)
-            .slice(0, 8);
-
-        // Generate a gradient of purple colors
-        const colors = [
+            // TODO: allow the user to select the theme here
+            // Generate a gradient of purple colors
+            const colors = [
             "bg-purple-900", "bg-purple-800", "bg-purple-700", "bg-purple-600",
             "bg-purple-500", "bg-purple-400", "bg-purple-300", "bg-purple-200"
         ];
 
-        return sortedNovels.map((source, index) => ({
-            site: source.site,
-            visits: source.visits,
+        return sourcesData.map((data, index) => ({
+            site: data.source.name,
+            visits: data.count,
+            url: data.source.url,
             color: colors[index % colors.length] || "bg-purple-900" // Provide default color
         }));
     } catch (error) {
         console.error("Error fetching sources data:", error);
+        toast.error("Error fetching sources data:");
         return [];
     }
 }

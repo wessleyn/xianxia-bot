@@ -9,7 +9,11 @@
       "@/*": ["./src/*"],
       "@assets/*": ["./src/assets/*"],
       "@stores/*": ["./src/stores/*"],
+      "@utils/*": ["./src/utils/*"],
       "@components/*": ["./src/components/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@ctypes/*": ["./src/ctypes/*"],
+      "@styles/*": ["./src/styles/*"],
       "~/*": ["./*"]
     }
   }

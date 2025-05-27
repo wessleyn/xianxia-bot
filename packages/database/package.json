@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "exports": {
     ".": "./src/index.ts",
+    "./supabase": "./src/supabase/index.ts",
     "./types": "./src/index.ts",
     "./queries": "./src/queries/index.ts",
     "./generated/prisma": "./generated/prisma/index.js"
@@ -31,7 +32,6 @@
     "@faker-js/faker": "^9.8.0",
     "@types/node": "^22.15.2",
     "prisma": "^6.8.1",
-    "supabase": "^2.23.4",
     "tsx": "^4.19.3"
   },
   "dependencies": {
