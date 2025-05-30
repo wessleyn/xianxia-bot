@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "xianxu",
-    "slug": "native",
+    "slug": "xianxu",
     "version": "1.0.0",
     "scheme": "xianxu",
     "orientation": "portrait",
@@ -31,9 +31,15 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-        "experiments": {
+    "experiments": {
       "typedRoutes": true
     },
+    "extra": {
+      "eas": {
+        "projectId": "a0538ec7-b064-448f-84a9-7e4c4c6729af"
+      }
+    },
+    "owner": "wessleyn",
     "plugins": ["expo-router"]
   }
 }
