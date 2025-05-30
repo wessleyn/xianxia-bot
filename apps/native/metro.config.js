@@ -1,6 +1,7 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require("expo/metro-config");
 const path = require("path");
+const { withNativeWind } = require('nativewind/metro');
 
 // Find the workspace root, this can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(__dirname, "../..");
@@ -18,9 +19,7 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
 
-// 4. Add packages folder to extraNodeModules to help Metro resolve workspace packages
-config.resolver.extraNodeModules = {
-  '@repo/ui': path.resolve(workspaceRoot, 'packages/ui')
-};
-
-module.exports = config;
+// 5. Add NativeWind configuration
+module.exports = withNativeWind(config, {
+  input: './src/styles/global.css'
+});

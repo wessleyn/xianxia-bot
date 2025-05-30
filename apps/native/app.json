@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "native",
+    "name": "xianxu",
     "slug": "native",
     "version": "1.0.0",
-    "scheme": "com.turbo.example",
+    "scheme": "xianxu",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
@@ -25,11 +25,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.turbo.example"
+      "package": "app.xianxu"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
+    },
+        "experiments": {
+      "typedRoutes": true
     },
     "plugins": ["expo-router"]
   }
