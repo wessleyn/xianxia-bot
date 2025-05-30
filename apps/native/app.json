@@ -16,7 +16,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -40,6 +42,13 @@
       }
     },
     "owner": "wessleyn",
-    "plugins": ["expo-router"]
+    "plugins": [
+      "expo-router",
+      "expo-audio",
+      "expo-font",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-sqlite"
+    ]
   }
 }
