@@ -7,6 +7,7 @@
       "@lib/*": ["./src/lib/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@assets/*": ["./assets/*"],
+      "@constants/*": ["./src/constants/*"],
       "@styles/*": ["./src/styles/*"],
       "@components/*": ["./src/components/*"],
       "@stores/*": ["./src/store/*"]

@@ -15,9 +15,10 @@
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-community/slider": "4.5.6",
     "@react-navigation/drawer": "^7.4.1",
-    "@repo/ui-lib": "*",
     "@repo/auth": "*",
     "@repo/db": "*",
+    "@repo/tailwind-config": "^0.0.0",
+    "@repo/ui-lib": "*",
     "expo": "^53.0.9",
     "expo-audio": "~0.4.5",
     "expo-blur": "~14.1.4",
@@ -36,6 +37,7 @@
     "expo-router": "~5.0.7",
     "expo-secure-store": "~14.2.3",
     "expo-sharing": "~13.1.5",
+    "expo-splash-screen": "~0.30.8",
     "expo-sqlite": "~15.2.10",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
@@ -48,11 +50,10 @@
     "react-native-reanimated": "3.16.2",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
+    "react-native-svg": "15.11.2",
     "react-native-web": "^0.20.0",
     "tailwindcss": "^3.4.17",
-    "webidl-conversions": "^5.0.0",
-    "react-native-svg": "15.11.2",
-    "expo-splash-screen": "~0.30.8"
+    "webidl-conversions": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.7",

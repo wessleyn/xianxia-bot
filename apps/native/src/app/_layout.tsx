@@ -1,9 +1,10 @@
-
 import '@styles/global.css'
-import { Stack } from "expo-router"
+import { Slot } from "expo-router"
 
 const AppLayout = () => {
-  return <Stack />
+  return (
+      <Slot />
+  )
 }
 
 export default AppLayout
