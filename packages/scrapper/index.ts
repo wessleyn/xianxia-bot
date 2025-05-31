@@ -1,33 +1,73 @@
 import { novelBin } from './patterns/novelBin';
+import { ChapterInfo } from './types';
 
-export const novelPatterns = [
-    novelBin,
-];
+export const novelPatterns = [novelBin];
 
-export function isNovelSite(url: string): boolean {
-    return novelPatterns.some(pattern => pattern.homepageRegex.test(url));
+// Generic checker by regex type
+function matchesAnyPattern(url: string, key: 'homepageRegex' | 'novelTocRegex' | 'novelChRegex'): boolean {
+    return novelPatterns.some(pattern => pattern[key].test(url));
 }
 
-export function isNovelToc(url: string): boolean {
-    return novelPatterns.some(pattern => pattern.novelTocRegex.test(url));
-}
+export const isNovelSite = (url: string): boolean => matchesAnyPattern(url, 'homepageRegex');
+export const isNovelToc = (url: string): boolean => matchesAnyPattern(url, 'novelTocRegex');
+export const isNovelChapter = (url: string): boolean => matchesAnyPattern(url, 'novelChRegex');
 
-export function isNovelChapter(url: string): boolean {
-    return novelPatterns.some(pattern => pattern.novelChRegex.test(url));
-}
-
+// Get matching pattern for URL
 export function getNovelPatternForUrl(url: string) {
-    // First try exact regex matching
-    let pattern = novelPatterns.find(pattern =>
-        pattern.homepageRegex.test(url) ||
-        pattern.novelTocRegex.test(url) ||
-        pattern.novelChRegex.test(url)
+    return (
+        novelPatterns.find(p =>
+            p.homepageRegex.test(url) ||
+            p.novelTocRegex.test(url) ||
+            p.novelChRegex.test(url)
+        ) ?? novelPatterns.find(p => url.includes(p.homepage))
     );
+}
 
-    // Fallback to domain check if regex doesn't match
-    if (!pattern) {
-        pattern = novelPatterns.find(pattern => url.includes(pattern.homepage));
+// Extract novel slug or formatted title based on `format` flag
+export function extractNovelInfo(url: string, format = true) {
+    const pattern = getNovelPatternForUrl(url);
+    if (!pattern?.extractNovelSlug) throw Error('No pattern found for URL');
+
+    const slug = pattern.extractNovelSlug(url);
+    if (!slug) throw Error('No slug extracted from URL');
+
+    return format ? slugToTitle(slug) : slug;
+}
+
+// Extract chapter information including slug, chapter number and name
+export function extractChapterInfo(url: string, format = true): ChapterInfo | null {
+    const pattern = getNovelPatternForUrl(url);
+    if (!pattern?.extractChapSlug) return null;
+
+    const slug = pattern.extractChapSlug(url);
+    if (!slug) return null;
+
+    // Extract chapter number and name from the URL
+    const chapterMatch = url.match(/chapter-(\d+(?:\.\d+)?)-?(.*?)$/);
+
+    const result: ChapterInfo = {
+        slug,
+        ...(format && { formattedTitle: slugToTitle(slug) })
+    };
+
+    if (chapterMatch) {
+        result.chapterNumber = parseFloat(chapterMatch[1]);
+        if (chapterMatch[2]) {
+            const chapterName = chapterMatch[2].replace(/-/g, ' ').trim();
+            if (chapterName) {
+                result.chapterName = format ? slugToTitle(chapterName) : chapterName;
+            }
+        }
     }
 
-    return pattern;
+    return result;
+}
+
+// Turn "some-novel-name" into "Some Novel Name"
+export function slugToTitle(slug: string): string {
+    return slug
+        .replace(/[-_]+/g, ' ')
+        .split(' ')
+        .map(word => word ? word[0].toUpperCase() + word.slice(1).toLowerCase() : '')
+        .join(' ');
 }

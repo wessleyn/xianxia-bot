@@ -1,5 +1,9 @@
 name: Create development builds
 
+defaults:
+  run:
+    working_directory: ./apps/native
+
 jobs:
   android_development_build:
     name: Build Android

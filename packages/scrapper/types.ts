@@ -3,4 +3,14 @@ export interface NovelPattern {
     homepageRegex: RegExp;
     novelTocRegex: RegExp;
     novelChRegex: RegExp;
+    extractNovelSlug: (url: string) => string | null
+    extractChapSlug: (url: string) => string | null
+}
+
+// Chapter information return type
+export interface ChapterInfo {
+    slug: string;
+    formattedTitle?: string;
+    chapterNumber?: number;
+    chapterName?: string;
 }

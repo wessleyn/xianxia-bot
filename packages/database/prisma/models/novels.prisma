@@ -7,15 +7,20 @@ model ReadNovel {
   novelId String
   novel   Novel  @relation(fields: [novelId], references: [id])
 
+  bookmarks Bookmark[]
+
+  readingSourceId String
+  readingSource SourceVisit @relation(fields: [readingSourceId], references: [id])
+
   currentChapterId String?
   currentChapter   NovelChapter? @relation("CurrentReadChapter", fields: [currentChapterId], references: [id])
 
   previousChapterId String?
   previousChapter   NovelChapter? @relation("PreviousReadChapter", fields: [previousChapterId], references: [id])
 
-  lastReadAt DateTime @default(now())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  lastReadAt DateTime?
+  startedAt  DateTime @default(now())
+  continuedAt  DateTime @updatedAt
 
   @@unique([userId, novelId])
   @@schema("public")
@@ -24,7 +29,9 @@ model ReadNovel {
 model Bookmark {
   id String @id @default(cuid())
 
-  userId    String
+  readingId String
+  readingNovel ReadNovel @relation(fields: [readingId], references: [id])
+
   chapterId String
   chapter   NovelChapter @relation(fields: [chapterId], references: [id])
 
@@ -34,13 +41,13 @@ model Bookmark {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, chapterId, position])
+  @@unique([chapterId, position])
   @@schema("public")
 }
 
 model ReadStreak {
   id String @id @default(cuid())
-
+// TODO inspect this  really wierd
   userId String
   date   DateTime
 

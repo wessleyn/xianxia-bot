@@ -22,6 +22,8 @@ model SourceVisit {
     sourceId String
     source NovelSource @relation(fields: [sourceId], references: [id])
 
+    readings ReadNovel[]
+
     count Int
 
     startedAt DateTime @default(now())

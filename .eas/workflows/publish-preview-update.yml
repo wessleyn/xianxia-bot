@@ -4,6 +4,11 @@ on:
   push:
     branches: ['*']
 
+defaults:
+  run:
+    working_directory: ./apps/native
+
+
 jobs:
   publish_preview_update:
     name: Publish preview update
