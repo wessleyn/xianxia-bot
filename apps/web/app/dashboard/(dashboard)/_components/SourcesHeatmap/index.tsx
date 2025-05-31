@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { fetchSourcesData } from "./action";
 
 export async function SourcesHeatmap() {
@@ -17,9 +18,16 @@ export async function SourcesHeatmap() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {sources.map((source) => (
+
                     <div key={source.site} className="flex flex-col">
                         <div className="flex items-center mb-1">
-                            <div className={`w-3 h-3 rounded-full ${source.color} mr-2`}></div>
+                            <img
+                                width={100}
+                                height={100}
+                                src={`https://favicone.com/${source.site}?s=100`}
+                                alt={`${source.site} favicon`}
+                                className="p-2 w-10 h-10 rounded-full mr-2"
+                            />
                             <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
                                 {source.site}
                             </span>
