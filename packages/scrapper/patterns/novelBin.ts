@@ -1,4 +1,4 @@
-import { NovelPattern } from "../ctypes";
+import { NovelPattern } from "../types";
 
 export const novelBin: NovelPattern = {
     homepage: "novelbin.me",

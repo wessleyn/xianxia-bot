@@ -1,5 +1,5 @@
 import { defineConfig } from 'wxt';
-import { novelPatterns } from './src/novelPatterns';
+import { novelPatterns } from '@repo/scrapper';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({

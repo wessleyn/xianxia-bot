@@ -1,5 +1,5 @@
 import { PopView } from "../ctypes";
-import { getNovelPatternForUrl, isNovelChapter, isNovelSite, isNovelToc } from "../novelPatterns";
+import { getNovelPatternForUrl, isNovelChapter, isNovelSite, isNovelToc } from "@repo/scrapper";
 
 export function detectPage(url: string) {
     const novelSiteDetected = isNovelSite(url);
@@ -17,7 +17,6 @@ export function detectPage(url: string) {
         pageType = "novelCh";
     }
 
-    // TODO: return or store metadata about the page: name, visits and so on
     return {
         type: pageType,
         name: matchedPattern?.homepage || "",

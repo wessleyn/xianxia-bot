@@ -17,6 +17,7 @@
     "@react-navigation/drawer": "^7.4.1",
     "@repo/auth": "*",
     "@repo/db": "*",
+    "@repo/scrapper": "^1.0.0",
     "@repo/tailwind-config": "^0.0.0",
     "@repo/ui-lib": "*",
     "expo": "^53.0.9",
