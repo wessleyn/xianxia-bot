@@ -63,6 +63,7 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 readingSourceUrl: sources[sourceIndex].url,
                 currentChapter: 0,
                 previousChapter: 0,
+                chapters: [], // Initialize empty chapters array
                 startedVisitOn: currentDateISO,
                 lastVisitedAt: currentDateISO,
                 startedReadingOn: undefined,
@@ -87,24 +88,55 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 break
             case 'novelCh':
                 const reading = readings[novelIndex]
-                const newChapter = extractChapterInfo(url.href)!.chapterNumber
+                const chapterInfo = extractChapterInfo(url.href)!
+                const newChapterNumber = chapterInfo.chapterNumber!
                 const updatedReadings = [...readings];
 
                 if (reading.lastReadingAt) {
-                    // we read this before
+                    const updatedChapters = [...reading.chapters]
+
+                    // Find if chapter already exists in reading history
+                    const existingChapterIndex = reading.chapters.findIndex(ch =>
+                        ch.slug === chapterInfo.slug || ch.chapterNumber === newChapterNumber
+                    );
+
+                    if (existingChapterIndex >= 0) {
+                        // Update existing chapter entry
+                        updatedChapters[existingChapterIndex] = {
+                            ...updatedChapters[existingChapterIndex],
+                            lastReadAt: currentDateISO
+                        };
+                    } else {
+                        updatedChapters.push({
+                            slug: chapterInfo.slug,
+                            chapterNumber: newChapterNumber,
+                            chapterName: chapterInfo.chapterName,
+                            lastReadAt: currentDateISO
+                        });
+                    }
+
                     updatedReadings[novelIndex] = {
                         ...reading,
+                        chapters: updatedChapters,
                         lastReadingAt: currentDateISO,
                         previousChapter: reading.currentChapter,
-                        currentChapter: newChapter!,
+                        currentChapter: newChapterNumber,
                     };
                 } else {
+                    const chapters = [{
+                        slug: chapterInfo.slug,
+                        chapterNumber: newChapterNumber,
+                        chapterName: chapterInfo.chapterName,
+                        lastReadAt: currentDateISO
+                    }]
+
                     updatedReadings[novelIndex] = {
                         ...reading,
+                        chapters,
                         previousChapter: 0,
-                        currentChapter: newChapter!,
                         startedReadingOn: currentDateISO,
-                        lastReadingAt: currentDateISO
+                        lastReadingAt: currentDateISO,
+                        currentChapter: newChapterNumber
                     };
                 }
 
@@ -114,7 +146,5 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
             default:
                 return
         }
-
-
     }
 }

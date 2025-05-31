@@ -12,8 +12,15 @@ export interface LocalSource {
     name: string;
     url: string;
     visits: number;
-    added: string; 
-    lastVisited: string; 
+    added: string;
+    lastVisited: string;
+}
+
+export interface ChapterData {
+    slug: string;
+    chapterNumber: number;
+    chapterName?: string;
+    lastReadAt: string;
 }
 
 export interface LocalReading {
@@ -29,8 +36,11 @@ export interface LocalReading {
     currentChapter: number;
     previousChapter: number;
 
-    startedVisitOn: string; 
-    lastVisitedAt: string;  
+    // New field to store chapter history/info
+    chapters: ChapterData[];
+
+    startedVisitOn: string;
+    lastVisitedAt: string;
 
     // this is for ch readings
     startedReadingOn: string | undefined;
