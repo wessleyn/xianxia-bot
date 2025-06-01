@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
-import { DEFAULT_CURRENT_READINGS, getCurrentReadingsFromStorage, recalculateCurrentReadings } from './action';
+import { fetchCurrentReadings } from './action';
 import BrowseLibraryButton from './components/BrowseLibrary';
 import CurrentHeader from './components/CurrentHeader';
 import ReadingCard from './components/ReadingCard';
@@ -12,8 +12,7 @@ const Current: React.FC = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { isSyncing } = useDashStore()
 
-    // Use SWR hook for data fetching with automatic error handling and revalidation
-    const { data: currentReadings = DEFAULT_CURRENT_READINGS, error, isLoading, mutate } = useSWR('current-readings', getCurrentReadingsFromStorage, {
+    const { data: currentReadings = [], error, isLoading, mutate } = useSWR('current-readings', fetchCurrentReadings, {
         revalidateOnFocus: false,
         onError: (err) => {
             console.error('Error loading current readings:', err);
@@ -27,14 +26,10 @@ const Current: React.FC = () => {
 
             // Use mutate to update the data
             await mutate(async () => {
-                const result = await recalculateCurrentReadings();
-                if (result.error) {
-                    toast.error(result.error);
-                    return currentReadings; // Return previous readings on error
-                }
+                const result = await fetchCurrentReadings();
 
                 // Compare new data with previous data
-                const isDataChanged = JSON.stringify(result.data) !== JSON.stringify(currentReadings);
+                const isDataChanged = JSON.stringify(result) !== JSON.stringify(currentReadings);
 
                 if (isDataChanged) {
                     toast.success('Current readings updated successfully');
@@ -42,7 +37,7 @@ const Current: React.FC = () => {
                     toast.success('Current readings already up to date');
                 }
 
-                return result.data;
+                return result;
             }, {
                 revalidate: false // We don't need to revalidate since we're already updating the data
             });

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
-import { DEFAULT_CURRENT_BOOKMARKS, getBookmarksFromStorage, reCalcBookmarks } from './action';
+import { reCalcBookmarks } from './action';
 import BookmarkCard from './components/BookmarkCard';
 import BookmarkHeader from './components/BookmarkHeader';
 import BookMarksSkeleton from './skeleton';
@@ -10,7 +10,7 @@ import BookMarksSkeleton from './skeleton';
 const Bookmarks = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { isSyncing } = useDashStore()
-    const { data: bookmarks = DEFAULT_CURRENT_BOOKMARKS, error, isLoading, mutate } = useSWR('current-bookmarks', getBookmarksFromStorage, {
+    const { data: bookmarks = [], error, isLoading, mutate } = useSWR('current-bookmarks', reCalcBookmarks, {
         revalidateOnFocus: false,
         onError: (err) => {
             console.error('Error loading current bookmarks:', err);
@@ -25,13 +25,9 @@ const Bookmarks = () => {
             // Use mutate to update the data
             await mutate(async () => {
                 const result = await reCalcBookmarks();
-                if (result.error) {
-                    toast.error(result.error);
-                    return bookmarks; // Return previous bookmarks on error
-                }
 
                 // Compare new data with previous data
-                const isDataChanged = JSON.stringify(result.data) !== JSON.stringify(bookmarks);
+                const isDataChanged = JSON.stringify(result) !== JSON.stringify(bookmarks);
 
                 if (isDataChanged) {
                     toast.success('Current bookmarks updated successfully');
@@ -39,7 +35,7 @@ const Bookmarks = () => {
                     toast.success('Current bookmarks already up to date');
                 }
 
-                return result.data;
+                return result;
             }, {
                 revalidate: false // We don't need to revalidate since we're already updating the data
             });

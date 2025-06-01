@@ -18,7 +18,9 @@ const ReadingCard: React.FC<ReadingCardProps> = ({ book }) => {
 
             <div className="flex-1 relative">
                 <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-gray-800 dark:text-white leading-tight line-clamp-1 pr-16">{book.title}</h3>
+                    <h3 className="font-bold text-gray-800 dark:text-white leading-tight line-clamp-1 pr-16" title={book.title}>
+                        {book.title.length > 25 ? book.title.substring(0, 25) + '...' : book.title}
+                    </h3>
                     <span className="absolute top-0 right-0 text-xs bg-indigo-100 dark:bg-indigo-900/50 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full">
                         {book.lastReadDate}
                     </span>

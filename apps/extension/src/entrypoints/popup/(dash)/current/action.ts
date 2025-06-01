@@ -1,5 +1,6 @@
-import { storage } from '#imports';
-import { delay } from '../../../../utils/common';
+import { localReadings } from '@constants/storage';
+import { formatDistance } from 'date-fns';
+
 export interface ReadingData {
     id: number;
     title: string;
@@ -11,94 +12,40 @@ export interface ReadingData {
     lastReadDate: string;
 }
 
-export const DEFAULT_CURRENT_READINGS: ReadingData[] = [];
-
-export const currentReadings = storage.defineItem<ReadingData[]>(
-    'local:xianxu_current_readings',
-    {
-        fallback: DEFAULT_CURRENT_READINGS,
-    }
-);
 
 /**
- * Get current readings from local storage
+ * Fetch current readings from storage and update local cache
  */
-export const getCurrentReadingsFromStorage = async (): Promise<ReadingData[]> => {
-    try {
-        return await currentReadings.getValue();
-    } catch (error) {
-        console.error('Error fetching current readings from storage:', error);
-        return DEFAULT_CURRENT_READINGS;
-    }
-};
+export const fetchCurrentReadings = async () => {
+    // Get readings from local storage
+    const storedReadings = await localReadings.getValue();
 
-/**
- * Save current readings to local storage
- */
-export const saveCurrentReadingsToStorage = async (readings: ReadingData[]): Promise<void> => {
-    try {
-        await currentReadings.setValue(readings);
-    } catch (error) {
-        console.error('Error saving current readings to storage:', error);
-    }
-};
+    const activeReadings = storedReadings.filter(reading => reading.lastReadingAt !== undefined);
 
-/**
- * Fetch current readings from API and update local storage
- */
-export const recalculateCurrentReadings = async (): Promise<{ data: ReadingData[], error: string | null }> => {
-    await delay(2)
+    // Sort by most recently read
+    activeReadings.sort((a, b) => {
+        const dateA = new Date(a.lastReadingAt || 0);
+        const dateB = new Date(b.lastReadingAt || 0);
+        return dateB.getTime() - dateA.getTime();
+    });
 
-    try {
-        // Mock data for current readings
-        const readings: ReadingData[] = [
-            {
-                id: 1,
-                title: "Against the Gods",
-                author: "Mars Gravity",
-                coverUrl: "https://via.placeholder.com/60x80",
-                currentChapter: 342,
-                totalChapters: 1823,
-                progress: 18.8,
-                lastReadDate: "2 hours ago",
-            },
-            {
-                id: 2,
-                title: "Martial World",
-                author: "Cocooned Cow",
-                coverUrl: "https://via.placeholder.com/60x80",
-                currentChapter: 984,
-                totalChapters: 2345,
-                progress: 42,
-                lastReadDate: "Yesterday",
-            },
-            {
-                id: 3,
-                title: "Desolate Era",
-                author: "I Eat Tomatoes",
-                coverUrl: "https://via.placeholder.com/60x80",
-                currentChapter: 156,
-                totalChapters: 1324,
-                progress: 11.8,
-                lastReadDate: "3 days ago",
-            },
-        ];
+    // Map to the expected format
+    return activeReadings.map((reading, index) => {
+        // Calculate progress based on actual totalChapters field
+        const progress = reading.totalChapters > 0
+            ? Math.min(100, (reading.currentChapter / reading.totalChapters) * 100)
+            : 0;
 
-        // Add some randomness to simulate updates
-        if (Math.random() > 0.5) {
-            readings[0].currentChapter += Math.floor(Math.random() * 5);
-            readings[0].progress = Math.min(100, (readings[0].currentChapter / readings[0].totalChapters) * 100);
-            readings[0].lastReadDate = "just now";
-        }
 
-        await currentReadings.setValue(readings);
-
-        return { data: readings, error: null };
-    } catch (error) {
-        const existingReadings = await currentReadings.getValue();
         return {
-            data: existingReadings,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            id: index + 1, // Use index+1 as ID for now
+            title: reading.novelName,
+            author: reading.novelAuthor || 'Unknown Author', 
+            coverUrl: reading.coverImage || 'https://via.placeholder.com/60x80',
+            currentChapter: reading.currentChapter,
+            totalChapters: reading.totalChapters,
+            progress: parseFloat(progress.toFixed(1)),
+            lastReadDate: formatDistance(new Date(reading.lastReadingAt!), new Date(), { addSuffix: true })
         };
-    }
+    });
 };

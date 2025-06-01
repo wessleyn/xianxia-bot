@@ -1,14 +1,42 @@
 import React from 'react';
+import { BookmarkLabel } from '../../../../../../ctypes';
 import { BookmarkData } from '../../action';
 
 interface BookmarkCardProps {
     bookmark: BookmarkData;
 }
 
+const getLabelStyles = (label: BookmarkLabel): { bgColor: string, textColor: string } => {
+    switch (label) {
+        case 'urgent':
+            return {
+                bgColor: 'bg-red-100 dark:bg-red-900/30',
+                textColor: 'text-red-700 dark:text-red-300'
+            };
+        case 'bad':
+            return {
+                bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+                textColor: 'text-orange-700 dark:text-orange-300'
+            };
+        case 'awesome':
+            return {
+                bgColor: 'bg-green-100 dark:bg-green-900/30',
+                textColor: 'text-green-700 dark:text-green-300'
+            };
+        default:
+            return {
+                bgColor: 'bg-gray-100 dark:bg-gray-700',
+                textColor: 'text-gray-700 dark:text-gray-300'
+            };
+    }
+};
+
 const BookmarkCard: React.FC<BookmarkCardProps> = ({ bookmark }) => {
+    const { bgColor, textColor } = getLabelStyles(bookmark.label);
+
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div className={`${bookmark.color} dark:bg-opacity-20 ${bookmark.textColor} dark:text-black px-3 py-1.5 flex justify-between items-center text-xs font-medium`}>
+            <div className={`${bgColor} ${textColor} px-3 py-1.5 flex justify-between items-center text-xs font-medium`}>
                 <span>{bookmark.novel}</span>
                 <span>Ch. {bookmark.chapter}</span>
             </div>
@@ -18,8 +46,6 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({ bookmark }) => {
                 <div className="mt-2 flex justify-between items-center">
                     <span className="text-xs text-gray-500 dark:text-gray-400">Added on {new Date(bookmark.dateAdded).toLocaleDateString()}</span>
                     <div className="flex gap-2">
-                        {/* Download button - Each bookmark will have different download states */}
-                        {bookmark.id % 2 === 0 ? (
                             // Available for download
                             <button className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400" title="Download chapter">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-download" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -29,24 +55,6 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({ bookmark }) => {
                                     <path d="M12 4l0 12"></path>
                                 </svg>
                             </button>
-                        ) : bookmark.id % 3 === 0 ? (
-                            // Already downloaded
-                            <button className="text-indigo-600 dark:text-indigo-400" title="Downloaded">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-check" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M5 12l5 5l10 -10"></path>
-                                </svg>
-                            </button>
-                        ) : (
-                            // Not available for download
-                            <button className="text-gray-300 dark:text-gray-600 cursor-not-allowed" title="Download not available">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-x" width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M18 6l-12 12"></path>
-                                    <path d="M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        )}
 
                         <button className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400" title="Bookmark">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

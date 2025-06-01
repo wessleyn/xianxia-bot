@@ -7,6 +7,8 @@ export interface ExtensionSettings {
     theme: ReadingTheme;
 }
 
+export type BookmarkLabel = 'urgent' | 'bad' | 'awesome';
+
 export interface LocalSource {
     id?: string;
     name: string;
@@ -21,29 +23,33 @@ export interface ChapterData {
     chapterNumber: number;
     chapterName?: string;
     lastReadAt: string;
+    bookmark: {
+        id: string
+        label: BookmarkLabel
+        excerpt: string;
+        dateAdded: string;
+    } | undefined; 
 }
 
 export interface LocalReading {
     // assuming we have'nt synced yet     
     novelId: string | undefined;
     novelName: string;
+    novelAuthor: string | undefined;
     coverImage: string | undefined;
-
-    // assuming we have'nt synced yet     
-    readingSourceId: string | undefined;
-    // but we need an anchor point
-    readingSourceUrl: string // can't be un-defined
-
-    currentChapter: number;
-    previousChapter: number;
-
-    // New field to store chapter history/info
-    chapters: ChapterData[];
+    novelGenres: string[]
 
     startedVisitOn: string;
     lastVisitedAt: string;
 
-    // this is for ch readings
+    readingSourceId: string | undefined;
+    readingSourceUrl: string
+
+    currentChapter: number;
+    previousChapter: number;
+
+    totalChapters: number;
     startedReadingOn: string | undefined;
     lastReadingAt: string | undefined;
+    readChapters: ChapterData[];
 }

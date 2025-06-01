@@ -183,14 +183,14 @@ export async function syncReadings({ userId }: { userId: string }) {
             let currentChapterId: string | null = null;
             let previousChapterId: string | null = null;
 
-            if (reading.chapters && reading.chapters.length > 0) {
-                console.debug('Processing', reading.chapters.length, 'chapters for novel:', reading.novelName);
+            if (reading.readChapters && reading.readChapters.length > 0) {
+                console.debug('Processing', reading.readChapters.length, 'chapters for novel:', reading.novelName);
                 try {
                     const now = new Date().toISOString();
-
+                    
                     // Process chapters sequentially to avoid race conditions
                     const validChapters = [];
-                    for (const chapter of reading.chapters) {
+                    for (const chapter of reading.readChapters) {
                         console.debug('Processing chapter:', chapter.chapterNumber, chapter.chapterName || '');
                         // First, check if the chapter already exists
                         const { data: existingChapter, error: checkError } = await supabase
@@ -242,7 +242,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                             });
                         }
                     }
-
+                    
                     console.debug('Successfully processed', validChapters.length, 'chapters');
 
                     // Sort chapters by number to find current and previous

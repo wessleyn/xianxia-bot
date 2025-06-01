@@ -61,11 +61,14 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 coverImage: extractedNovelInfo && newInfo.pattern?.homepage.includes('novelbin') ?
                     `https://novelbin.me/media/novel/${extractedNovelInfo.slug}.jpg` : undefined,
                 novelName: extractedNovelInfo.title,
+                novelGenres: [],
+                novelAuthor: undefined,
                 readingSourceId: undefined,
                 readingSourceUrl: sources[sourceIndex].url,
                 currentChapter: 0,
                 previousChapter: 0,
-                chapters: [], // Initialize empty chapters array
+                totalChapters:  0, // FIXME: scrap from content script
+                readChapters: [], // Initialize empty chapters array
                 startedVisitOn: currentDateISO,
                 lastVisitedAt: currentDateISO,
                 startedReadingOn: undefined,
@@ -95,10 +98,10 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 const updatedReadings = [...readings];
 
                 if (reading.lastReadingAt) {
-                    const updatedChapters = [...reading.chapters]
+                    const updatedChapters = [...reading.readChapters]
 
                     // Find if chapter already exists in reading history
-                    const existingChapterIndex = reading.chapters.findIndex(ch =>
+                    const existingChapterIndex = reading.readChapters.findIndex(ch =>
                         ch.slug === chapterInfo.slug || ch.chapterNumber === newChapterNumber
                     );
 
@@ -113,13 +116,14 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                             slug: chapterInfo.slug,
                             chapterNumber: newChapterNumber,
                             chapterName: chapterInfo.chapterName,
-                            lastReadAt: currentDateISO
+                            lastReadAt: currentDateISO,
+                            bookmark: undefined
                         });
                     }
-
+                    
                     updatedReadings[novelIndex] = {
                         ...reading,
-                        chapters: updatedChapters,
+                        readChapters: updatedChapters,
                         lastReadingAt: currentDateISO,
                         previousChapter: reading.currentChapter,
                         currentChapter: newChapterNumber,
@@ -129,12 +133,13 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                         slug: chapterInfo.slug,
                         chapterNumber: newChapterNumber,
                         chapterName: chapterInfo.chapterName,
-                        lastReadAt: currentDateISO
+                        lastReadAt: currentDateISO,
+                        bookmark: undefined
                     }]
 
                     updatedReadings[novelIndex] = {
                         ...reading,
-                        chapters,
+                        readChapters: chapters,
                         previousChapter: 0,
                         startedReadingOn: currentDateISO,
                         lastReadingAt: currentDateISO,
