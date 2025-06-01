@@ -11,7 +11,7 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
     let sources = await localSources.getValue()
     let readings = await localReadings.getValue()
 
-    if (tab.url) {
+    if (tab.status == 'complete' && tab.url) {
         const url = new URL(tab.url)
         const newInfo = detectPage(url.href)
 
