@@ -27,7 +27,7 @@ model SourceVisit {
     count Int
 
     startedAt DateTime @default(now())
-    lastVisted  DateTime @updatedAt
+    lastVisited  DateTime @updatedAt
 
     // no two tracking instances for the same site and user
     @@unique([userId, sourceId]) 

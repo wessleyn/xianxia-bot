@@ -37,7 +37,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                 .from('Novel')
                 .select('id')
                 .ilike('title', `%${reading.novelName}%`)
-                .maybeSingle();
+                .single();
 
             if (novelError) {
                 console.error('Error checking existing novel:', novelError);
@@ -84,7 +84,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                 .from('NovelSource')
                 .select('id')
                 .eq('url', reading.readingSourceUrl)
-                .maybeSingle();
+                .single();
 
             if (sourceError) {
                 console.error('Error checking source:', sourceError);
@@ -148,7 +148,8 @@ export async function syncReadings({ userId }: { userId: string }) {
                         userId: userId,
                         sourceId: sourceId,
                         count: 1,
-                        startedAt: new Date().toISOString()
+                        startedAt: new Date().toISOString(),
+                        lastVisited: new Date().toISOString()
                     })
                     .select('id')
                     .single();
@@ -168,7 +169,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                     .from('SourceVisit')
                     .update({
                         count: (existingSourceVisit.count || 0) + 1,
-                        lastVisted: new Date().toISOString()
+                        lastVisited: new Date().toISOString()
                     })
                     .eq('id', sourceVisitId);
 
