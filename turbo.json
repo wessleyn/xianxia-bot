@@ -27,6 +27,7 @@
         "dist/**",
         ".output/**",
         ".next/**",
+        "node_modules/.cache/metro/**",
         "!.next/cache/**"
       ],
       "dependsOn": [

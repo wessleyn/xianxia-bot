@@ -2,7 +2,7 @@ env:
   DIRECTORY: .output
   PROJECT_NAME: ext
 
-name: Deploy
+name: Deploy Web Extension
 
 on:
   push:

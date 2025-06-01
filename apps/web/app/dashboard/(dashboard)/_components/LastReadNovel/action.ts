@@ -2,6 +2,7 @@
 
 import { getCurrentUserId } from "@repo/auth/utils";
 import { prisma } from "@repo/db";
+import { formatDistance } from "date-fns";
 
 export async function fetchLastReadNovel() {
     try {
@@ -52,22 +53,11 @@ export async function fetchLastReadNovel() {
             description: lastRead.novel.description,
             currentChapter: lastRead.currentChapter?.title || "Chapter 1",
             chapterNumber: lastRead.currentChapter?.number || 1,
-            lastRead: formatLastRead(lastRead.lastReadAt),
+            lastRead: formatDistance(new Date(lastRead.lastReadAt!), new Date()),
             progress
         };
     } catch (error) {
         console.error("Error fetching last read novel:", error);
         return null;
     }
-}
-
-function formatLastRead(date: Date): string {
-    const now = new Date();
-    const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Yesterday";
-    if (diff < 7) return `${diff} days ago`;
-
-    return date.toLocaleDateString();
 }

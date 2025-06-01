@@ -1,36 +1,62 @@
 {
   "expo": {
-    "name": "native",
-    "slug": "native",
+    "name": "xianxu",
+    "slug": "xianxu",
     "version": "1.0.0",
-    "scheme": "com.turbo.example",
+    "scheme": "xianxu",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": ["**/*"],
+    "icon": "./assets/icon.png",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": {
+        "dark": "./assets/ios-dark.png",
+        "light": "./assets/ios-light.png",
+        "tinted": "./assets/ios-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.turbo.example"
+      "package": "app.xianxu"
     },
-    "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+    "experiments": {
+      "typedRoutes": true
     },
-    "plugins": ["expo-router"]
+    "extra": {
+      "eas": {
+        "projectId": "a0538ec7-b064-448f-84a9-7e4c4c6729af"
+      }
+    },
+    "owner": "wessleyn",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon-dark.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF",
+          "dark":{
+            "image": "./assets/splash-icon-light.png",
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      "expo-audio",
+      "expo-font",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-sqlite"
+    ]
   }
 }

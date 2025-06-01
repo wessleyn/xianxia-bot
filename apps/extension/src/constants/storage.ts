@@ -1,5 +1,5 @@
 import { storage } from '#imports';
-import { ExtensionSettings, LocalSource, PopView } from '../ctypes';
+import { ExtensionSettings, LocalReading, LocalSource, PopView } from '../ctypes';
 
 /**
  * Just stores the current view the users sees when he click the popup
@@ -27,6 +27,11 @@ export const localSettings = storage.defineItem<ExtensionSettings>(SETTINGS_STOR
  */
 export const NOVEL_SOURCES_STORAGE_KEY = 'local:sources'
 export const localSources = storage.defineItem<LocalSource[]>(NOVEL_SOURCES_STORAGE_KEY, {
+    fallback: []
+
+})
+export const NOVEL_Readings_STORAGE_KEY = 'local:readings'
+export const localReadings = storage.defineItem<LocalReading[]>(NOVEL_Readings_STORAGE_KEY, {
     fallback: []
 })
 
