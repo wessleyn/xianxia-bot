@@ -1,68 +1,3 @@
-model ReadNovel {
-  id String @id @default(cuid())
-
-  userId String     @db.Uuid
-  user   UserProfile @relation(fields: [userId], references: [id])
-
-  novelId String
-  novel   Novel  @relation(fields: [novelId], references: [id])
-
-  bookmarks Bookmark[]
-  readingSourceUrl String // last left url 
-
-  readingSourceId String
-  readingSource SourceVisit @relation(fields: [readingSourceId], references: [id])
-
-  currentChapterId String?
-  currentChapter   NovelChapter? @relation("CurrentReadChapter", fields: [currentChapterId], references: [id])
-
-  previousChapterId String?
-  previousChapter   NovelChapter? @relation("PreviousReadChapter", fields: [previousChapterId], references: [id])
-
-  lastReadAt DateTime?
-  startedAt  DateTime @default(now())
-  continuedAt  DateTime @updatedAt
-
-  @@unique([userId, novelId])
-  @@schema("public")
-}
-
-model Bookmark {
-  id String @id @default(cuid())
-
-  readingId String
-  readingNovel ReadNovel @relation(fields: [readingId], references: [id])
-
-  chapterId String
-  chapter   NovelChapter @relation(fields: [chapterId], references: [id])
-
-  position Int // Position within the chapter (e.g., paragraph number)
-  note     String? // Optional note for the bookmark
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([chapterId, position])
-  @@schema("public")
-}
-
-model ReadStreak {
-  id String @id @default(cuid())
-// TODO inspect this  really wierd
-  userId String
-  date   DateTime
-
-  chapterId String
-  chapter   NovelChapter @relation("ReadChapter", fields: [chapterId], references: [id])
-
-  minutesRead Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, date, chapterId])
-  @@schema("public")
-}
 
 model Novel {
   id String @id @default(cuid())
@@ -97,7 +32,7 @@ model NovelChapter {
   novel Novel @relation(fields: [novelId], references: [id])
 
   bookmarks Bookmark[]
-  readStreaks ReadStreak[] @relation("ReadChapter")
+  readings ReadChapter[] @relation("ReadChapter")
 
   currentReads ReadNovel[] @relation("CurrentReadChapter")
   previousReads ReadNovel[] @relation("PreviousReadChapter")
@@ -105,5 +40,6 @@ model NovelChapter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([novelId, number])
   @@schema("public")
 }

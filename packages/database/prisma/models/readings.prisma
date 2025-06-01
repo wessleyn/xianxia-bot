@@ -1,0 +1,64 @@
+model ReadNovel {
+  id String @id @default(cuid())
+
+  userId String     @db.Uuid
+  user   UserProfile @relation(fields: [userId], references: [id])
+
+  novelId String
+  novel   Novel  @relation(fields: [novelId], references: [id])
+
+  bookmarks Bookmark[]
+  readChapter ReadChapter[]
+  readingSourceUrl String // last left url 
+
+  readingSourceId String
+  readingSource SourceVisit @relation(fields: [readingSourceId], references: [id])
+
+  currentChapterId String?
+  currentChapter   NovelChapter? @relation("CurrentReadChapter", fields: [currentChapterId], references: [id])
+
+  previousChapterId String?
+  previousChapter   NovelChapter? @relation("PreviousReadChapter", fields: [previousChapterId], references: [id])
+
+  lastReadAt DateTime?
+  startedAt  DateTime @default(now())
+  continuedAt  DateTime @updatedAt
+
+  @@unique([userId, novelId])
+  @@schema("public")
+}
+
+model Bookmark {
+  id String @id @default(cuid())
+
+  readingId String
+  readingNovel ReadNovel @relation(fields: [readingId], references: [id])
+
+  chapterId String
+  chapter   NovelChapter @relation(fields: [chapterId], references: [id])
+
+  position Int // Position within the chapter (e.g., paragraph number)
+  note     String? // Optional note for the bookmark
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([chapterId, position])
+  @@schema("public")
+}
+
+model ReadChapter {
+  id String @id @default(cuid())
+
+  readingId String
+  reading ReadNovel @relation(fields: [readingId], references: [id])
+
+  chapterId String
+  chapter   NovelChapter @relation("ReadChapter", fields: [chapterId], references: [id])
+
+  startedAt DateTime @default(now())
+  lastReadAt DateTime @updatedAt
+
+  @@unique([readingId, chapterId])
+  @@schema("public")
+}

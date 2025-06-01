@@ -22,6 +22,7 @@ export interface ChapterData {
     slug: string;
     chapterNumber: number;
     chapterName?: string;
+    startedAt: string
     lastReadAt: string;
     bookmark: {
         id: string

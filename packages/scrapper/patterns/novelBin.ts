@@ -6,11 +6,10 @@ export const novelBin: NovelPattern = {
     novelTocRegex: /^https?:\/\/(?:www\.)?novelbin\.(me|com)\/novel-book\/[^\/]+(?:#tab-chapters-title)?$/,
     novelChRegex: /^https?:\/\/(?:www\.)?novelbin\.(me|com)\/(?:b|novel-book)\/[^\/]+\/(?:c+)?chapter-[^\/]+$/,
     extractNovelSlug: (url: string) => {
-        // Handle TOC URLs
+        // Handle extraction from table of contents 
         const tocMatch = url.match(/^https?:\/\/(?:www\.)?novelbin\.(me|com)\/novel-book\/([^\/]+)(?:#tab-chapters-title)?$/);
         if (tocMatch) return tocMatch[2];
 
-        // Handle chapter URLs
         const chapterMatch = url.match(/^https?:\/\/(?:www\.)?novelbin\.(me|com)\/(?:b|novel-book)\/([^\/]+)\/(?:c+)?chapter-[^\/]+$/);
         return chapterMatch ? chapterMatch[2] : null;
     },

@@ -45,38 +45,74 @@ export const recalculateStats = async () => {
   // Count total books read
   const booksRead = activeReadings.length;
 
-  // Count total chapters read across all books
-  const chaptersRead = activeReadings.reduce((total, reading) => {
-    return total + (reading.readChapters?.length || 0);
-  }, 0);
+  // Prepare data structures for calculations
+  let chaptersRead = 0;
+  let totalReadingTimeMinutes = 0;
+  const readingDays = new Set<string>();
+  const monthlyActivity = Array(28).fill(0);
+  const genreCounts: Record<string, number> = {};
 
-  // Calculate total hours read (estimate based on chapters)
-  // Assuming average of 15 minutes per chapter
-  const totalHoursRead = Math.round((chaptersRead * 15) / 60);
+  // Calculate stats based on reading history
+  activeReadings.forEach(reading => {
+    // Add to chapter count
+    chaptersRead += reading.readChapters?.length || 0;
+
+    // Process each chapter for time calculations and activity tracking
+    reading.readChapters?.forEach(chapter => {
+      if (chapter.startedAt && chapter.lastReadAt) {
+        // Calculate actual reading time for this chapter
+        const startTime = new Date(chapter.startedAt).getTime();
+        const endTime = new Date(chapter.lastReadAt).getTime();
+
+        // If reading time is reasonable (between 1 min and 2 hours), use it
+        // Otherwise fall back to the 15-minute estimate
+        const chapterMinutes = Math.max(1, Math.min(120, (endTime - startTime) / (1000 * 60))) || 15;
+        totalReadingTimeMinutes += chapterMinutes;
+
+        // Track which days had reading activity (for streak calculation)
+        const readDate = new Date(chapter.lastReadAt);
+        readingDays.add(readDate.toISOString().split('T')[0]);
+
+        // Record activity for monthly heatmap
+        const today = new Date();
+        const daysDiff = Math.floor((today.getTime() - readDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysDiff >= 0 && daysDiff < 28) {
+          monthlyActivity[daysDiff]++;
+        }
+      }
+    });
+
+    // Count genres for favorite calculation
+    if (reading.novelGenres.length > 0) {
+      reading.novelGenres.forEach(genre => {
+        const trimmedGenre = genre.trim();
+        if (trimmedGenre) {
+          genreCounts[trimmedGenre] = (genreCounts[trimmedGenre] || 0) + 1;
+        }
+      });
+    }
+  });
+
+  // Convert total reading time to hours
+  const totalHoursRead = Math.round(totalReadingTimeMinutes / 60);
 
   // Calculate words read (estimate based on chapters)
-  // Assuming average of 2500 words per chapter
   const wordsRead = chaptersRead * 2500;
 
   // Calculate reading time for the last week
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
 
-  const lastWeekChapters = activeReadings.reduce((total, reading) => {
-    const recentChapters = reading.readChapters?.filter(chapter => {
-      if (!chapter.lastReadAt) return false;
-      const readDate = new Date(chapter.lastReadAt);
-      return readDate > oneWeekAgo;
-    }) || [];
-    return total + recentChapters.length;
-  }, 0);
+  // Calculate weekly streak based on consecutive days of reading
+  const sortedReadingDays = Array.from(readingDays).sort();
+  const lastWeekReadingDays = sortedReadingDays.filter(day => day >= oneWeekAgoStr);
+  const lastWeekReadingTime = Math.round(
+    lastWeekReadingDays.length * (totalReadingTimeMinutes / readingDays.size || 15) / 60
+  );
 
-  // Estimate last week reading time in hours (15 min per chapter)
-  const lastWeekReadingTime = Math.round((lastWeekChapters * 15) / 60);
-
-  // Calculate weekly streak (simple implementation)
-  // True streak calculation would require more detailed data
-  const weeklyStreak = Math.min(Math.max(1, Math.round(lastWeekChapters / 7)), 52);
+  // Simple weekly streak calculation based on reading frequency
+  const weeklyStreak = Math.min(52, Math.max(1, lastWeekReadingDays.length));
 
   // Calculate completion rate based on current/total chapters
   const booksWithTotalChapters = activeReadings.filter(book => book.totalChapters > 0);
@@ -89,41 +125,6 @@ export const recalculateStats = async () => {
     }, 0);
     completionRate = Math.round(totalCompletionRate / booksWithTotalChapters.length);
   }
-
-  // Generate monthly activity data (last 28 days)
-  const monthlyActivity = Array(28).fill(0);
-
-  // Populate activity data based on chapter reading history
-  activeReadings.forEach(reading => {
-    reading.readChapters?.forEach(chapter => {
-      if (chapter.lastReadAt) {
-        const readDate = new Date(chapter.lastReadAt);
-        const today = new Date();
-        const daysDiff = Math.floor((today.getTime() - readDate.getTime()) / (1000 * 60 * 60 * 24));
-
-        // If within the last 28 days, increment the counter for that day
-        if (daysDiff >= 0 && daysDiff < 28) {
-          monthlyActivity[daysDiff]++;
-        }
-      }
-    });
-  });
-
-  // Determine favorite genre by counting occurrences across all readings
-  const genreCounts: Record<string, number> = {};
-
-  // Count genres from all active readings
-  activeReadings.forEach(reading => {
-    // Check if reading has novelGenres and it's an array
-    if (reading.novelGenres.length > 0) {
-      reading.novelGenres.forEach(genre => {
-        const trimmedGenre = genre.trim();
-        if (trimmedGenre) {
-          genreCounts[trimmedGenre] = (genreCounts[trimmedGenre] || 0) + 1;
-        }
-      });
-    }
-  });
 
   // Find the genre with the highest count
   let favoriteGenre = 'Unknown';
@@ -157,5 +158,5 @@ export const recalculateStats = async () => {
   // Save the calculated stats
   await readingStats.setValue(stats);
 
-  return stats
+  return stats;
 };
