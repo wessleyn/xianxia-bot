@@ -61,11 +61,15 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 coverImage: extractedNovelInfo && newInfo.pattern?.homepage.includes('novelbin') ?
                     `https://novelbin.me/media/novel/${extractedNovelInfo.slug}.jpg` : undefined,
                 novelName: extractedNovelInfo.title,
+                novelGenres: [],
+                novelAuthor: undefined,
                 readingSourceId: undefined,
                 readingSourceUrl: sources[sourceIndex].url,
+                fullUrl: extractedNovelInfo.sourceUrl, // Store the full source URL
                 currentChapter: 0,
                 previousChapter: 0,
-                chapters: [], // Initialize empty chapters array
+                totalChapters: 0, // FIXME: scrap from content script
+                readChapters: [], // Initialize empty chapters array
                 startedVisitOn: currentDateISO,
                 lastVisitedAt: currentDateISO,
                 startedReadingOn: undefined,
@@ -94,53 +98,46 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 const newChapterNumber = chapterInfo.chapterNumber!
                 const updatedReadings = [...readings];
 
-                if (reading.lastReadingAt) {
-                    const updatedChapters = [...reading.chapters]
+                const chapterEntry = {
+                    slug: chapterInfo.slug,
+                    chapterNumber: newChapterNumber,
+                    chapterName: chapterInfo.chapterName,
+                    lastReadAt: currentDateISO,
+                    startedAt: currentDateISO,
+                    bookmark: undefined
+                };
 
+                // Handle read chapters array
+                let updatedChapters = [...(reading.readChapters || [])];
+
+                if (reading.lastReadingAt) {
                     // Find if chapter already exists in reading history
-                    const existingChapterIndex = reading.chapters.findIndex(ch =>
+                    const existingChapterIndex = updatedChapters.findIndex(ch =>
                         ch.slug === chapterInfo.slug || ch.chapterNumber === newChapterNumber
                     );
 
                     if (existingChapterIndex >= 0) {
-                        // Update existing chapter entry
                         updatedChapters[existingChapterIndex] = {
                             ...updatedChapters[existingChapterIndex],
                             lastReadAt: currentDateISO
                         };
                     } else {
-                        updatedChapters.push({
-                            slug: chapterInfo.slug,
-                            chapterNumber: newChapterNumber,
-                            chapterName: chapterInfo.chapterName,
-                            lastReadAt: currentDateISO
-                        });
+                        updatedChapters.push(chapterEntry);
                     }
-
-                    updatedReadings[novelIndex] = {
-                        ...reading,
-                        chapters: updatedChapters,
-                        lastReadingAt: currentDateISO,
-                        previousChapter: reading.currentChapter,
-                        currentChapter: newChapterNumber,
-                    };
                 } else {
-                    const chapters = [{
-                        slug: chapterInfo.slug,
-                        chapterNumber: newChapterNumber,
-                        chapterName: chapterInfo.chapterName,
-                        lastReadAt: currentDateISO
-                    }]
-
-                    updatedReadings[novelIndex] = {
-                        ...reading,
-                        chapters,
-                        previousChapter: 0,
-                        startedReadingOn: currentDateISO,
-                        lastReadingAt: currentDateISO,
-                        currentChapter: newChapterNumber
-                    };
+                    updatedChapters = [chapterEntry];
                 }
+
+                updatedReadings[novelIndex] = {
+                    ...reading,
+                    fullUrl: extractedNovelInfo.sourceUrl,
+                    readChapters: updatedChapters,
+                    lastReadingAt: currentDateISO,
+                    previousChapter: reading.lastReadingAt ? reading.currentChapter : 0,
+                    currentChapter: newChapterNumber,
+                    // Only add startedReadingOn if this is the first time reading
+                    ...(reading.lastReadingAt ? {} : { startedReadingOn: currentDateISO })
+                };
 
                 await localReadings.setValue(updatedReadings);
                 settings.autoSync && await sync('readings')

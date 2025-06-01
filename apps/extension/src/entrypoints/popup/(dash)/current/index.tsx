@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
-import { DEFAULT_CURRENT_READINGS, getCurrentReadingsFromStorage, recalculateCurrentReadings } from './action';
-import BrowseLibraryButton from './components/BrowseLibrary';
+import { fetchCurrentReadings } from './action';
 import CurrentHeader from './components/CurrentHeader';
+import CurrentEmptyState from './components/EmptyState';
 import ReadingCard from './components/ReadingCard';
 import CurrentSkeleton from './skeleton';
 
@@ -12,8 +12,7 @@ const Current: React.FC = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { isSyncing } = useDashStore()
 
-    // Use SWR hook for data fetching with automatic error handling and revalidation
-    const { data: currentReadings = DEFAULT_CURRENT_READINGS, error, isLoading, mutate } = useSWR('current-readings', getCurrentReadingsFromStorage, {
+    const { data: currentReadings = [], error, isLoading, mutate } = useSWR('current-readings', fetchCurrentReadings, {
         revalidateOnFocus: false,
         onError: (err) => {
             console.error('Error loading current readings:', err);
@@ -27,14 +26,10 @@ const Current: React.FC = () => {
 
             // Use mutate to update the data
             await mutate(async () => {
-                const result = await recalculateCurrentReadings();
-                if (result.error) {
-                    toast.error(result.error);
-                    return currentReadings; // Return previous readings on error
-                }
+                const result = await fetchCurrentReadings();
 
                 // Compare new data with previous data
-                const isDataChanged = JSON.stringify(result.data) !== JSON.stringify(currentReadings);
+                const isDataChanged = JSON.stringify(result) !== JSON.stringify(currentReadings);
 
                 if (isDataChanged) {
                     toast.success('Current readings updated successfully');
@@ -42,7 +37,7 @@ const Current: React.FC = () => {
                     toast.success('Current readings already up to date');
                 }
 
-                return result.data;
+                return result;
             }, {
                 revalidate: false // We don't need to revalidate since we're already updating the data
             });
@@ -59,20 +54,23 @@ const Current: React.FC = () => {
     return (isLoading || isRefreshing || isSyncing) ? (
         <CurrentSkeleton />
     ) : (
-        <div className="flex flex-col h-full justify-between gap-4">
-            <CurrentHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+        <div className="flex flex-col h-full">
+            <div className="mb-4">
+                <CurrentHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+            </div>
 
-            {currentReadings.length > 0 ? (
-                currentReadings.map((book) => (
-                    <ReadingCard key={book.id} book={book} />
-                ))
-            ) : (
-                <div className="text-center py-8">
-                    <p className="text-gray-500 dark:text-gray-400">No current readings found.</p>
-                </div>
-            )}
+                {currentReadings.length > 0 ? (
+            <div className="flex-1 overflow-auto">
+                    <div className="space-y-4">
+                        {currentReadings.map((book) => (
+                            <ReadingCard key={book.id} book={book} />
+                        ))}
+                    </div>
+            </div>
+                ) : (
+                    <CurrentEmptyState />
+                )}
 
-            <BrowseLibraryButton />
         </div>
     );
 };

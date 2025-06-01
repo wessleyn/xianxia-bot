@@ -18,5 +18,6 @@ export interface ChapterInfo {
 export interface NovelInfo {
     slug: string;
     title: string;
-    source?: string;
+    source: string;
+    sourceUrl: string; // Full URL to the novel on the source site
 }

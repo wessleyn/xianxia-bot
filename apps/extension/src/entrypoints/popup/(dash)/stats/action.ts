@@ -1,5 +1,5 @@
 import { storage } from '#imports';
-import { delay } from '../../../../utils/common';
+import { localReadings } from '@constants/storage';
 
 export interface ReadingStats {
   booksRead: number;
@@ -26,60 +26,137 @@ export const DEFAULT_STATS: ReadingStats = {
 };
 
 export const readingStats = storage.defineItem<ReadingStats>(
-  'local:xianxu_reading_stats',
+  'local:reading_stats',
   {
     fallback: DEFAULT_STATS,
   }
 );
 
 /**
- * Get reading stats from local storage
+ * Fetch current readings from storage and calculate stats
  */
-export const getStatsFromStorage = async (): Promise<ReadingStats> => {
-  try {
-    return await readingStats.getValue();
-  } catch (error) {
-    console.error('Error fetching stats from storage:', error);
-    return DEFAULT_STATS;
+export const recalculateStats = async () => {
+  // Get readings from local storage
+  const storedReadings = await localReadings.getValue();
+
+  // Count only readings with lastReadingAt (books that were actually read)
+  const activeReadings = storedReadings.filter(reading => reading.lastReadingAt);
+
+  // Count total books read
+  const booksRead = activeReadings.length;
+
+  // Prepare data structures for calculations
+  let chaptersRead = 0;
+  let totalReadingTimeMinutes = 0;
+  const readingDays = new Set<string>();
+  const monthlyActivity = Array(28).fill(0);
+  const genreCounts: Record<string, number> = {};
+
+  // Calculate stats based on reading history
+  activeReadings.forEach(reading => {
+    // Add to chapter count
+    chaptersRead += reading.readChapters?.length || 0;
+
+    // Process each chapter for time calculations and activity tracking
+    reading.readChapters?.forEach(chapter => {
+      if (chapter.startedAt && chapter.lastReadAt) {
+        // Calculate actual reading time for this chapter
+        const startTime = new Date(chapter.startedAt).getTime();
+        const endTime = new Date(chapter.lastReadAt).getTime();
+
+        // If reading time is reasonable (between 1 min and 2 hours), use it
+        // Otherwise fall back to the 15-minute estimate
+        const chapterMinutes = Math.max(1, Math.min(120, (endTime - startTime) / (1000 * 60))) || 15;
+        totalReadingTimeMinutes += chapterMinutes;
+
+        // Track which days had reading activity (for streak calculation)
+        const readDate = new Date(chapter.lastReadAt);
+        readingDays.add(readDate.toISOString().split('T')[0]);
+
+        // Record activity for monthly heatmap
+        const today = new Date();
+        const daysDiff = Math.floor((today.getTime() - readDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysDiff >= 0 && daysDiff < 28) {
+          monthlyActivity[daysDiff]++;
+        }
+      }
+    });
+
+    // Count genres for favorite calculation
+    if (reading.novelGenres.length > 0) {
+      reading.novelGenres.forEach(genre => {
+        const trimmedGenre = genre.trim();
+        if (trimmedGenre) {
+          genreCounts[trimmedGenre] = (genreCounts[trimmedGenre] || 0) + 1;
+        }
+      });
+    }
+  });
+
+  // Convert total reading time to hours
+  const totalHoursRead = Math.round(totalReadingTimeMinutes / 60);
+
+  // Calculate words read (estimate based on chapters)
+  const wordsRead = chaptersRead * 2500;
+
+  // Calculate reading time for the last week
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
+
+  // Calculate weekly streak based on consecutive days of reading
+  const sortedReadingDays = Array.from(readingDays).sort();
+  const lastWeekReadingDays = sortedReadingDays.filter(day => day >= oneWeekAgoStr);
+  const lastWeekReadingTime = Math.round(
+    lastWeekReadingDays.length * (totalReadingTimeMinutes / readingDays.size || 15) / 60
+  );
+
+  // Simple weekly streak calculation based on reading frequency
+  const weeklyStreak = Math.min(52, Math.max(1, lastWeekReadingDays.length));
+
+  // Calculate completion rate based on current/total chapters
+  const booksWithTotalChapters = activeReadings.filter(book => book.totalChapters > 0);
+  let completionRate = 0;
+
+  if (booksWithTotalChapters.length > 0) {
+    const totalCompletionRate = booksWithTotalChapters.reduce((sum, book) => {
+      const bookProgress = Math.min(100, (book.currentChapter / book.totalChapters) * 100);
+      return sum + bookProgress;
+    }, 0);
+    completionRate = Math.round(totalCompletionRate / booksWithTotalChapters.length);
   }
-};
 
-/**
- * Save reading stats to local storage
- */
-export const saveStatsToStorage = async (stats: ReadingStats): Promise<void> => {
-  try {
-    await readingStats.setValue(stats);
-  } catch (error) {
-    console.error('Error saving stats to storage:', error);
+  // Find the genre with the highest count
+  let favoriteGenre = 'Unknown';
+  let maxCount = 0;
+
+  Object.entries(genreCounts).forEach(([genre, count]) => {
+    if (count > maxCount) {
+      favoriteGenre = genre;
+      maxCount = count;
+    }
+  });
+
+  // If no genres found or all readings have empty genre arrays, default to 'Xianxia'
+  if (favoriteGenre === 'Unknown' && activeReadings.length > 0) {
+    favoriteGenre = 'Xianxia';
   }
-};
 
-/**
- * Fetch user stats from API and update local storage
- */
-export const recalculateStats = async (): Promise<{ data: ReadingStats, error: string | null }> => {
-  await delay(2)
+  // Assemble the stats object
+  const stats: ReadingStats = {
+    booksRead,
+    chaptersRead,
+    totalHoursRead,
+    wordsRead,
+    lastWeekReadingTime,
+    weeklyStreak,
+    favoriteGenre,
+    completionRate,
+    monthlyActivity,
+  };
 
-  try {
-    // TODO: Calculate stats based on users reading habits 
-    const stats: ReadingStats = {
-      booksRead: Math.floor(Math.random() * 20) + 1, // 1-20 books
-      chaptersRead: Math.floor(Math.random() * 500) + 50, // 50-550 chapters
-      totalHoursRead: Math.floor(Math.random() * 100) + 5, // 5-105 hours
-      wordsRead: Math.floor(Math.random() * 5000000) + 500000, // 500K-5.5M words
-      lastWeekReadingTime: Math.floor(Math.random() * 20) + 1, // 1-21 hours last week
-      weeklyStreak: Math.floor(Math.random() * 15) + 1, // 1-16 week streak
-      favoriteGenre: ['Xianxia', 'Wuxia', 'Xuanhuan', 'Cultivation', 'Martial Arts'][Math.floor(Math.random() * 5)],
-      completionRate: Math.floor(Math.random() * 90) + 10, // 10-100% completion rate
-      monthlyActivity: Array(28).fill(0).map(() => Math.floor(Math.random() * 120)), // Daily reading activity
-    };
+  // Save the calculated stats
+  await readingStats.setValue(stats);
 
-    await readingStats.setValue(stats);
-
-    return { data: stats, error: null };
-  } catch (error) {
-    const existingStats = await readingStats.getValue();
-    return { data: existingStats, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
+  return stats;
 };

@@ -12,12 +12,14 @@ export async function fetchReadingStats() {
         const oneWeekAgo = new Date(now);
         oneWeekAgo.setDate(now.getDate() - 7);
 
-        // Group streak days by date
-        const streakDays = await prisma.readStreak.groupBy({
-            by: ['date'],
+        // Group reading activity by date
+        const streakDays = await prisma.readChapter.groupBy({
+            by: ['lastReadAt'],
             where: {
-                userId,
-                date: {
+                reading: {
+                    userId
+                },
+                lastReadAt: {
                     gte: oneWeekAgo
                 }
             },
@@ -30,8 +32,8 @@ export async function fetchReadingStats() {
         let streak = 0;
         const dateMap = new Map();
 
-        streakDays.forEach(day => {
-            const dateStr = new Date(day.date).toDateString();
+        streakDays.forEach((day) => {
+            const dateStr = new Date(day.lastReadAt).toDateString();
             dateMap.set(dateStr, true);
         });
 
@@ -48,26 +50,37 @@ export async function fetchReadingStats() {
             }
         }
 
-        // Get total chapters read (count unique chapters with reading streaks)
-        const chaptersRead = await prisma.readStreak.groupBy({
+        // Get total chapters read (count unique chapters)
+        const chaptersRead = await prisma.readChapter.groupBy({
             by: ['chapterId'],
-            where: { userId },
+            where: {
+                reading: {
+                    userId
+                }
+            },
             _count: {
                 id: true
             }
         });
 
-        // Get time spent reading (in minutes)
-        const timeSpent = await prisma.readStreak.aggregate({
-            where: { userId },
-            _sum: {
-                minutesRead: true
+        // Get time spent reading (estimate based on chapters read)
+        // Since we don't have minutesRead field, we'll estimate 10 minutes per chapter
+        const totalChapters = await prisma.readChapter.count({
+            where: {
+                reading: {
+                    userId
+                }
             }
         });
+        const estimatedMinutes = totalChapters * 10; // Estimating 10 minutes per chapter
 
         // Get bookmarks count
         const bookmarks = await prisma.bookmark.count({
-            where: { userId }
+            where: {
+                readingNovel: {
+                    userId
+                }
+            }
         });
 
         return [
@@ -81,7 +94,7 @@ export async function fetchReadingStats() {
             },
             {
                 name: "Time Spent Reading",
-                value: formatReadingTime(timeSpent._sum.minutesRead || 0)
+                value: formatReadingTime(estimatedMinutes)
             },
             {
                 name: "Bookmarks",

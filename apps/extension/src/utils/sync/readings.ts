@@ -37,7 +37,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                 .from('Novel')
                 .select('id')
                 .ilike('title', `%${reading.novelName}%`)
-                .single();
+                .maybeSingle();
 
             if (novelError) {
                 console.error('Error checking existing novel:', novelError);
@@ -55,12 +55,12 @@ export async function syncReadings({ userId }: { userId: string }) {
                         title: reading.novelName,
                         // TODO: scrap this from content script
                         coverImage: reading.coverImage,
-                        author: 'Unknown',
+                        author: reading.novelAuthor ?? 'Unknown',
                         description: '',
                         publishedAt: now,
                         createdAt: now,
                         updatedAt: now,
-                        genre: []
+                        genre: reading.novelGenres
                     })
                     .select('id')
                     .single();
@@ -183,14 +183,14 @@ export async function syncReadings({ userId }: { userId: string }) {
             let currentChapterId: string | null = null;
             let previousChapterId: string | null = null;
 
-            if (reading.chapters && reading.chapters.length > 0) {
-                console.debug('Processing', reading.chapters.length, 'chapters for novel:', reading.novelName);
+            if (reading.readChapters && reading.readChapters.length > 0) {
+                console.debug('Processing', reading.readChapters.length, 'chapters for novel:', reading.novelName);
                 try {
                     const now = new Date().toISOString();
 
                     // Process chapters sequentially to avoid race conditions
                     const validChapters = [];
-                    for (const chapter of reading.chapters) {
+                    for (const chapter of reading.readChapters) {
                         console.debug('Processing chapter:', chapter.chapterNumber, chapter.chapterName || '');
                         // First, check if the chapter already exists
                         const { data: existingChapter, error: checkError } = await supabase
@@ -283,6 +283,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                 userId: userId,
                 novelId: novelId,
                 readingSourceId: sourceVisitId,  // Now correctly using the sourceVisitId instead of sourceId
+                readingSourceUrl: reading.fullUrl, // Include the full URL to the novel
                 currentChapterId: currentChapterId,
                 previousChapterId: previousChapterId,
                 lastReadAt: reading.lastReadingAt,
@@ -300,8 +301,70 @@ export async function syncReadings({ userId }: { userId: string }) {
 
             if (readNovelError) {
                 console.error('Error updating read novel:', readNovelError);
+                continue;
             } else {
                 console.debug('Successfully upserted ReadNovel entry for novel:', reading.novelName);
+            }
+
+            // Now sync the ReadChapter entries for tracking reading history
+            if (reading.readChapters && reading.readChapters.length > 0) {
+                console.debug('Syncing ReadChapter entries for', reading.readChapters.length, 'chapters');
+                const readNovelId = readNovelData.id;
+
+                for (const chapter of reading.readChapters) {
+                    // Get the chapter ID from our database
+                    const { data: chapterData, error: chapterError } = await supabase
+                        .from('NovelChapter')
+                        .select('id')
+                        .eq('novelId', novelId)
+                        .eq('number', chapter.chapterNumber)
+                        .single();
+
+                    if (chapterError) {
+                        console.error('Error finding chapter for ReadChapter entry:', chapterError);
+                        continue;
+                    }
+
+                    const chapterId = chapterData.id;
+
+                    // Check if a ReadChapter entry already exists
+                    const { data: existingReadChapter, error: checkReadChapterError } = await supabase
+                        .from('ReadChapter')
+                        .select('id')
+                        .eq('readingId', readNovelId)
+                        .eq('chapterId', chapterId)
+                        .maybeSingle();
+
+                    if (checkReadChapterError) {
+                        console.error('Error checking existing ReadChapter:', checkReadChapterError);
+                        continue;
+                    }
+
+                    // Prepare ReadChapter data
+                    const readChapterData = {
+                        id: existingReadChapter ? existingReadChapter.id : crypto.randomUUID(),
+                        readingId: readNovelId,
+                        chapterId: chapterId,
+                        startedAt: chapter.startedAt || now,
+                        lastReadAt: chapter.lastReadAt || now
+                    };
+
+                    // Upsert ReadChapter entry
+                    console.debug('Upserting ReadChapter for chapter:', chapter.chapterNumber);
+                    const { error: readChapterError } = await supabase
+                        .from('ReadChapter')
+                        .upsert(readChapterData, {
+                            onConflict: 'readingId,chapterId',
+                            ignoreDuplicates: false
+                        });
+
+                    if (readChapterError) {
+                        console.error('Error upserting ReadChapter:', readChapterError);
+                    } else {
+                        console.debug('Successfully recorded ReadChapter for chapter:', chapter.chapterNumber);
+                    }
+                }
+                console.debug('Finished syncing ReadChapter entries');
             }
         }
 

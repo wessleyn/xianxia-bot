@@ -1,5 +1,4 @@
 import React from 'react';
-import { BrowseLibraryButtonSkeleton } from './components/BrowseLibrary/skeleton';
 import { HeaderSkeleton } from './components/CurrentHeader/skeleton';
 import { ReadingCardSkeleton } from './components/ReadingCard/skeleton';
 
@@ -11,8 +10,6 @@ const CurrentSkeleton: React.FC = () => {
             {Array.from({ length: 3 }).map((_, index) => (
                 <ReadingCardSkeleton key={`reading-skeleton-${index}`} />
             ))}
-
-            <BrowseLibraryButtonSkeleton />
         </div>
     );
 };

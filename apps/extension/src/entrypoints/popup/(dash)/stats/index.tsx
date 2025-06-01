@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
-import { DEFAULT_STATS, getStatsFromStorage, recalculateStats } from './action';
+import { DEFAULT_STATS, recalculateStats } from './action';
 import ReadingActivity from './components/ReadingActivity';
 import ReadingInsights from './components/ReadingInsights';
 import StatCard from './components/StatCard';
@@ -12,7 +12,7 @@ import StatsSkeleton from './skeleton';
 const Stats: React.FC = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { isSyncing }  = useDashStore()
-    const { data: stats = DEFAULT_STATS, error, isLoading, mutate } = useSWR('reading-stats', getStatsFromStorage, {
+    const { data: stats = DEFAULT_STATS, error, isLoading, mutate } = useSWR('reading-stats', recalculateStats, {
         revalidateOnFocus: false,
         onError: (err) => {
             console.error('Error loading stats:', err);
@@ -26,13 +26,9 @@ const Stats: React.FC = () => {
             // Start refreshing (this will set a loading state)
             await mutate(async () => {
                 const result = await recalculateStats();
-                if (result.error) {
-                    toast.error(result.error);
-                    return stats; // Return previous stats on error
-                }
 
                 // Compare new data with previous data
-                const isDataChanged = JSON.stringify(result.data) !== JSON.stringify(stats);
+                const isDataChanged = JSON.stringify(result) !== JSON.stringify(stats);
 
                 if (isDataChanged) {
                     toast.success('Stats updated successfully');
@@ -40,7 +36,7 @@ const Stats: React.FC = () => {
                     toast.success('Stats already up to date');
                 }
 
-                return result.data;
+                return result;
             }, {
                 revalidate: false // We don't need to revalidate since we're already updating the data
             });

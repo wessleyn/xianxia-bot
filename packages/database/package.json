@@ -9,8 +9,7 @@
     "./generated/prisma": "./generated/prisma/index.js"
   },
   "prisma": {
-    "schema": "./prisma",
-    "seed": "tsx ./prisma/seed/index.ts"
+    "schema": "./prisma"
   },
   "scripts": {
     "query": "tsx ./prisma/queries/index.ts",
@@ -24,7 +23,6 @@
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "db:forcePush": "prisma db push  --accept-data-loss",
-    "db:seed": "npm run db:generate && npx prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "postinstall": "prisma generate --no-engine"
   },
