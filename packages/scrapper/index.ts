@@ -34,7 +34,8 @@ export function extractNovelInfo(url: string) {
     return {
         slug: slug,
         title: slugToTitle(slug),
-        source: pattern.homepage
+        source: pattern.homepage,
+        sourceUrl: url // Store the full URL to the novel
     };
 }
 

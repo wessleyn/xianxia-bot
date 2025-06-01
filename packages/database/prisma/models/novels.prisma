@@ -8,6 +8,7 @@ model ReadNovel {
   novel   Novel  @relation(fields: [novelId], references: [id])
 
   bookmarks Bookmark[]
+  readingSourceUrl String // last left url 
 
   readingSourceId String
   readingSource SourceVisit @relation(fields: [readingSourceId], references: [id])

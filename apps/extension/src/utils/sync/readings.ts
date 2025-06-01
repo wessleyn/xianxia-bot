@@ -55,12 +55,12 @@ export async function syncReadings({ userId }: { userId: string }) {
                         title: reading.novelName,
                         // TODO: scrap this from content script
                         coverImage: reading.coverImage,
-                        author: 'Unknown',
+                        author: reading.novelAuthor ?? 'Unknown',
                         description: '',
                         publishedAt: now,
                         createdAt: now,
                         updatedAt: now,
-                        genre: []
+                        genre: reading.novelGenres
                     })
                     .select('id')
                     .single();
@@ -187,7 +187,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                 console.debug('Processing', reading.readChapters.length, 'chapters for novel:', reading.novelName);
                 try {
                     const now = new Date().toISOString();
-                    
+
                     // Process chapters sequentially to avoid race conditions
                     const validChapters = [];
                     for (const chapter of reading.readChapters) {
@@ -242,7 +242,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                             });
                         }
                     }
-                    
+
                     console.debug('Successfully processed', validChapters.length, 'chapters');
 
                     // Sort chapters by number to find current and previous
@@ -283,6 +283,7 @@ export async function syncReadings({ userId }: { userId: string }) {
                 userId: userId,
                 novelId: novelId,
                 readingSourceId: sourceVisitId,  // Now correctly using the sourceVisitId instead of sourceId
+                readingSourceUrl: reading.fullUrl, // Include the full URL to the novel
                 currentChapterId: currentChapterId,
                 previousChapterId: previousChapterId,
                 lastReadAt: reading.lastReadingAt,

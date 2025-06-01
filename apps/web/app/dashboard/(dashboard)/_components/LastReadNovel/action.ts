@@ -14,9 +14,12 @@ export async function fetchLastReadNovel() {
             orderBy: {
                 lastReadAt: 'desc'
             },
-            include: {
+            select: {
+                readingSourceUrl: true,
                 novel: true,
-                currentChapter: true
+                lastReadAt: true,
+                currentChapter: true,
+                novelId: true
             }
         });
 
@@ -49,6 +52,7 @@ export async function fetchLastReadNovel() {
             id: lastRead.novel.id,
             title: lastRead.novel.title,
             coverImage: lastRead.novel.coverImage,
+            link: lastRead.readingSourceUrl,
             author: lastRead.novel.author,
             description: lastRead.novel.description,
             currentChapter: lastRead.currentChapter?.title || "Chapter 1",

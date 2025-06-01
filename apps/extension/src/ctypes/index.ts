@@ -28,7 +28,7 @@ export interface ChapterData {
         label: BookmarkLabel
         excerpt: string;
         dateAdded: string;
-    } | undefined; 
+    } | undefined;
 }
 
 export interface LocalReading {
@@ -44,6 +44,7 @@ export interface LocalReading {
 
     readingSourceId: string | undefined;
     readingSourceUrl: string
+    fullUrl: string // Full URL to the novel on the source site
 
     currentChapter: number;
     previousChapter: number;

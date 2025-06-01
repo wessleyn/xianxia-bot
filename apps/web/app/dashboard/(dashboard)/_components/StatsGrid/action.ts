@@ -67,7 +67,11 @@ export async function fetchReadingStats() {
 
         // Get bookmarks count
         const bookmarks = await prisma.bookmark.count({
-            where: { userId }
+            where: { 
+                readingNovel: {
+                    userId
+                }
+             }
         });
 
         return [

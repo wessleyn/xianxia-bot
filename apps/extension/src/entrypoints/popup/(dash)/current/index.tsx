@@ -3,8 +3,8 @@ import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
 import { fetchCurrentReadings } from './action';
-import BrowseLibraryButton from './components/BrowseLibrary';
 import CurrentHeader from './components/CurrentHeader';
+import CurrentEmptyState from './components/EmptyState';
 import ReadingCard from './components/ReadingCard';
 import CurrentSkeleton from './skeleton';
 
@@ -54,20 +54,23 @@ const Current: React.FC = () => {
     return (isLoading || isRefreshing || isSyncing) ? (
         <CurrentSkeleton />
     ) : (
-        <div className="flex flex-col h-full justify-between gap-4">
-            <CurrentHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+        <div className="flex flex-col h-full">
+            <div className="mb-4">
+                <CurrentHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+            </div>
 
-            {currentReadings.length > 0 ? (
-                currentReadings.map((book) => (
-                    <ReadingCard key={book.id} book={book} />
-                ))
-            ) : (
-                <div className="text-center py-8">
-                    <p className="text-gray-500 dark:text-gray-400">No current readings found.</p>
-                </div>
-            )}
+                {currentReadings.length > 0 ? (
+            <div className="flex-1 overflow-auto">
+                    <div className="space-y-4">
+                        {currentReadings.map((book) => (
+                            <ReadingCard key={book.id} book={book} />
+                        ))}
+                    </div>
+            </div>
+                ) : (
+                    <CurrentEmptyState />
+                )}
 
-            <BrowseLibraryButton />
         </div>
     );
 };

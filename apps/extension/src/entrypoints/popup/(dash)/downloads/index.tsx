@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import useDashStore from '../../stores/useDashStore';
 import { DEFAULT_STATE, deleteDownloadedNovel, getDownloadedNovelsFromStorage, NovelData, recalculateDownloadedNovels } from './action';
-import EmptyState from './components/EmptyState';
+import DownloadsEmptyState from './components/EmptyState';
 import FilterBar from './components/FilterBar';
 import NovelCard from './components/NovelCard';
 import StorageUsage from './components/StorageUsage';
@@ -132,7 +132,7 @@ const Downloads = () => {
                             ))}
                         </div>
                     ) : (
-                        <EmptyState />
+                        <DownloadsEmptyState />
                     )}
                 </div>
 

@@ -6,6 +6,9 @@ interface ReadingCardProps {
 }
 
 const ReadingCard: React.FC<ReadingCardProps> = ({ book }) => {
+    const handleNovelView = () => {
+        window.open(book.fullUrl)
+    }
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 border border-gray-100 dark:border-gray-700 flex gap-3">
             <div className="w-14 h-20 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex-shrink-0">
@@ -53,7 +56,7 @@ const ReadingCard: React.FC<ReadingCardProps> = ({ book }) => {
                                 <path d="M12 4l0 12"></path>
                             </svg>
                         </button>
-                        <button className="bg-indigo-100 dark:bg-indigo-900/30 hover:bg-indigo-200 dark:hover:bg-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-xs py-1 px-3 rounded transition-colors">
+                        <button onClick={handleNovelView} className="bg-indigo-100 dark:bg-indigo-900/30 hover:bg-indigo-200 dark:hover:bg-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-xs py-1 px-3 rounded transition-colors">
                             Continue
                         </button>
                     </div>

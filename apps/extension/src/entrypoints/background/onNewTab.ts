@@ -65,9 +65,10 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                 novelAuthor: undefined,
                 readingSourceId: undefined,
                 readingSourceUrl: sources[sourceIndex].url,
+                fullUrl: extractedNovelInfo.sourceUrl, // Store the full source URL
                 currentChapter: 0,
                 previousChapter: 0,
-                totalChapters:  0, // FIXME: scrap from content script
+                totalChapters: 0, // FIXME: scrap from content script
                 readChapters: [], // Initialize empty chapters array
                 startedVisitOn: currentDateISO,
                 lastVisitedAt: currentDateISO,
@@ -120,9 +121,10 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
                             bookmark: undefined
                         });
                     }
-                    
+
                     updatedReadings[novelIndex] = {
                         ...reading,
+                        fullUrl: extractedNovelInfo.sourceUrl, // Store the full source URL
                         readChapters: updatedChapters,
                         lastReadingAt: currentDateISO,
                         previousChapter: reading.currentChapter,
@@ -139,6 +141,7 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
 
                     updatedReadings[novelIndex] = {
                         ...reading,
+                        fullUrl: extractedNovelInfo.sourceUrl, // Store the full source URL
                         readChapters: chapters,
                         previousChapter: 0,
                         startedReadingOn: currentDateISO,

@@ -6,6 +6,7 @@ export interface ReadingData {
     title: string;
     author: string;
     coverUrl: string;
+    fullUrl: string;
     currentChapter: number;
     totalChapters: number;
     progress: number;
@@ -43,6 +44,7 @@ export const fetchCurrentReadings = async () => {
             author: reading.novelAuthor || 'Unknown Author', 
             coverUrl: reading.coverImage || 'https://via.placeholder.com/60x80',
             currentChapter: reading.currentChapter,
+            fullUrl: reading.fullUrl,
             totalChapters: reading.totalChapters,
             progress: parseFloat(progress.toFixed(1)),
             lastReadDate: formatDistance(new Date(reading.lastReadingAt!), new Date(), { addSuffix: true })
