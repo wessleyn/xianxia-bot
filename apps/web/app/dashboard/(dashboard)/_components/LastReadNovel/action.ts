@@ -32,7 +32,7 @@ export async function fetchLastReadNovel() {
             where: { novelId: lastRead.novelId }
         });
 
-        const readChapters = await prisma.readStreak.groupBy({
+        const readChapters = await prisma.readChapter.groupBy({
             by: ['chapterId'],
             where: {
                 chapter: {
