@@ -14,3 +14,9 @@ export interface ChapterInfo {
     chapterNumber?: number;
     chapterName?: string;
 }
+
+export interface NovelInfo {
+    slug: string;
+    title: string;
+    source?: string;
+}

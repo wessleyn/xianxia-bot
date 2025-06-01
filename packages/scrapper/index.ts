@@ -24,14 +24,18 @@ export function getNovelPatternForUrl(url: string) {
 }
 
 // Extract novel slug or formatted title based on `format` flag
-export function extractNovelInfo(url: string, format = true) {
+export function extractNovelInfo(url: string) {
     const pattern = getNovelPatternForUrl(url);
-    if (!pattern?.extractNovelSlug) throw Error('No pattern found for URL');
+    if (!pattern?.extractNovelSlug) throw Error('No pattern matched for url: ' + url)
 
     const slug = pattern.extractNovelSlug(url);
-    if (!slug) throw Error('No slug extracted from URL');
+    if (!slug) throw Error('No slug extracted url: ' + url)
 
-    return format ? slugToTitle(slug) : slug;
+    return {
+        slug: slug,
+        title: slugToTitle(slug),
+        source: pattern.homepage
+    };
 }
 
 // Extract chapter information including slug, chapter number and name

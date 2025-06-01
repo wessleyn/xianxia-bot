@@ -51,14 +51,16 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
         const extractedNovelInfo = extractNovelInfo(url.href);
         let novelIndex = readings.findIndex(novel =>
             novel.novelName && extractedNovelInfo ?
-                novel.novelName.includes(extractedNovelInfo) :
+                novel.novelName.includes(extractedNovelInfo.title) :
                 false
         );
 
         if (novelIndex == -1) {
             const newNovel: LocalReading = {
                 novelId: undefined,
-                novelName: extractedNovelInfo,
+                coverImage: extractedNovelInfo && newInfo.pattern?.homepage.includes('novelbin') ?
+                    `https://novelbin.me/media/novel/${extractedNovelInfo.slug}.jpg` : undefined,
+                novelName: extractedNovelInfo.title,
                 readingSourceId: undefined,
                 readingSourceUrl: sources[sourceIndex].url,
                 currentChapter: 0,

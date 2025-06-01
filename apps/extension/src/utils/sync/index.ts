@@ -24,14 +24,14 @@ export default async function sync(type: syncType) {
 
             break;
         case 'history':
-
+            // return await syncReadings({ userId });
             break;
         case 'readings':
             return await syncReadings({ userId })
         case 'all':
             const status = await Promise.all([
                 syncSources({ userId }),
-                syncReadings({ userId })
+                syncReadings({ userId }),
             ]);
 
             if (status.some(s => s === false)) {
@@ -40,6 +40,7 @@ export default async function sync(type: syncType) {
             } else {
                 toast.success('Sync completed successfully');
             }
+            return true;
     }
     return true;
 }

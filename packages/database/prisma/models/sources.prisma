@@ -23,7 +23,7 @@ model SourceVisit {
     source NovelSource @relation(fields: [sourceId], references: [id])
 
     readings ReadNovel[]
-
+// TODO: this is general count for all visits, maybe up the visits 
     count Int
 
     startedAt DateTime @default(now())

@@ -27,6 +27,7 @@ export interface LocalReading {
     // assuming we have'nt synced yet     
     novelId: string | undefined;
     novelName: string;
+    coverImage: string | undefined;
 
     // assuming we have'nt synced yet     
     readingSourceId: string | undefined;
