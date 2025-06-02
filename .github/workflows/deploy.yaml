@@ -52,6 +52,9 @@ jobs:
       - name: Zip extensions
         run: |
           cd apps/extension && npm run zip:fox
+        env:
+          WXT_SUPABASE_URL: ${{ vars.WXT_SUPABASE_URL }}
+          WXT_SUPABASE_ANON_KEY: ${{ vars.WXT_SUPABASE_ANON_KEY }}
       - name: Submit to stores
         working-directory: apps/extension
         run: |
