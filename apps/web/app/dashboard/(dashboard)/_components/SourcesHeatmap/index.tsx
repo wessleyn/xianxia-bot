@@ -9,7 +9,7 @@ export async function SourcesHeatmap() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-800 dark:text-white">
-                    Reading Sources
+                    Active Reading Sources
                 </h3>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                     Last 30 days
