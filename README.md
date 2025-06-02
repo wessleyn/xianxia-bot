@@ -1,4 +1,4 @@
-# Xianxia Bot
+# Xianxu (xianxia-novel-bot)
 
 ![Hackatime](https://hackatime-badge.hackclub.com/U08RWLFGRKN/xianxia-bot?style=flat-square&label=hackatime&color=blue) ![GitHub Repo stars](https://img.shields.io/github/stars/wessleyn/xianxia-bot?style=social) ![GitHub last commit](https://img.shields.io/github/last-commit/wessleyn/xianxia-bot)
 
