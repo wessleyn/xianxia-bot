@@ -9,7 +9,7 @@ export async function LastReadNovel() {
         return <div>No recent reading activity</div>;
     }
     return (
-        <div className="rounded-lg bg-card p-6 shadow-sm">
+        <div className="rounded-lg bg-card dark:bg-gray-800 p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Last Read Novel</h2>
             
             <div className="flex flex-col md:flex-row gap-4">

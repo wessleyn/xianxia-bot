@@ -51,6 +51,7 @@ export async function fetchRecentNovels() {
                     id: entry.novel.id,
                     title: entry.novel.title,
                     coverImage: entry.novel.coverImage,
+                    link: entry.readingSourceUrl,
                     lastRead,
                     progress
                 };

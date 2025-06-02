@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { fetchRecentNovels } from "./actions";
 
 export async function RecentReading() {
@@ -18,30 +19,31 @@ export async function RecentReading() {
 
             <div className="space-y-4">
                 {novels.map((novel) => (
-                    <div
+                    <Link
+                    href={novel.link}
                         key={novel.title}
-                        className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between"
+                        className="bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between"
                     >
-                        <div>
-                            <h4 className="font-medium text-gray-800 dark:text-white">
-                                {novel.title}
-                            </h4>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Last read {novel.lastRead}
-                            </p>
-                        </div>
-                        <div className="mt-2 sm:mt-0 w-full sm:w-32">
-                            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                                <div
-                                    className="bg-purple-600 h-2 rounded-full"
-                                    style={{ width: `${novel.progress}%` }}
-                                ></div>
+                            <div>
+                                <h4 className="font-medium text-gray-800 dark:text-white">
+                                    {novel.title}
+                                </h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Last read {novel.lastRead}
+                                </p>
                             </div>
-                            <p className="text-xs text-right mt-1 text-gray-500 dark:text-gray-400">
-                                {novel.progress}% complete
-                            </p>
-                        </div>
-                    </div>
+                            <div className="mt-2 sm:mt-0 w-full sm:w-32">
+                                <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                    <div
+                                        className="bg-purple-600 h-2 rounded-full"
+                                        style={{ width: `${novel.progress}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-xs text-right mt-1 text-gray-500 dark:text-gray-400">
+                                    {novel.progress}% complete
+                                </p>
+                            </div>
+                    </Link>
                 ))}
             </div>
         </div>

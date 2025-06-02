@@ -58,7 +58,7 @@ const Stats: React.FC = () => {
                 <StatCard title="Books Read" value={stats.booksRead} />
                 <StatCard title="Chapters" value={stats.chaptersRead} />
                 <StatCard title="Hours Read" value={stats.totalHoursRead || 0} />
-                <StatCard title="Weekly Streak" value={`${stats.weeklyStreak || 0} ${stats.weeklyStreak === 1 ? 'week' : 'weeks'}`} />
+                <StatCard title="Streak" value={`${stats.dailyStreak || 0} ${stats.dailyStreak === 1 ? 'day' : 'days'}`} />
             </div>
 
             <ReadingActivity monthlyActivity={stats.monthlyActivity} />

@@ -7,7 +7,7 @@ export interface ReadingStats {
   totalHoursRead: number;
   wordsRead: number;
   lastWeekReadingTime: number;
-  weeklyStreak: number;
+  dailyStreak: number;
   favoriteGenre: string;
   completionRate: number;
   monthlyActivity: number[];
@@ -19,7 +19,7 @@ export const DEFAULT_STATS: ReadingStats = {
   totalHoursRead: 0,
   wordsRead: 0,
   lastWeekReadingTime: 0,
-  weeklyStreak: 0,
+  dailyStreak: 0,
   favoriteGenre: 'Unknown',
   completionRate: 0,
   monthlyActivity: Array(28).fill(0),
@@ -111,8 +111,39 @@ export const recalculateStats = async () => {
     lastWeekReadingDays.length * (totalReadingTimeMinutes / readingDays.size || 15) / 60
   );
 
-  // Simple weekly streak calculation based on reading frequency
-  const weeklyStreak = Math.min(52, Math.max(1, lastWeekReadingDays.length));
+  // Calculate daily streak based on consecutive days of reading
+  let dailyStreak = 0;
+  if (sortedReadingDays.length > 0) {
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    // Check if read today or yesterday to keep the streak active
+    const hasRecentActivity = sortedReadingDays.includes(today) || sortedReadingDays.includes(yesterdayStr);
+
+    if (hasRecentActivity) {
+      dailyStreak = 1; // Start with 1 for today/yesterday
+      let currentDate = sortedReadingDays.includes(today) ? today : yesterdayStr;
+
+      // Loop backwards through dates to find consecutive days
+      for (let i = sortedReadingDays.length - 1; i >= 0; i--) {
+        const prevDate = new Date(currentDate);
+        prevDate.setDate(prevDate.getDate() - 1);
+        const prevDateStr = prevDate.toISOString().split('T')[0];
+
+        if (sortedReadingDays.includes(prevDateStr)) {
+          dailyStreak++;
+          currentDate = prevDateStr;
+        } else {
+          break; // Streak is broken
+        }
+      }
+    }
+  }
+
+  // Fix monthly activity array (reverse it so position 0 is 4 weeks ago)
+  const reversedMonthlyActivity = [...monthlyActivity].reverse();
 
   // Calculate completion rate based on current/total chapters
   const booksWithTotalChapters = activeReadings.filter(book => book.totalChapters > 0);
@@ -149,10 +180,10 @@ export const recalculateStats = async () => {
     totalHoursRead,
     wordsRead,
     lastWeekReadingTime,
-    weeklyStreak,
+    dailyStreak,
     favoriteGenre,
     completionRate,
-    monthlyActivity,
+    monthlyActivity: reversedMonthlyActivity,
   };
 
   // Save the calculated stats

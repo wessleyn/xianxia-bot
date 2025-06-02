@@ -39,7 +39,7 @@ export default function DashboardLoading() {
                 </div>
             </div>
 
-            {/* Recent Updates/News Section */}
+            {/* Recent Updates Section */}
             <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                 <Skeleton className="h-6 w-[180px] mb-4" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
