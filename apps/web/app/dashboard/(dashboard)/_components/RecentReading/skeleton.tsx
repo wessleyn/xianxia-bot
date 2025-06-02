@@ -2,7 +2,7 @@ import { Skeleton } from "@/app/_components/skeleton";
 
 export function RecentReadingSkeleton() {
     return (
-        <div className="rounded-lg bg-card p-6 shadow-sm">
+        <div className="rounded-lg bg-card  dark:bg-gray-800  p-6 shadow-sm">
             <Skeleton className="h-6 w-[180px] mb-4" />
             <div className="space-y-4">
                 {Array(4).fill(0).map((_, i) => (

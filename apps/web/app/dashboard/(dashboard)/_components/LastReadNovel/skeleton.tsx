@@ -2,7 +2,7 @@ import { Skeleton } from "@/app/_components/skeleton";
 
 export function LastReadNovelSkeleton() {
     return (
-        <div className="rounded-lg  bg-card p-6 shadow-sm">
+        <div className="rounded-lg  bg-card  dark:bg-gray-800  p-6 shadow-sm">
             <Skeleton className="h-6 w-[180px] mb-4" />
             <div className="flex flex-col md:flex-row gap-4">
                 <Skeleton className="h-[220px] w-[160px] rounded-md" />

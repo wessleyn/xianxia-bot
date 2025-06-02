@@ -1,8 +1,9 @@
-import { localReadings, localSettings, localSources, localTabView } from "@constants/storage";
+import { localReadings, localSettings, localSources } from "@constants/storage";
 import { LocalReading } from "@ctypes/index";
 import { extractChapterInfo, extractNovelInfo } from "@repo/scrapper";
 import { detectPage } from "@utils/detectPage";
 import sync from "@utils/sync";
+import setView from "./utils/setView";
 
 export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tabs.TabChangeInfo, tab: globalThis.Browser.tabs.Tab) => {
     const currentDate = new Date()
@@ -14,14 +15,10 @@ export const onNewTab = async (tabId: number, changeInfo: globalThis.Browser.tab
     if (tab.status == 'complete' && tab.url) {
         const url = new URL(tab.url)
         const newInfo = detectPage(url.href)
+        
+        const currentView = await setView(newInfo.type)
 
-        let currentView = await localTabView.getValue()
-        // if this is a new view, change the local storage
-        currentView !== newInfo.type && await localTabView.setValue(newInfo.type)
-        // either way, fetch the latest view
-        currentView = await localTabView.getValue()
-
-        if (currentView === 'dashboard') return
+        if (currentView == 'dashboard') return
 
         let sourceIndex = sources.findIndex(source => source.name.includes(newInfo.pattern!.homepage))
         if (sourceIndex == -1) {

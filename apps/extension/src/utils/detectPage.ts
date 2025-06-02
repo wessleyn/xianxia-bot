@@ -2,21 +2,18 @@ import { extractChapterInfo, extractNovelInfo, getNovelPatternForUrl, isNovelCha
 import { PopView } from "../ctypes";
 
 export function detectPage(url: string) {
-    const novelSiteDetected = isNovelSite(url);
-    const novelChapterDetected = isNovelChapter(url);
-    const novelTocDetected = isNovelToc(url);
     const pattern = getNovelPatternForUrl(url);
 
     let pageType: PopView = "dashboard";
     let name = ''
 
-    if (novelSiteDetected) {
+    if (isNovelSite(url)) {
         pageType = "novelSite";
         name = pattern!.homepage
-    } else if (novelTocDetected) {
+    } else if (isNovelToc(url)) {
         pageType = "novelToc";
-        name = extractNovelInfo(url) ?? ''
-    } else if (novelChapterDetected) {
+        name = extractNovelInfo(url).title ?? ''
+    } else if (isNovelChapter(url)) {
         pageType = "novelCh";
         name = extractChapterInfo(url)?.chapterName ?? ''
     }
