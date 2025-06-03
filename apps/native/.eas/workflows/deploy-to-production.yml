@@ -1,12 +1,12 @@
 name: Deploy to production
 
-defaults:
-  run:
-    working_directory: ./apps/native
-
 on:
   push:
     branches: ['main']
+    
+defaults:
+  run:
+    working_directory: ./apps/native
 
 jobs:
   fingerprint:

@@ -1,5 +1,9 @@
 name: Create development builds
 
+on:
+  pull_request_labeled:
+    - eas-build
+
 defaults:
   run:
     working_directory: ./apps/native
