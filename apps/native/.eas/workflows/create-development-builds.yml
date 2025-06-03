@@ -1,27 +1,16 @@
 name: Create development builds
 
 on:
-  pull_request:
-    types: [labeled]
-  issues:
-    types: [labeled]
+  pull_request_labeled:
+    - eas-build
 
 defaults:
   run:
-    working-directory: ./apps/native
+    working_directory: ./apps/native
 
 jobs:
-  check_label:
-    name: Check for devBuild label
-    runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'devBuild' }}
-    steps:
-      - name: Label detected
-        run: echo "devBuild label detected, proceeding with build"
-
   android_development_build:
     name: Build Android
-    needs: check_label
     type: build
     params:
       platform: android
