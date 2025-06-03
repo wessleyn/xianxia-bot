@@ -19,6 +19,12 @@ export default function TabLayout() {
         }
       })}
     >
+      <Tabs.Screen
+        name={'index'}
+        options={{
+        href: null, // Prevents the index tab from being displayed in the tab bar
+        }}
+      />
       {tabs.map(({ name, icon: Icon, title }) => (
         <Tabs.Screen
           key={name}
