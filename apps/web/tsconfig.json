@@ -12,6 +12,7 @@
       "@components/*": ["./app/_components/*"],
       "@assets/*": ["./app/_assets/*"],
       "@store/*": ["./app/_store/*"],
+      "@lib/*": ["./app/_lib/*"],
       "@styles/*": ["./app/_styles/*"]
     }
   },
