@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Logo from '../../../_assets/monk-man.svg';
+import Logo from '@assets/svg/monk-man.svg';
 import { useResponsiveSidebar } from '../../_store/useSidebarStore';
 
 export default function SidebarLogo() {

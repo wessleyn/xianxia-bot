@@ -34,7 +34,7 @@ export default async function TrendingGenres() {
             ))}
           </ul>
         ) : (
-          <p className="text-center text-gray-600 dark:text-gray-400">No trending genres found</p>
+          <p className="text-gray-600 dark:text-gray-400">No trending genres found</p>
         )}
 
       </div>
