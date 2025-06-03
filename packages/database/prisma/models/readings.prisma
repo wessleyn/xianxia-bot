@@ -1,5 +1,9 @@
 model ReadNovel {
   id String @id @default(cuid())
+  
+  rating Int? // Stars (max:5) given by the user, can be null if not rated
+  readingSourceUrl String //  left at  url
+
 
   userId String     @db.Uuid
   user   UserProfile @relation(fields: [userId], references: [id])
@@ -9,7 +13,6 @@ model ReadNovel {
 
   bookmarks Bookmark[]
   readChapter ReadChapter[]
-  readingSourceUrl String // last left url 
 
   readingSourceId String
   readingSource SourceVisit @relation(fields: [readingSourceId], references: [id])
