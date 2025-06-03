@@ -1,9 +1,9 @@
-import documentCloud from '../../../_assets/document-cloud.json';
-import documentDownload from '../../../_assets/document-download.json';
-import documentScan from '../../../_assets/document-scan.json';
-import documentSearch from '../../../_assets/document-search.json';
-import newspaper from '../../../_assets/newspaper.json';
-import writeList from '../../../_assets/write-list.json';
+import documentCloud from '@assets/lottie/document-cloud.json';
+import documentDownload from '@assets/lottie/document-download.json';
+import documentScan from '@assets/lottie/document-scan.json';
+import documentSearch from '@assets/lottie/document-search.json';
+import newspaper from '@assets/lottie/newspaper.json';
+import writeList from '@assets/lottie/write-list.json';
 import Feature from './Feature';
 
 const features = [

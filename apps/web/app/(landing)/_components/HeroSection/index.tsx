@@ -1,8 +1,9 @@
+import { IconChevronRight, IconRobot } from '@tabler/icons-react';
 import Link from 'next/link';
 import { ExtensionDropdown } from './ExtensionsDropDown';
+import { MobileAppDropdown } from './MobileAppDropdown';
 import NovelCarousel from './NovelCarousel';
 import RegAuthBtn from './RegAuthBtn';
-
 
 const data = {
     title: "Xianxu",
@@ -12,7 +13,7 @@ const data = {
 
 const HeroSection = () => {
     return (
-        <section className="py-8 md:py-16">
+        <section className="min-h-[86vh] flex items-center">
             <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                 <div className="container">
                     <div className="flex flex-col lg:flex-row items-center">
@@ -31,31 +32,22 @@ const HeroSection = () => {
 
                             <div className="ai-recommendation mb-5 md:mb-6">
                                 <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900 px-3 py-1 text-sm font-medium text-purple-700 dark:text-purple-300 mr-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 mr-1">
-                                        <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
-                                    </svg>
+                                    <IconRobot size={16} className="mr-1" />
                                     AI-Powered
                                 </span>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Smart recommendations tailored to your reading preferences</span>
                             </div>
 
-                            <div className="actions flex flex-wrap gap-3 md:gap-0 md:items-center md:space-x-3">
-                                <RegAuthBtn />
-                                <Link
-                                    href="/download/mobile"
-                                    className="Button brand bg-gradient-to-r from-indigo-400 to-blue-500 hover:from-indigo-400 hover:to-blue-600 text-white px-4 py-2 rounded-full font-medium transition-all text-sm whitespace-nowrap"
-                                >
-                                    Mobile App
-                                </Link>
+                            <div className="actions flex flex-wrap gap-3 md:gap-4 md:items-center">
+                                <MobileAppDropdown />
                                 <ExtensionDropdown />
+                                <RegAuthBtn />
                                 <Link
                                     href="/manuals"
                                     className="text-purple-600 dark:text-purple-400 hover:underline flex items-center text-sm whitespace-nowrap"
                                 >
                                     <span>Manuals</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                    </svg>
+                                    <IconChevronRight size={16} className="ml-1" />
                                 </Link>
                             </div>
                         </div>

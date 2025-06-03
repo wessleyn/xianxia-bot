@@ -1,6 +1,6 @@
 # Xianxu (xianxia-novel-bot)
 
-![Hackatime](https://hackatime-badge.hackclub.com/U08RWLFGRKN/xianxia-bot?style=flat-square&label=hackatime&color=blue) ![GitHub Repo stars](https://img.shields.io/github/stars/wessleyn/xianxia-bot?style=social) ![GitHub last commit](https://img.shields.io/github/last-commit/wessleyn/xianxia-bot)
+![Hackatime](https://hackatime-badge.hackclub.com/U08RWLFGRKN/xianxia-bot?style=flat-square&label=hackatime&color=blue) ![GitHub Repo stars](https://img.shields.io/github/stars/wessleyn/xianxia-bot?style=social) ![GitHub last commit](https://img.shields.io/github/last-commit/wessleyn/xianxia-bot) [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
 ![Landing Page](./_assets/landing.png)
 
@@ -23,16 +23,4 @@ The bot uses natural language processing and machine learning algorithms to:
 
 ## Supported Platforms
 
-- Wuxiaworld
-- Royal Road
-- Webnovel
-- ScribbleHub
-- NovelUpdates
-
-## Development Status
-
-This project is currently in early development.
-
-## License
-
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+- novelbin.me
