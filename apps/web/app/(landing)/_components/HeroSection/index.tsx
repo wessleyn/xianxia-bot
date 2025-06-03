@@ -5,7 +5,6 @@ import { MobileAppDropdown } from './MobileAppDropdown';
 import NovelCarousel from './NovelCarousel';
 import RegAuthBtn from './RegAuthBtn';
 
-
 const data = {
     title: "Xianxu",
     tagline: "Webnovels in your spatial ring",
@@ -14,7 +13,7 @@ const data = {
 
 const HeroSection = () => {
     return (
-        <section className="min-h-[84vh] flex items-center">
+        <section className="min-h-[86vh] flex items-center">
             <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
                 <div className="container">
                     <div className="flex flex-col lg:flex-row items-center">

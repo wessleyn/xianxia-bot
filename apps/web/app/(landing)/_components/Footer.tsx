@@ -100,15 +100,14 @@ const Footer = () => {
                     <div className="text-right">
                         <div className="mb-4">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                <a
+                                <Link
                                     href="https://github.com/wessleyn/xianxia-bot/blob/main/LICENSE"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="hover:text-purple-600 dark:hover:text-purple-400"
                                 >
                                     GPL-3.0 Licensed
-                                </a><br />
-                                Xianxu Developers
+                                </Link>
                             </p>
                         </div>
                         <ul className="flex justify-end space-x-4">
