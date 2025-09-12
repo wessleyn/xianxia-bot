@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "dev:docs": "turbo dev --filter=docs",
+    "dev:native": "turbo dev --filter=native",
     "dev:web": "turbo dev --filter=web",
     "dev:ext": "turbo dev --filter=ext",
     "devBuild": "cd apps/native && eas workflow:run ./.eas/workflows/create-development-builds.yml",

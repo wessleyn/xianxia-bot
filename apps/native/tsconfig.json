@@ -10,7 +10,7 @@
       "@constants/*": ["./src/constants/*"],
       "@styles/*": ["./src/styles/*"],
       "@components/*": ["./src/components/*"],
-      "@stores/*": ["./src/store/*"]
+      "@stores/*": ["./src/stores/*"]
     }
   },
   "include": [
