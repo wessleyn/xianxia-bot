@@ -1,6 +1,6 @@
 import { Alert, Button, Text, TextInput, View } from 'react-native';
 
-import { supabase } from '@constants/supabase';
+import { supabase } from '@utils/supabase';
 import React, { useState } from 'react';
 import { useAccountStore } from '../stores/account';
 import CustomModal from './custom/CustomModal';

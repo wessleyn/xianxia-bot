@@ -1,4 +1,4 @@
-import { supabase } from '@constants/supabase';
+import { supabase } from '@utils/supabase';
 import { useAccountStore } from '@stores/account';
 import '@styles/global.css';
 import { Slot } from "expo-router";

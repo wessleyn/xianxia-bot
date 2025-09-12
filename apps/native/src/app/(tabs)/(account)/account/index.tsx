@@ -1,4 +1,4 @@
-import CustomSafeArea from "@//components/custom/CustomSafeArea";
+import CustomSafeArea from "@components/custom/CustomSafeArea";
 import AuthModal from '@components/AuthModal';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAccountStore } from '@stores/account';

@@ -1,66 +1,50 @@
 model ReadNovel {
-  id String @id @default(cuid())
-  
-  rating Int? // Stars (max:5) given by the user, can be null if not rated
-  readingSourceUrl String //  left at  url
-
-
-  userId String     @db.Uuid
-  user   UserProfile @relation(fields: [userId], references: [id])
-
-  novelId String
-  novel   Novel  @relation(fields: [novelId], references: [id])
-
-  bookmarks Bookmark[]
-  readChapter ReadChapter[]
-
-  readingSourceId String
-  readingSource SourceVisit @relation(fields: [readingSourceId], references: [id])
-
-  currentChapterId String?
-  currentChapter   NovelChapter? @relation("CurrentReadChapter", fields: [currentChapterId], references: [id])
-
+  id                String        @id @default(cuid())
+  userId            String        @db.Uuid
+  novelId           String
+  readingSourceId   String
+  currentChapterId  String?
   previousChapterId String?
+  lastReadAt        DateTime?
+  startedAt         DateTime      @default(now())
+  continuedAt       DateTime      @updatedAt
+  readingSourceUrl  String
+  rating            Int?
+  bookmarks         Bookmark[]
+  readChapter       ReadChapter[]
+  currentChapter    NovelChapter? @relation("CurrentReadChapter", fields: [currentChapterId], references: [id])
+  novel             Novel         @relation(fields: [novelId], references: [id])
   previousChapter   NovelChapter? @relation("PreviousReadChapter", fields: [previousChapterId], references: [id])
-
-  lastReadAt DateTime?
-  startedAt  DateTime @default(now())
-  continuedAt  DateTime @updatedAt
+  readingSource     SourceVisit   @relation(fields: [readingSourceId], references: [id])
+  user              UserProfile   @relation(fields: [userId], references: [id])
 
   @@unique([userId, novelId])
   @@schema("public")
 }
 
 model Bookmark {
-  id String @id @default(cuid())
-
-  readingId String
-  readingNovel ReadNovel @relation(fields: [readingId], references: [id])
-
-  chapterId String
-  chapter   NovelChapter @relation(fields: [chapterId], references: [id])
-
-  position Int // Position within the chapter (e.g., paragraph number)
-  note     String? // Optional note for the bookmark
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String       @id @default(cuid())
+  readingId    String
+  chapterId    String
+  position     Int
+  note         String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  chapter      NovelChapter @relation(fields: [chapterId], references: [id])
+  readingNovel ReadNovel    @relation(fields: [readingId], references: [id])
 
   @@unique([chapterId, position])
   @@schema("public")
 }
 
 model ReadChapter {
-  id String @id @default(cuid())
-
-  readingId String
-  reading ReadNovel @relation(fields: [readingId], references: [id])
-
-  chapterId String
-  chapter   NovelChapter @relation("ReadChapter", fields: [chapterId], references: [id])
-
-  startedAt DateTime @default(now())
-  lastReadAt DateTime @updatedAt
+  id         String       @id @default(cuid())
+  readingId  String
+  chapterId  String
+  startedAt  DateTime     @default(now())
+  lastReadAt DateTime     @updatedAt
+  chapter    NovelChapter @relation("ReadChapter", fields: [chapterId], references: [id])
+  reading    ReadNovel    @relation(fields: [readingId], references: [id])
 
   @@unique([readingId, chapterId])
   @@schema("public")

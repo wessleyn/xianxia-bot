@@ -1,13 +1,17 @@
 import { supportedLanguages } from '@//constants/supportedLanguages';
 import { inAppSettings, Theme } from '@constants/inAppSettings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAccountStore } from '@stores/account';
+import { pullSettings } from '@utils/pullSettings';
+import { pushSettings } from '@utils/pushSettings';
 import * as FileSystem from 'expo-file-system';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from "react";
-import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 
 const SettingsSection = () => {
+    const { isLoggedIn, user } = useAccountStore()
     const { colorScheme, setColorScheme } = useColorScheme();
     const [isAutoSync, setIsAutoSync] = useState(false);
     const [theme, setTheme] = useState<Theme>('system');
@@ -20,6 +24,71 @@ const SettingsSection = () => {
     const [downloadPath, setDownloadPath] = useState('');
     const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    const handlePullSettings = async () => {
+        if (!user?.id) return;
+console.log("pulling")
+        try {
+            setIsSyncing(true);
+            const serverSettings = await pullSettings(user.id);
+
+            // Update local state with server settings
+            if (serverSettings !== null) {
+                setTheme(serverSettings.theme as Theme);
+                setLanguage(serverSettings.language);
+                setIsAutoSync(serverSettings.autoSync);
+                setAutoCheckUpdates(serverSettings.autoCheckUpdates);
+
+                // Apply theme
+                if (serverSettings.theme === 'system') {
+                    setColorScheme('system');
+                } else {
+                    setColorScheme(serverSettings.theme as 'light' | 'dark');
+                }
+
+                Alert.alert(
+                    "Settings Synced",
+                    "Settings have been pulled from the server successfully."
+                );
+            } else {
+                Alert.alert(
+                    "No Settings Found",
+                    "No settings found on the server. Please push your local settings first."
+                );
+                return;
+            }
+        } catch (error) {
+            console.error("Error pulling settings:", error);
+            Alert.alert(
+                "Sync Failed",
+                "Failed to pull settings from the server. Please try again."
+            );
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
+    const handlePushSettings = async () => {
+        if (!user?.id) return;
+
+        try {
+            setIsSyncing(true);
+            await pushSettings(user.id);
+            Alert.alert(
+                "Settings Synced",
+                "Settings have been pushed to the server successfully."
+            );
+        } catch (error) {
+            console.error("Error pushing settings:", error);
+            Alert.alert(
+                "Sync Failed",
+                "Failed to push settings to the server. Please try again."
+            );
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     const toggleSync = async () => {
         setIsAutoSync(prev => !prev);
@@ -40,44 +109,37 @@ const SettingsSection = () => {
         setIsThemeMenuOpen(false);
     };
 
-    // Set language
     const selectLanguage = async (langCode: string) => {
         setLanguage(langCode);
         await AsyncStorage.setItem('language', langCode);
         setIsLanguageMenuOpen(false);
     };
 
-    // Get selected language name
     const getSelectedLanguageName = () => {
         const selectedLang = supportedLanguages.find(lang => lang.code === language);
         return selectedLang ? selectedLang.name : 'English';
     };
 
-    // Toggle download over WiFi only
     const toggleDownloadWifiOnly = async () => {
         setDownloadWifiOnly(prev => !prev);
         await AsyncStorage.setItem('downloadWifiOnly', JSON.stringify(!downloadWifiOnly));
     };
 
-    // Toggle notifications
     const toggleNotifications = async () => {
         setEnableNotifications(prev => !prev);
         await AsyncStorage.setItem('enableNotifications', JSON.stringify(!enableNotifications));
     };
 
-    // Toggle suggestions
     const toggleSuggestions = async () => {
         setShowSuggestions(prev => !prev);
         await AsyncStorage.setItem('showSuggestions', JSON.stringify(!showSuggestions));
     };
 
-    // Toggle auto check updates
     const toggleAutoCheckUpdates = async () => {
         setAutoCheckUpdates(prev => !prev);
         await AsyncStorage.setItem('autoCheckUpdates', JSON.stringify(!autoCheckUpdates));
     };
 
-    // Toggle auto backup
     const toggleAutoBackup = async () => {
         setAutoBackup(prev => !prev);
         await AsyncStorage.setItem('autoBackup', JSON.stringify(!autoBackup));
@@ -188,10 +250,42 @@ const SettingsSection = () => {
 
     return (
         <ScrollView
-            className="w-full px-5 mt-6 mb-10"
+            className="w-full px-5 mt-6  h-full"
             showsVerticalScrollIndicator={false}
         >
-            <Text className='text-2xl font-bold text-gray-500 mb-4'>Settings</Text>
+            <View className='flex-row justify-between'>
+                <Text className='text-2xl font-bold text-gray-500 mb-4'>Settings</Text>
+                {
+                    isLoggedIn && (
+                        <View className='flex-row h-10 space-x-2'>
+                            {/* Prefer the server changes */}
+                            <Pressable
+                                onPress={handlePullSettings}
+                                disabled={isSyncing}
+                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300' : 'bg-blue-500 active:bg-blue-600'}`}
+                            >
+                                {isSyncing ? (
+                                    <ActivityIndicator size="small" color="#fff" />
+                                ) : (
+                                    <Text className="text-white font-medium">Pull</Text>
+                                )}
+                            </Pressable>
+                            {/* Prefer local changes */}
+                            <Pressable
+                                onPress={handlePushSettings}
+                                disabled={isSyncing}
+                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300' : 'bg-indigo-500 active:bg-indigo-600'}`}
+                            >
+                                {isSyncing ? (
+                                    <ActivityIndicator size="small" color="#fff" />
+                                ) : (
+                                    <Text className="text-white font-medium">Push</Text>
+                                )}
+                            </Pressable>
+                        </View>
+                    )
+                }
+            </View>
 
             {/* Section Header: General */}
             <View className="mb-2">

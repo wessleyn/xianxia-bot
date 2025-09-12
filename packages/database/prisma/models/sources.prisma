@@ -1,35 +1,26 @@
 model NovelSource {
-    id String @id @default(uuid())
+  id       String        @id @default(uuid())
+  name     String
+  url      String
+  stars    Int
+  visits   SourceVisit[]
+  visitors UserProfile[] @relation("NovelSourceToUserProfile")
+  novels   Novel[]       @relation("NovelToNovelSource")
 
-    name String
-    url  String
-
-    stars Int // rating or reputation
-
-    novels   Novel[]
-    visitors UserProfile[]
-    visits SourceVisit[]
-
-    @@schema("public")
+  @@schema("public")
 }
 
 model SourceVisit {
-    id String @id @default(uuid())
-    
-    userId String @db.Uuid
-    user UserProfile @relation(fields: [userId], references: [id])
-    
-    sourceId String
-    source NovelSource @relation(fields: [sourceId], references: [id])
+  id          String      @id @default(uuid())
+  userId      String      @db.Uuid
+  sourceId    String
+  count       Int
+  startedAt   DateTime    @default(now())
+  lastVisited DateTime    @updatedAt
+  readings    ReadNovel[]
+  source      NovelSource @relation(fields: [sourceId], references: [id])
+  user        UserProfile @relation(fields: [userId], references: [id])
 
-    readings ReadNovel[]
-// TODO: this is general count for all visits, maybe up the visits 
-    count Int
-
-    startedAt DateTime @default(now())
-    lastVisited  DateTime @updatedAt
-
-    // no two tracking instances for the same site and user
-    @@unique([userId, sourceId]) 
-    @@schema("public")
+  @@unique([userId, sourceId])
+  @@schema("public")
 }

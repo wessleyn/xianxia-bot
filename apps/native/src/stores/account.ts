@@ -1,4 +1,4 @@
-import { supabase } from '@constants/supabase'
+import { supabase } from '@utils/supabase'
 import { Session, User } from '@supabase/supabase-js'
 import { create } from 'zustand'
 

@@ -10,5 +10,13 @@ export const inAppSettings = [
     "downloadPath",
 ];
  
+// Settings that should be synced with the server
+export const SYNCED_SETTINGS = {
+    theme: 'theme',
+    language: 'language',
+    autoSync: 'autoSync',
+    autoUpdates: 'autoCheckUpdates'
+};
+
 export type Theme = 'light' | 'dark' | 'system';
  
