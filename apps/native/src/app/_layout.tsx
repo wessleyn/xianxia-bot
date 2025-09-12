@@ -1,7 +1,8 @@
-import { supabase } from '@utils/supabase';
 import { useAccountStore } from '@stores/account';
 import '@styles/global.css';
+import { supabase } from '@utils/supabase';
 import { Slot } from "expo-router";
+import { SQLiteProvider } from 'expo-sqlite';
 import { useEffect } from 'react';
 import 'react-native-url-polyfill/auto';
 
@@ -14,7 +15,6 @@ const AppLayout = () => {
       setSession(session);
     });
 
-    // Check current session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -25,7 +25,9 @@ const AppLayout = () => {
   }, []);
 
   return (
-    <Slot />
+    <SQLiteProvider databaseName='xianxu.db'>
+      <Slot />
+    </SQLiteProvider>
   )
 }
 
