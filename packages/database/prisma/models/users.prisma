@@ -6,6 +6,8 @@ model UserProfile {
 
   user  users   @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   
+  settings UserSettings?
+  // Reading Data
   novels  ReadNovel[]
   sources NovelSource[]
   sourceVisits SourceVisit[]

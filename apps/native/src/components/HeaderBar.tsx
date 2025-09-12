@@ -5,7 +5,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import CustomSafeArea from './CustomSafeArea';
+import CustomSafeArea from './custom/CustomSafeArea';
 
 interface HeaderBarProps {
     title?: string;
@@ -27,9 +27,9 @@ export default function HeaderBar({ title }: HeaderBarProps) {
                     value={searchText}
                     onChangeText={setSearchText}
                 />
-            <TouchableOpacity onPress={toggleMenu} className="ml-3 p-1">
-                <MaterialIcons name="more-vert" size={24} color="#4b5563" />
-            </TouchableOpacity>
+                <TouchableOpacity onPress={toggleMenu} className="ml-3 p-1">
+                    <MaterialIcons name="more-vert" size={24} color="#4b5563" />
+                </TouchableOpacity>
             </View>
         </CustomSafeArea>
     );

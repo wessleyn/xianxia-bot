@@ -1,4 +1,4 @@
-import CustomView from "@components/CustomView";
+import CustomView from "@//components/custom/CustomView";
 import { Text } from "react-native";
 
 export default function Explore() {

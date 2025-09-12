@@ -1,0 +1,14 @@
+
+model UserSettings {
+    userId String @id
+    user UserProfile @relation(fields: [userId], references: [id])
+
+    darkMode Boolean @default(false)
+    language String @default("en")
+    autoSync Boolean @default(true)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("public")
+}
