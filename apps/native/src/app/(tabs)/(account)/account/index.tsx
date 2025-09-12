@@ -3,13 +3,12 @@ import AuthModal from '@components/AuthModal';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAccountStore } from '@stores/account';
 import { useState } from "react";
-import { Alert, Image, Switch, Text, TouchableOpacity, View } from "react-native";
-import 'react-native-url-polyfill/auto';
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import SettingsSection from "../../../../components/SettingsSection";
 
 export default function Account() {
   const { isLoggedIn, user, logout } = useAccountStore();
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
-  const [isAutoSync, setIsAutoSync] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -21,61 +20,43 @@ export default function Account() {
     }
   };
 
-  const toggleSync = () => setIsAutoSync(prev => !prev);
   const toggleModal = () => setIsAuthModalVisible(prev => !prev);
 
   return (
     <CustomSafeArea className="items-center gap-5 h-full">
       <View className="font-bold text-3xl items-center gap-4">
-        {
-          isLoggedIn ?
-            <Image source={{ uri: user?.user_metadata?.avatar_url || "https://www.gstatic.com/images/branding/product/1x/avatar_circle_blue_512dp.png" }}
-              className="w-32 h-32 rounded-full" />
-            : <MaterialIcons name="account-circle" size={128} color="gray" />
-        }
-        {
-          isLoggedIn ? (
-            <View className="items-center">
-              <Text className="text-xl font-bold">{user?.user_metadata?.full_name || 'User'}</Text>
-              <Text className="text-gray-500">{user?.email}</Text>
-              <TouchableOpacity
-                onPress={handleSignOut}
-                className="mt-4 bg-gray-200 px-4 py-2 rounded-md"
-              >
-                <Text className="text-gray-700">Sign Out</Text>
-              </TouchableOpacity>
+        <View className="w-32 h-32 rounded-full overflow-hidden items-center justify-center">
+          {isLoggedIn ?
+            <Image
+              source={{ uri: user?.user_metadata?.avatar_url || "https://www.gstatic.com/images/branding/product/1x/avatar_circle_blue_512dp.png" }}
+              className="w-32 h-32"
+            />
+            : <View className="bg-gray-200 w-32 h-32 rounded-full items-center justify-center">
+              <MaterialIcons name="account-circle" size={96} color="gray" />
             </View>
-          ) : (
-            <View>
-              <TouchableOpacity
-                onPress={() => setIsAuthModalVisible(true)}
-                className="bg-[#6366f1] px-4 py-2 rounded-md"
-              >
-                <Text className="text-white">Sign in to your account</Text>
-              </TouchableOpacity>
-            </View>
-          )
-        }
+          }
+        </View>
+
+        <View className="items-center">
+          <Text className="text-xl font-bold">
+            {isLoggedIn ? (user?.user_metadata?.full_name || 'User') : 'Guest User'}
+          </Text>
+          {isLoggedIn && <Text className="text-gray-500">{user?.email}</Text>}
+
+          <TouchableOpacity
+            onPress={isLoggedIn ? handleSignOut : () => setIsAuthModalVisible(true)}
+            className={`mt-4 px-5 py-2 rounded-md ${isLoggedIn ? 'bg-gray-200' : 'bg-[#6366f1]'}`}
+          >
+            <Text className={isLoggedIn ? 'text-gray-700' : 'text-white'}>
+              {isLoggedIn ? 'Sign Out' : 'Sign in to your account'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <AuthModal showModal={isAuthModalVisible} toggleModal={toggleModal} />
 
-      {/* Settings Section */}
-      <View className="w-full px-5 mt-6">
-        <Text className='text-xl font-bold text-gray-500 mb-4'>Settings</Text>
-
-        <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-          <Text className="text-lg">
-            Auto Sync
-          </Text>
-          <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={isAutoSync ? '#4287f5' : '#f4f3f4'}
-            value={isAutoSync}
-            onValueChange={toggleSync}
-          />
-        </View>
-      </View>
+      <SettingsSection />
 
     </CustomSafeArea>
   );

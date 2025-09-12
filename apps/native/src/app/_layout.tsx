@@ -3,6 +3,7 @@ import { useAccountStore } from '@stores/account';
 import '@styles/global.css';
 import { Slot } from "expo-router";
 import { useEffect } from 'react';
+import 'react-native-url-polyfill/auto';
 
 const AppLayout = () => {
   const { setSession } = useAccountStore();
