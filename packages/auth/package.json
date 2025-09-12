@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.4"
+    "@supabase/supabase-js": "^2.57.4"
   },
   "dependencies": {
     "@repo/db": "^0.0.0",
