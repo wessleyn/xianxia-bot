@@ -1,5 +1,5 @@
+import CustomSafeArea from "@//components/custom/CustomSafeArea";
 import AuthModal from '@components/AuthModal';
-import CustomSafeArea from "@components/CustomSafeArea";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAccountStore } from '@stores/account';
 import { useState } from "react";
@@ -25,7 +25,7 @@ export default function Account() {
   const toggleModal = () => setIsAuthModalVisible(prev => !prev);
 
   return (
-    <CustomSafeArea className="items-center gap-5 ">
+    <CustomSafeArea className="items-center gap-5 h-full">
       <View className="font-bold text-3xl items-center gap-4">
         {
           isLoggedIn ?
@@ -49,7 +49,7 @@ export default function Account() {
             <View>
               <TouchableOpacity
                 onPress={() => setIsAuthModalVisible(true)}
-                className="bg-blue-500 px-4 py-2 rounded-md"
+                className="bg-[#6366f1] px-4 py-2 rounded-md"
               >
                 <Text className="text-white">Sign in to your account</Text>
               </TouchableOpacity>

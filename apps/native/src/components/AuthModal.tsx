@@ -3,7 +3,7 @@ import { Alert, Button, Text, TextInput, View } from 'react-native';
 import { supabase } from '@constants/supabase';
 import React, { useState } from 'react';
 import { useAccountStore } from '../stores/account';
-import CustomModal from './CustomModal';
+import CustomModal from './custom/CustomModal';
 
 const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
     const { setSession } = useAccountStore();
@@ -68,6 +68,7 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
             } else {
                 console.log('OTP verified, user logged in:', data.user);
                 setSession(data.session);
+                resetAuth()
                 toggleModal();
                 Alert.alert('Success', 'You have successfully logged in!');
             }
@@ -79,17 +80,22 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
         }
     };
 
+    const resetAuth = () => {
+        setEmail('')
+        setOtp('')
+        setOtpSent(false)
+    }
+
     return (
         <CustomModal
             visible={showModal}
             onRequestClose={toggleModal}
             animationType="slide"
             transparent={true}
-            className="flex-row gap-2 items-center  h-[26%]"
-            modalBar
+            className="px-4 py-8 "
+            position="bottom"
         >
-            {/* <View className='flex-1 justify-center items-center bg-black/30'> */}
-            <View className='p-8 rounded-2xl bg-white shadow-lg w-4/5 max-w-md'>
+            <View className='px-6 w-full'>
                 <Text className="text-2xl font-bold mb-6 text-center">
                     {otpSent ? 'Enter Verification Code' : 'Sign In'}
                 </Text>
@@ -108,7 +114,7 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                             placeholder="Enter your email"
                             autoCapitalize="none"
                             keyboardType="email-address"
-                            className='border border-gray-300 rounded-md p-3 mb-4 w-full'
+                            className='border border-gray-300 rounded-md p-3 mb-4 w-full placeholder:text-gray-400'
                         />
                         <Text className="text-gray-500 mb-4 text-sm">
                             We'll send you a one-time code to verify your email.
@@ -133,13 +139,13 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                     <Button
                         title="Cancel"
                         onPress={toggleModal}
-                        color="#6B7280"
+                        color="#6366f1"
                     />
                     <Button
                         title={otpSent ? "Verify Code" : "Send Code"}
                         onPress={otpSent ? handleOtp : handleEmail}
                         disabled={loading}
-                        color="#4287f5"
+                        color="#6366f1"
                     />
                 </View>
 
@@ -151,12 +157,11 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                                 setOtpSent(false);
                                 handleEmail();
                             }}
-                            color="#6B7280"
+                            color="#4287f5"
                         />
                     </View>
                 )}
             </View>
-            {/* </View> */}
         </CustomModal>
     );
 }
