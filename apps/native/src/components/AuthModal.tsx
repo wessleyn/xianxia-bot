@@ -91,9 +91,10 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
             visible={showModal}
             onRequestClose={toggleModal}
             animationType="slide"
-            transparent={true}
             className="px-4 py-8 "
             position="bottom"
+            transparent
+            bar
         >
             <View className='px-6 w-full'>
                 <Text className="text-2xl font-bold mb-6 text-center">

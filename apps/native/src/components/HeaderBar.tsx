@@ -7,11 +7,7 @@ import {
 } from 'react-native';
 import CustomSafeArea from './custom/CustomSafeArea';
 
-interface HeaderBarProps {
-    title?: string;
-}
-
-export default function HeaderBar({ title }: HeaderBarProps) {
+export default function HeaderBar() {
     const [searchText, setSearchText] = useState('');
     const [menuVisible, setMenuVisible] = useState(false);
 
@@ -22,7 +18,7 @@ export default function HeaderBar({ title }: HeaderBarProps) {
             <View className="flex-1 flex-row items-center bg-gray-100 rounded-full px-3 py-3">
                 <MaterialIcons name="search" size={20} color="#6b7280" className="mr-2" />
                 <TextInput
-                    className="flex-1 h-10 text-base text-gray-800 p-0"
+                    className="flex-1 h-10 text-base  placeholder:text-gray-500 p-0"
                     placeholder="Search novels"
                     value={searchText}
                     onChangeText={setSearchText}
