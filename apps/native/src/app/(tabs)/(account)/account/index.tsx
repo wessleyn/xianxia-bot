@@ -1,10 +1,11 @@
-import CustomSafeArea from "@components/custom/CustomSafeArea";
 import AuthModal from '@components/AuthModal';
+import CustomSafeArea from "@components/custom/CustomSafeArea";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAccountStore } from '@stores/account';
 import { useState } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
-import SettingsSection from "../../../../components/SettingsSection";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import Toast from 'react-native-toast-message';
+import SettingsSection from "@components/SettingsSection";
 
 export default function Account() {
   const { isLoggedIn, user, logout } = useAccountStore();
@@ -13,10 +14,22 @@ export default function Account() {
   const handleSignOut = async () => {
     try {
       await logout();
-      Alert.alert('Success', 'You have been signed out');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'You have been signed out',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
     } catch (error) {
       console.error('Error signing out:', error);
-      Alert.alert('Error', 'Failed to sign out');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to sign out',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
     }
   };
 

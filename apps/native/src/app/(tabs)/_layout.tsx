@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Tabs } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
-import initializeDatabase from '../../constants/database';
+import initializeDatabase from '@constants/database';
 
 
 export default function TabLayout() {

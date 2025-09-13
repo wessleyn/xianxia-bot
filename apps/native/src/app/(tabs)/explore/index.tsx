@@ -1,4 +1,5 @@
-import CustomView from "@//components/custom/CustomView";
+import CustomView from "@components/custom/CustomView";
+import SourceImage from "@components/reusable/SourceImage";
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -6,11 +7,10 @@ import { Link } from "expo-router";
 
 import { Novel, Source } from "@constants/types";
 import { useSQLiteContext } from "expo-sqlite";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 export default function Explore() {
-  const [imageStates, setImageStates] = useState<Record<string, { loaded: boolean, error: boolean }>>({});
   const [enabledSources, setEnabledSources] = useState<Source[]>([]);
   const db = useSQLiteContext();
 
@@ -21,20 +21,6 @@ export default function Explore() {
     }
 
     fetchSources();
-  }, []);
-
-  const handleImageLoad = useCallback((id: string) => {
-    setImageStates(prev => ({
-      ...prev,
-      [id]: { ...prev[id], loaded: true }
-    }));
-  }, []);
-
-  const handleImageError = useCallback((id: string) => {
-    setImageStates(prev => ({
-      ...prev,
-      [id]: { ...prev[id], error: true }
-    }));
   }, []);
 
   const suggestedNovels = [] as Novel[];
@@ -63,7 +49,7 @@ export default function Explore() {
           </Link>
         </View>
         <View className="flex-row">
-          <TouchableOpacity  className="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm">
+          <TouchableOpacity className="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm">
             <MaterialCommunityIcons name="dice-multiple-outline" size={24} color="#4b5563" />
             <Text className="font-medium">Random</Text>
             {/* TODO: Triggers a random novel selection and redirects to the novel page */}
@@ -81,7 +67,7 @@ export default function Explore() {
       <View className="mb-4">
         <View className="flex-row justify-between px-4 mb-4">
           <Text className="text-lg font-semibold">Suggestions</Text>
-          { suggestedNovels.length > 0 && <Link href={'/suggestions'} asChild>
+          {suggestedNovels.length > 0 && <Link href={'/suggestions'} asChild>
             <TouchableOpacity>
               <Text className="text-blue-500">More</Text>
             </TouchableOpacity>
@@ -139,36 +125,21 @@ export default function Explore() {
 
         <FlatList
           data={enabledSources}
-          renderItem={({ item }) => {
-            // Get the loading state for this specific image
-            const imageState = imageStates[item.id] || { loaded: false, error: false };
-
-            return (
-              <Link href={`/sources/${item.id}`} asChild>
-                <Pressable className="items-center mb-6">
-                  <View
-                    className="p-2"
-                  >
-                    {!imageState.error ? (
-                    <Image
-                      source={{ uri: item.icon }}
-                      className="w-16 h-16 rounded-lg"
-                      onLoad={() => handleImageLoad(item.id)}
-                      onError={() => handleImageError(item.id)}
-                    />
-                  ) : (
-                    <View className="w-16 h-16 rounded-lg bg-gray-200 items-center justify-center">
-                      <Text className="text-2xl font-bold text-gray-500">
-                        {item.name.charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
+          renderItem={({ item }) => (
+            <Link href={`/sources/${item.id}`} asChild>
+              <Pressable className="items-center mb-6">
+                <View className="p-2">
+                  <SourceImage
+                    id={item.id}
+                    icon={item.icon}
+                    name={item.name}
+                    size={64}
+                  />
                 </View>
                 <Text className="text-center mt-2" numberOfLines={1}>{item.name}</Text>
-                </Pressable>
-              </Link>
-            );
-          }}
+              </Pressable>
+            </Link>
+          )}
           keyExtractor={item => item.id}
           numColumns={3}
           columnWrapperStyle={{ justifyContent: 'space-around', paddingHorizontal: 8 }}

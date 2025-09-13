@@ -6,6 +6,7 @@ export default async function initializeDatabase(db: SQLiteDatabase) {
         // Create and initialize Sources table if it doesn't exist
         await db.execAsync(`
         PRAGMA journal_mode = WAL;
+        DROP TABLE IF EXISTS sources;
         CREATE TABLE IF NOT EXISTS sources (
             id TEXT PRIMARY KEY NOT NULL,
             name TEXT NOT NULL,
@@ -17,8 +18,8 @@ export default async function initializeDatabase(db: SQLiteDatabase) {
             last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         INSERT INTO sources(id, name, icon, enabled) VALUES('novelbin', 'NovelBin', 'https://b/nb.png', 1);
-        INSERT INTO sources(id, name, icon, mainCategory) VALUES('royalroad', 'Royal Road', 'https://.../rr.png', 'litRPG');
-        INSERT INTO sources(id, name, icon) VALUES('wuxiaworld', 'WuxiaWorld', 'https://.../wx.png');
+        INSERT INTO sources(id, name, icon, mainCategory) VALUES('royalroad', 'Royal Road', 'https://ad/rr.png', 'litRPG');
+        INSERT INTO sources(id, name, icon) VALUES('wuxiaworld', 'WuxiaWorld', 'https://ad/wx.png');
 
     `);
 
