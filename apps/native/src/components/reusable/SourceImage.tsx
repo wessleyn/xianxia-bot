@@ -26,28 +26,24 @@ export default function SourceImage({ id, icon, name, size = 16 }: SourceImagePr
     const imageSize = { width: size, height: size };
 
     return (
-        <>
-            {!error ? (
+        <View style={imageSize} className="rounded-lg items-center justify-center">
+            {!error && (
                 <Image
                     source={{ uri: icon }}
-                    style={imageSize}
+                    style={[imageSize, { position: "absolute" }]}
                     className="rounded-lg"
                     onLoad={handleImageLoad}
                     onError={handleImageError}
                 />
-            ) : (
-                <View
-                    style={imageSize}
-                    className="rounded-lg bg-gray-200 items-center justify-center"
-                >
-                    <Text
-                        className="font-bold text-gray-500"
-                        style={{ fontSize }}
-                    >
-                        {name.charAt(0).toUpperCase()}
-                    </Text>
-                </View>
             )}
-        </>
+            {(!loaded || error) && (
+                <Text
+                    className="font-bold text-gray-500"
+                    style={{ fontSize }}
+                >
+                    {name.charAt(0).toUpperCase()}
+                </Text>
+            )}
+        </View>
     );
 }

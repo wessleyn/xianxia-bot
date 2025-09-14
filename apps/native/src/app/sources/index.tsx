@@ -1,15 +1,16 @@
 import CustomView from "@//components/custom/CustomView";
 import BackButton from "@//components/reusable/BackButton";
+import AnimatedSearchInput from "@components/reusable/AnimatedSearchInput";
 import SourceImage from "@components/reusable/SourceImage";
 import { supportedLanguages } from "@constants/supportedLanguages";
 import { Source } from "@constants/types";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Link } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-toast-message';
-import AnimatedSearchInput from "../../components/reusable/AnimatedSearchInput";
 
 export default function Sources() {
     const [sourcesList, setSourcesList] = useState<Source[]>([])
@@ -226,18 +227,20 @@ export default function Sources() {
                 }
                 {filteredSources.map(source => (
                     <View key={source.id} className="flex-row items-center w-full justify-between px-8" >
-                        <View className="flex-row items-center">
-                            <SourceImage
-                                id={source.id}
-                                icon={source.icon}
-                                name={source.name}
-                                size={50}
-                            />
-                            <View className="p-4 ">
-                                <Text className="text-lg font-semibold">{source.name}</Text>
-                                <Text className="text-sm text-gray-500">{source.mainCategory}, {source.language}</Text>
+                        <Link href={`/sources/${source.id}`} asChild>
+                            <View className="flex-row items-center">
+                                <SourceImage
+                                    id={source.id}
+                                    icon={source.icon}
+                                    name={source.name}
+                                    size={50}
+                                />
+                                <View className="p-4 ">
+                                    <Text className="text-lg font-semibold">{source.name}</Text>
+                                    <Text className="text-sm text-gray-500">{source.mainCategory}, {source.language}</Text>
+                                </View>
                             </View>
-                        </View>
+                        </Link>
 
                         <View className="flex-row gap-4 items-center">
                             <View className="h-8 w-px bg-gray-300"></View>

@@ -1,10 +1,10 @@
-import { Alert, Button, Text, TextInput, View } from 'react-native';
+import { Button, Text, TextInput, View } from 'react-native';
 
+import { useAccountStore } from '@stores/account';
 import { supabase } from '@utils/supabase';
 import React, { useState } from 'react';
-import { useAccountStore } from '@stores/account';
-import CustomModal from './custom/CustomModal';
 import Toast from 'react-native-toast-message';
+import CustomModal from './custom/CustomModal';
 
 const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
     const { setSession } = useAccountStore();

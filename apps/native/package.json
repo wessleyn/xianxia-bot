@@ -40,6 +40,7 @@
     "expo-sqlite": "~15.2.10",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
+    "linkedom": "^0.18.12",
     "lottie-react-native": "7.2.2",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
