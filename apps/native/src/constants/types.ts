@@ -1,4 +1,7 @@
+import { ReactNode } from "react";
+
 export type Novel = {
+    [x: string]: ReactNode;
     id: string;
     title: string;
     link: string
@@ -24,22 +27,26 @@ export interface FilterOption {
     icon?: string;
 }
 
+export interface NovelPageResult {
+    novels: Novel[];
+    hasNextPage: boolean;
+}
+
 export interface SourceDefinition {
-    getId: () => string
-    getMetadata: () => {
-        name: string
-        baseUrl: string
-        mainCategory: string
-        language: string
-        isRaw: boolean
-    }
+    getId(): string;
+    getMetadata(): any;
+    getIcon(): Promise<string>;
+    getGenres(): Promise<string[]>;
 
-    getIcon: () => Promise<string>
+    // Base novel fetching method - all sources must implement this
+    getNovels(page?: number): Promise<NovelPageResult>;
 
-    getGenres: () => Promise<string[]>
-    getNovels: () => Promise<Novel[]>
-    getNovelImage: () => Promise<string>
-    // fetchNovelDetails: (novelId: string) => Promise<Novel>
-    // fetchChapters: (novelId: string) => Promise<any>
-    // fetchChapterContent: (novelId: string, chapterId: string) => Promise<string>
+    // Optional filter methods
+    getUpdatedNovels?(page?: number): Promise<NovelPageResult>;
+    getNewestNovels?(page?: number): Promise<NovelPageResult>;
+    getCompletedNovels?(page?: number): Promise<NovelPageResult>;
+    getHighestRatedNovels?(page?: number): Promise<NovelPageResult>;
+    getNovelsWithChapters?(minChapters: number, page?: number): Promise<NovelPageResult>;
+    getOldestNovels?(page?: number): Promise<NovelPageResult>;
+    getCompletedNovels?(page?: number): Promise<NovelPageResult>;
 }

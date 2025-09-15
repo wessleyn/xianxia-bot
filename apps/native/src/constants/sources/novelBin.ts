@@ -1,6 +1,6 @@
 import { parseHTML } from "linkedom";
 import { normalizeText } from "../../utils/normalizeText";
-import { Novel, SourceDefinition } from "../types";
+import { Novel, NovelPageResult, SourceDefinition } from "../types";
 
 type iconResponse = {
     hasIcon: boolean;
@@ -11,11 +11,14 @@ type iconResponse = {
 const placeholderImage = ''
 
 export class NovelBin implements SourceDefinition {
+    // Inbuilt Source Properties
     private name = "NovelBin";
     private baseUrl = "https://www.novelbin.me/";
     private mainCategory = "Fantasy";
     private language = "English";
     private isRaw = false;
+   
+    // Runtime Variables
     private novel: Novel = {
         id: '',
         title: '',
@@ -75,7 +78,9 @@ export class NovelBin implements SourceDefinition {
 
     async getNovelImage() {
         try {
-            const response = await fetch(this.novel.link)
+            const response = await fetch(this.novel.link, {
+                cache: 'force-cache'
+            })
             if (!response.ok) {
                 console.error("Failed to fetch novel image");
                 return placeholderImage;
@@ -105,9 +110,9 @@ export class NovelBin implements SourceDefinition {
         }
     }
 
-    async getNovels() {
+    async getNovels(page: number = 1): Promise<NovelPageResult> {
         const response = await fetch(`${this.baseUrl}`, {
-            cache: 'force-cache'
+            cache: 'reload'
         });
 
         if (!response.ok) {
@@ -115,12 +120,9 @@ export class NovelBin implements SourceDefinition {
         }
         const html = await response.text();
 
-        let novels: { id: string; title: string; image: string; genres: string[]; link: string; }[] = [];
-
         const { document } = parseHTML(html);
 
         const divs = document.querySelectorAll('.list-new .row')
-        const novelLength = divs.length
 
         const novelPromises = Array.from(divs).map(async (div) => {
             const title = div.querySelector('.col-title h3 a')?.textContent?.trim() ?? '';
@@ -131,6 +133,8 @@ export class NovelBin implements SourceDefinition {
             this.novel.link = link;
 
             const image = await this.getNovelImage()
+
+            const time = div.querySelector('.col-time')?.textContent
 
             const rawGenres = div.querySelector('.col-genre');
             let genres: string[] = []
@@ -145,12 +149,22 @@ export class NovelBin implements SourceDefinition {
                 title,
                 image,
                 genres,
-                link
+                link,
+                time
             };
         });
 
         // Wait for all promises to resolve and filter out any null values
         const results = await Promise.all(novelPromises);
-        return results.filter(novel => novel !== null);
+
+        return {
+            novels: results.filter(novel => novel !== null),
+            hasNextPage: false
+        }
+    }
+
+    async getUpdatedNovels(page: number = 1): Promise<NovelPageResult> {
+        // TODO: Implement the real updated novels fetch
+        return this.getNovels(page);
     }
 }

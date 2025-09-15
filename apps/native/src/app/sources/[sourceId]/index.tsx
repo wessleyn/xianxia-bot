@@ -6,8 +6,9 @@ import AnimatedSearchInput from "@components/reusable/AnimatedSearchInput";
 import BackButton from "@components/reusable/BackButton";
 import { FILTER_OPTIONS } from "@constants/constants";
 import sources from "@constants/sources";
-import { FilterOption, Novel, Source } from "@constants/types";
+import { FilterOption, Novel, NovelPageResult, Source } from "@constants/types";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { getSupportedFilters } from "@utils/supportedFilter";
 import { useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
@@ -26,12 +27,14 @@ export default function SourceDetail() {
     const [genreModalVisible, setGenreModalVisible] = useState(false)
     const [selectedFilter, setSelectedFilter] = useState<FilterOption>(FILTER_OPTIONS[0])
 
+    const [loading, setLoading] = useState<boolean>(false)
     const [fetchedNovels, setFetchedNovels] = useState<Novel[]>([])
-    const [filteredNovels, setFilteredNovels] = useState<Novel[]>([])
     const [fetchError, setFetchError] = useState<boolean>(false)
 
-    const [page, setPage] = useState<number>(1)
-    const [loading, setLoading] = useState<boolean>(false)
+    const [filteredNovels, setFilteredNovels] = useState<Novel[]>([])
+    const [supportedFilters, setSupportedFilters] = useState<FilterOption[]>([]);
+
+    const [currentPage, setCurrentPage] = useState<number>(1)
     const [hasMoreData, setHasMoreData] = useState<boolean>(true)
 
     const db = useSQLiteContext()
@@ -55,45 +58,78 @@ export default function SourceDetail() {
                 setSourceDetails(source)
                 setSourceGenres(JSON.parse(source?.genres ?? "[]"))
                 setSourceFound(source !== null);
+
+                // Check which filters are supported
+                if (source) {
+                    const src = sources[source.id!];
+                    if (src) {
+                        const sourceInstance = new src();
+                        const supported = getSupportedFilters(sourceInstance);
+                        setSupportedFilters(supported);
+
+                        // Set default filter to the first supported one
+                        if (supported.length > 0) {
+                            setSelectedFilter(supported[0]);
+                        }
+                    }
+                }
             }
         }
         fetchSource()
     }, [sourceId, db])
 
     const fetchNovels = async (pageNum: number = 1) => {
-        if (!sourceDetails || loading || !hasMoreData) return;
-        console.log("in fetching novels..")
+        if (!sourceDetails || loading ) return;
 
         setLoading(true);
         try {
             const src = sources[sourceDetails.id!];
             if (src) {
                 const sourceInstance = new src();
-                // Note: If the getNovels method doesn't support pagination,
-                // you'll need to modify the source class to implement it properly
+                let result: NovelPageResult = {} as NovelPageResult;
 
                 try {
-                    const novels = await sourceInstance.getNovels();
-
-                    if (novels.length === 0) {
-                        setHasMoreData(false);
-                    } else {
-                        if (pageNum === 1) {
-                            setFetchedNovels(novels);
-                            // Initialize filtered novels with the same data
-                            setFilteredNovels(novels);
-                        } else {
-                            setFetchedNovels(prevNovels => {
-                                const updatedNovels = [...prevNovels, ...novels];
-                                return updatedNovels;
-                            });
-                        }
-                        setPage(pageNum);
+                    switch (selectedFilter.id) {
+                        case 'updated':
+                            result = await sourceInstance.getUpdatedNovels?.(pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        case 'newest':
+                            result = await sourceInstance.getNewestNovels?.(pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        case 'completed':
+                            result = await sourceInstance.getCompletedNovels?.(pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        case 'rating':
+                            result = await sourceInstance.getHighestRatedNovels?.(pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        case '100chapters':
+                            result = await sourceInstance.getNovelsWithChapters?.(100, pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        case '1000chapters':
+                            result = await sourceInstance.getNovelsWithChapters?.(1000, pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        case 'oldest':
+                            result = await sourceInstance.getOldestNovels?.(pageNum) || await sourceInstance.getNovels(pageNum);
+                            break;
+                        default:
+                            result = await sourceInstance.getNovels(pageNum);
                     }
                 } catch (error) {
                     console.error("Error in sourceInstance.getNovels():", error);
                     setFetchError(true);
                 }
+                const { novels, hasNextPage } = result;
+                setHasMoreData(hasNextPage);
+
+                if (pageNum === 1) {
+                    // First page - replace existing data
+                    setFetchedNovels(novels);
+                } else {
+                    // Subsequent pages - append data
+                    setFetchedNovels(prevNovels => [...prevNovels, ...novels]);
+                }
+                setCurrentPage(hasNextPage ? pageNum + 1 : pageNum);
+
             }
         } catch (error) {
             console.error("Error fetching novels:", error);
@@ -103,11 +139,12 @@ export default function SourceDetail() {
     };
 
     useEffect(() => {
-        if (sourceDetails) {
+        if (sourceFound) {
+            // fetch the new first page
+            setCurrentPage(1)
             fetchNovels(1);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sourceDetails]);
+    }, [sourceDetails, selectedFilter]);
 
     useEffect(() => {
         let filteredResults = [...fetchedNovels];
@@ -121,10 +158,8 @@ export default function SourceDetail() {
             );
         }
 
-        // TODO:  apply dropdown filters based on selectedFilter
-
         setFilteredNovels(filteredResults);
-    }, [fetchedNovels, selectedSourceGenres, selectedFilter]);
+    }, [fetchedNovels, selectedSourceGenres]);
 
     return (
         <CustomView className="flex gap-6">
@@ -149,13 +184,12 @@ export default function SourceDetail() {
 
             {
                 (sourceDetails === null) ? (
-                    <Text>Loading...</Text>
+                    <Text> Source Loading...</Text>
                 ) : <View className="w-full flex-row items-center justify-between px-4">
                     <Text className="text-3xl font-medium">{sourceDetails?.name}</Text>
 
                     <FilterDropdown
-                        // TODO: Check which filtering options are supported per source and display and trigger those methods accordingly
-                        options={FILTER_OPTIONS}
+                        options={supportedFilters}
                         selectedOption={selectedFilter}
                         onSelectOption={(option: FilterOption) => {
                             setSelectedFilter(option);
@@ -207,12 +241,15 @@ export default function SourceDetail() {
                                                 </Text>
                                             ))}
                                         </View>
+                                        {
+                                            selectedFilter.id == 'updated' && <Text>{novel.time}</Text>
+                                        }
                                     </View>
                                 </View>
                             )}
                             onEndReached={() => {
                                 if (!loading && hasMoreData) {
-                                    fetchNovels(page + 1);
+                                    fetchNovels();
                                 }
                             }}
                             onEndReachedThreshold={0.5}
@@ -220,9 +257,16 @@ export default function SourceDetail() {
                             ListFooterComponent={() => (
                                 loading ? (
                                     <View className="py-4 flex items-center justify-center">
-                                        <Text className="text-gray-500">Loading more novels...</Text>
+                                        <Text className="text-gray-500">
+                                            {
+                                                currentPage === 1 ?
+                                                    "Loading novels..." :
+                                                    "Loading more novels..."
+                                            }
+
+                                        </Text>
                                     </View>
-                                ) : !hasMoreData && filteredNovels.length > 0 ? (
+                                ) : !hasMoreData ? (
                                     <View className="py-4 flex items-center justify-center">
                                         <Text className="text-gray-500">No more novels to load</Text>
                                     </View>
