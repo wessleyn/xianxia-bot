@@ -15,14 +15,21 @@ import { FlatList, Image, Pressable, Text, View } from "react-native";
 
 
 export default function SourceDetail() {
-    const { sourceId } = useLocalSearchParams<{ sourceId: string }>()
+    const params = useLocalSearchParams<{ sourceId: string }>()
+    const sourceId = params.sourceId
+
     const [sourceDetails, setSourceDetails] = useState<Source | null>(null)
     const [sourceFound, setSourceFound] = useState(false)
-    const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+    const [sourceGenres, setSourceGenres] = useState<string[]>([])
+
+    const [selectedSourceGenres, setSelectedSourceGenres] = useState<string[]>([])
     const [genreModalVisible, setGenreModalVisible] = useState(false)
     const [selectedFilter, setSelectedFilter] = useState<FilterOption>(FILTER_OPTIONS[0])
+
     const [fetchedNovels, setFetchedNovels] = useState<Novel[]>([])
-    const [genres, setGenres] = useState<string[]>([])
+    const [filteredNovels, setFilteredNovels] = useState<Novel[]>([])
+    const [fetchError, setFetchError] = useState<boolean>(false)
+
     const [page, setPage] = useState<number>(1)
     const [loading, setLoading] = useState<boolean>(false)
     const [hasMoreData, setHasMoreData] = useState<boolean>(true)
@@ -30,48 +37,62 @@ export default function SourceDetail() {
     const db = useSQLiteContext()
 
     const handleSelectGenre = (genre: string) => {
-        setSelectedGenres(prevGenres => {
+        setSelectedSourceGenres(prevGenres => {
             if (prevGenres.includes(genre)) {
+                // remove the genre if it was already present
                 return prevGenres.filter(g => g !== genre);
             } else {
+                // otherwise append it
                 return [...prevGenres, genre];
             }
         });
     };
 
     useEffect(() => {
-        const fetchSources = async () => {
-            const source = await db.getFirstAsync<Source>('SELECT * FROM sources WHERE id = ?;', [sourceId])
-            setSourceDetails(source)
-            setGenres(JSON.parse(source?.genres ?? "[]"))
-            setSourceFound(source !== null);
+        const fetchSource = async () => {
+            if (sourceId) {
+                const source = await db.getFirstAsync<Source>('SELECT * FROM sources WHERE id = ?;', [sourceId])
+                setSourceDetails(source)
+                setSourceGenres(JSON.parse(source?.genres ?? "[]"))
+                setSourceFound(source !== null);
+            }
         }
-        fetchSources()
-    }, [])
+        fetchSource()
+    }, [sourceId, db])
 
     const fetchNovels = async (pageNum: number = 1) => {
-        // if (!sourceDetails || loading || !hasMoreData) return;
+        if (!sourceDetails || loading || !hasMoreData) return;
         console.log("in fetching novels..")
 
         setLoading(true);
         try {
-            const src = sources[sourceDetails.id];
+            const src = sources[sourceDetails.id!];
             if (src) {
                 const sourceInstance = new src();
                 // Note: If the getNovels method doesn't support pagination,
                 // you'll need to modify the source class to implement it properly
-                console.log("Fetching novels..")
-                const novels = await sourceInstance.getNovels();
 
-                if (novels.length === 0) {
-                    setHasMoreData(false);
-                } else {
-                    if (pageNum === 1) {
-                        setFetchedNovels(novels);
+                try {
+                    const novels = await sourceInstance.getNovels();
+
+                    if (novels.length === 0) {
+                        setHasMoreData(false);
                     } else {
-                        setFetchedNovels(prevNovels => [...prevNovels, ...novels]);
+                        if (pageNum === 1) {
+                            setFetchedNovels(novels);
+                            // Initialize filtered novels with the same data
+                            setFilteredNovels(novels);
+                        } else {
+                            setFetchedNovels(prevNovels => {
+                                const updatedNovels = [...prevNovels, ...novels];
+                                return updatedNovels;
+                            });
+                        }
+                        setPage(pageNum);
                     }
-                    setPage(pageNum);
+                } catch (error) {
+                    console.error("Error in sourceInstance.getNovels():", error);
+                    setFetchError(true);
                 }
             }
         } catch (error) {
@@ -82,12 +103,28 @@ export default function SourceDetail() {
     };
 
     useEffect(() => {
-        console.log("details changed")
         if (sourceDetails) {
-            console.log("fetching novels")
             fetchNovels(1);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sourceDetails]);
+
+    useEffect(() => {
+        let filteredResults = [...fetchedNovels];
+
+        // Apply genre filter if any genres are selected
+        if (selectedSourceGenres.length > 0) {
+            filteredResults = filteredResults.filter((novel: Novel) =>
+                selectedSourceGenres.every(selectedGenre =>
+                    novel.genres.includes(selectedGenre)
+                )
+            );
+        }
+
+        // TODO:  apply dropdown filters based on selectedFilter
+
+        setFilteredNovels(filteredResults);
+    }, [fetchedNovels, selectedSourceGenres, selectedFilter]);
 
     return (
         <CustomView className="flex gap-6">
@@ -117,11 +154,11 @@ export default function SourceDetail() {
                     <Text className="text-3xl font-medium">{sourceDetails?.name}</Text>
 
                     <FilterDropdown
+                        // TODO: Check which filtering options are supported per source and display and trigger those methods accordingly
                         options={FILTER_OPTIONS}
                         selectedOption={selectedFilter}
                         onSelectOption={(option: FilterOption) => {
                             setSelectedFilter(option);
-                            // Here you would implement the actual filtering logic based on the selected option
                             console.log(`Filtering by: ${option.label}`);
                         }}
                     />
@@ -131,8 +168,8 @@ export default function SourceDetail() {
 
             <View >
                 <GenreFiltersCarousel
-                    genres={genres}
-                    selectedGenres={selectedGenres}
+                    genres={sourceGenres}
+                    selectedGenres={selectedSourceGenres}
                     onOpenGenreModal={() => setGenreModalVisible(true)}
                     onSelectGenre={handleSelectGenre}
                 />
@@ -140,9 +177,24 @@ export default function SourceDetail() {
 
             {
                 !sourceFound ? <Text>Source Unavailable</Text> :
+                    fetchError ?
+                        <View className="w-full h-3/4 items-center justify-center py-4 gap-2">
+                            <MaterialCommunityIcons name="power-plug-off-outline" size={24} color="#fca5a5" />
+                            <Text className="text-black mb-2">Network Error</Text>
+                            <Pressable
+                                className="bg-gray-400 px-4 py-2 rounded"
+                                onPress={() => {
+                                    setFetchError(false);
+                                    fetchNovels(1);
+                                }}
+                            >
+                                <Text className="text-white font-semibold">Try Again</Text>
+                            </Pressable>
+                        </View>
+                        :
                         <FlatList<Novel>
-                            data={fetchedNovels}
-                            keyExtractor={(item: Novel) => item.id}
+                            data={filteredNovels}
+                            keyExtractor={(item: Novel, index) => `${index}-${item.id}`}
                             renderItem={({ item: novel }: { item: Novel }) => (
                                 <View className="flex-row items-center gap-4 p-4 border-b border-gray-200">
                                     <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
@@ -170,23 +222,23 @@ export default function SourceDetail() {
                                     <View className="py-4 flex items-center justify-center">
                                         <Text className="text-gray-500">Loading more novels...</Text>
                                     </View>
-                                ) : !hasMoreData && fetchedNovels.length > 0 ? (
+                                ) : !hasMoreData && filteredNovels.length > 0 ? (
                                     <View className="py-4 flex items-center justify-center">
                                         <Text className="text-gray-500">No more novels to load</Text>
                                     </View>
                                 ) : null
                             )}
-                        
+
                             className="w-full"
                         />
             }
 
             <GenreFiltersModal
-                genres={genres}
+                genres={sourceGenres}
                 visible={genreModalVisible}
                 onClose={() => setGenreModalVisible(false)}
                 onSelectGenre={handleSelectGenre}
-                selectedGenres={selectedGenres}
+                selectedGenres={selectedSourceGenres}
             />
         </CustomView>
     );

@@ -42,7 +42,7 @@ export class NovelBin implements SourceDefinition {
 
     async getIcon() {
         try {
-            const response = await fetch(`https://favicone.com/${this.baseUrl}?s32`);
+            const response = await fetch(`https://favicone.com/${this.baseUrl}?s32`, { cache: 'force-cache' });
             const data = await response.text();
             const parsedData = JSON.parse(data) as iconResponse;
             return parsedData.hasIcon ? parsedData.url : placeholderImage;
@@ -106,7 +106,9 @@ export class NovelBin implements SourceDefinition {
     }
 
     async getNovels() {
-        const response = await fetch(`${this.baseUrl}`);
+        const response = await fetch(`${this.baseUrl}`, {
+            cache: 'force-cache'
+        });
 
         if (!response.ok) {
             throw ("Failed to fetch novel list");
