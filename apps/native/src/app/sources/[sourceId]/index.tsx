@@ -9,7 +9,7 @@ import sources from "@constants/sources";
 import { FilterOption, Novel, NovelPageResult, Source } from "@constants/types";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { getSupportedFilters } from "@utils/supportedFilter";
-import { useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
@@ -33,6 +33,7 @@ export default function SourceDetail() {
 
     const [filteredNovels, setFilteredNovels] = useState<Novel[]>([])
     const [supportedFilters, setSupportedFilters] = useState<FilterOption[]>([]);
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [hasMoreData, setHasMoreData] = useState<boolean>(true)
@@ -52,6 +53,7 @@ export default function SourceDetail() {
     };
 
     useEffect(() => {
+        // TODO: add source visit details in the sqlite db and use this to sort sources
         const fetchSource = async () => {
             if (sourceId) {
                 const source = await db.getFirstAsync<Source>('SELECT * FROM sources WHERE id = ?;', [sourceId])
@@ -79,7 +81,7 @@ export default function SourceDetail() {
     }, [sourceId, db])
 
     const fetchNovels = async (pageNum: number = 1) => {
-        if (!sourceDetails || loading ) return;
+        if (!sourceDetails || loading) return;
 
         setLoading(true);
         try {
@@ -158,8 +160,14 @@ export default function SourceDetail() {
             );
         }
 
+        if (searchQuery) {
+            filteredResults = filteredResults.filter(
+                (novel: Novel) => novel.title.includes(searchQuery)
+            )
+        }
+
         setFilteredNovels(filteredResults);
-    }, [fetchedNovels, selectedSourceGenres]);
+    }, [fetchedNovels, selectedSourceGenres, searchQuery]);
 
     return (
         <CustomView className="flex gap-6">
@@ -167,10 +175,17 @@ export default function SourceDetail() {
             <View className="w-full flex-row items-center justify-between px-4">
                 <BackButton />
                 <View className="flex-row items-center gap-4">
+                    /**
+                    * TODO: Implement server side searching
+                    * - Add a search method to source classes
+                    * - Send the search query to the website's search endpoint
+                    * - Parse and return those specific results
+                    */
                     <AnimatedSearchInput
                         headerName=""
-                        placeholder="Search through novels."
-                        onSearch={(query) => console.log(query)}
+                        iconPosition="right"
+                        placeholder="Search by novels title."
+                        onSearch={(query) => setSearchQuery(query)}
                         onToggle={() => { }}
                     />
                     <Pressable>
@@ -230,22 +245,28 @@ export default function SourceDetail() {
                             data={filteredNovels}
                             keyExtractor={(item: Novel, index) => `${index}-${item.id}`}
                             renderItem={({ item: novel }: { item: Novel }) => (
-                                <View className="flex-row items-center gap-4 p-4 border-b border-gray-200">
-                                    <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
-                                    <View className="flex-1">
-                                        <Text className="text-lg font-semibold">{novel.title}</Text>
-                                        <View className="flex-row gap-2">
-                                            {novel.genres.map((g: string, index: number) => (
-                                                <Text key={index} className="text-gray-500">
-                                                    {g}
-                                                </Text>
-                                            ))}
+                                <Link href={`/novel/${novel.link}`} asChild>
+                                    <Pressable className="flex-row items-center gap-4 p-4 border-b border-gray-200">
+                                        <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
+                                        <View className="flex-1">
+                                            <Text className="text-lg font-semibold">{novel.title}</Text>
+                                            <View className="flex-row gap-2">
+                                                {novel.genres.map((g: string, index: number) => (
+                                                    <Text key={index} className="text-gray-500">
+                                                        {g}
+                                                    </Text>
+                                                ))}
+                                            </View>
+                                            {
+                                                selectedFilter.id == 'updated' && novel.time && (
+                                                    <Text className="text-sm text-gray-600 mt-1 italic">
+                                                        Updated {novel.time}
+                                                    </Text>
+                                                )
+                                            }
                                         </View>
-                                        {
-                                            selectedFilter.id == 'updated' && <Text>{novel.time}</Text>
-                                        }
-                                    </View>
-                                </View>
+                                    </Pressable>
+                                </Link>
                             )}
                             onEndReached={() => {
                                 if (!loading && hasMoreData) {

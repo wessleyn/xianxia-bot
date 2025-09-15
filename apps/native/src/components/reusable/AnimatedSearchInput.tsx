@@ -4,16 +4,18 @@ import { Animated, Pressable, TextInput } from 'react-native';
 
 interface AnimatedSearchInputProps {
     headerName: string;
-    onSearch?: (text: string) => void;
-    onToggle: (expanded: boolean) => void;
+    onSearch: (text: string) => void;
+    onToggle?: (expanded: boolean) => void;
     placeholder?: string;
+    iconPosition?: 'left' | 'right'; 
 }
 
 const AnimatedSearchInput = ({
     headerName,
     onSearch,
     onToggle,
-    placeholder = 'Search...'
+    placeholder = 'Search...',
+    iconPosition = 'left' 
 }: AnimatedSearchInputProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -22,6 +24,10 @@ const AnimatedSearchInput = ({
 
     const handleToggle = () => {
         if (isExpanded) {
+            if (searchText) {
+                setSearchText("")
+                return
+            }
             // Collapse animation
             Animated.parallel([
                 Animated.timing(animatedWidth, {
@@ -36,14 +42,14 @@ const AnimatedSearchInput = ({
                 })
             ]).start(() => {
                 setIsExpanded(false);
-                onToggle(false);
+                onToggle && onToggle(false);
                 setSearchText('');
                 if (onSearch) onSearch('');
             });
         } else {
             // Expand animation
             setIsExpanded(true);
-            onToggle(true);
+            onToggle && onToggle(true);
             Animated.parallel([
                 Animated.timing(animatedWidth, {
                     toValue: 250,
@@ -64,34 +70,55 @@ const AnimatedSearchInput = ({
         if (onSearch) onSearch(text);
     };
 
+    // Render content based on iconPosition prop
+    const renderContent = () => {
+        const iconButton = (
+            <Pressable onPress={handleToggle} className="p-2">
+                <MaterialIcons name={isExpanded ? "clear" : "search"} size={24} color="#4b5563" />
+            </Pressable>
+        );
+
+        const inputField = isExpanded && (
+            <Animated.View
+                style={{
+                    opacity: textInputOpacity,
+                    flex: 1,
+                }}
+            >
+                <TextInput
+                    className={`flex-1 ${iconPosition === 'left' ? 'pr-4' : 'pl-4'}`}
+                    placeholder={placeholder || `Search ${headerName}...`}
+                    placeholderTextColor="#9ca3af"
+                    value={searchText}
+                    onChangeText={handleChangeText}
+                    autoFocus
+                />
+            </Animated.View>
+        );
+
+        return iconPosition === 'left'
+            ? (
+                <>
+                    {iconButton}
+                    {inputField}
+                </>
+            ) : (
+                <>
+                    {inputField}
+                    {iconButton}
+                </>
+            );
+    };
+
     return (
         <Animated.View
             className="flex-row items-center bg-gray-100 rounded-full overflow-hidden"
             style={{
                 width: animatedWidth,
+                justifyContent: iconPosition === 'right' && !isExpanded ? 'flex-end' : 'flex-start',
             }}
         >
-            <Pressable onPress={handleToggle} className="p-2">
-                <MaterialIcons name="search" size={24} color="#4b5563" />
-            </Pressable>
-
-            {isExpanded && (
-                <Animated.View
-                    style={{
-                        opacity: textInputOpacity,
-                        flex: 1,
-                    }}
-                >
-                    <TextInput
-                        className="flex-1 pr-4"
-                        placeholder={placeholder || `Search ${headerName}...`}
-                        placeholderTextColor="#9ca3af"
-                        value={searchText}
-                        onChangeText={handleChangeText}
-                        autoFocus
-                    />
-                </Animated.View>
-            )}
+            {renderContent()}
         </Animated.View>
     );
 };
