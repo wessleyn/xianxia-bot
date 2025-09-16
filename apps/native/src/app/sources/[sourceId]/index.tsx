@@ -1,9 +1,11 @@
+import CustomLoading from "@components/custom/CustomLoading";
 import CustomView from "@components/custom/CustomView";
 import FilterDropdown from "@components/novelSource/FilterDropdown";
 import GenreFiltersCarousel from "@components/novelSource/GenreFiltersCarousel";
 import GenreFiltersModal from "@components/novelSource/GenreFiltersModal";
 import AnimatedSearchInput from "@components/reusable/AnimatedSearchInput";
 import BackButton from "@components/reusable/BackButton";
+import RandomNovel from "@components/reusable/RandomNovel";
 import { FILTER_OPTIONS } from "@constants/constants";
 import sources from "@constants/sources";
 import { FilterOption, Novel, NovelPageResult, Source } from "@constants/types";
@@ -11,9 +13,47 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { getSupportedFilters } from "@utils/supportedFilter";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 
+
+const NovelItem = memo(({ novel, selectedFilter }: { novel: Novel, selectedFilter: FilterOption }) => (
+    <Link href={
+        {
+            pathname: '/novel/[novelLink]',
+            params: {
+                novelLink: novel.link
+            }
+        }
+    } asChild>
+        <Pressable className="flex-row items-center gap-4 p-4 border-b border-gray-200">
+            <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
+            <View className="flex-1">
+                <Text className="text-lg font-semibold">{novel.title}</Text>
+                <View className="flex-row gap-2">
+                    {novel.genres.slice(0, 2).map((g: string, index: number) => (
+                        <Text key={index} className="text-gray-500">
+                            {g}
+                        </Text>
+                    ))}
+                </View>
+                {
+                    selectedFilter.id === 'updated' && novel.time && (
+                        <Text className="text-sm text-gray-600 mt-1 italic">
+                            Updated {novel.time}
+                        </Text>
+                    )
+                }{
+                    selectedFilter.id === 'completed' && (
+                        <Text className="text-sm text-gray-800 mt-1 italic">
+                            {novel.chapters}  Chapters
+                        </Text>
+                    )
+                }
+            </View>
+        </Pressable>
+    </Link>
+));
 
 export default function SourceDetail() {
     const params = useLocalSearchParams<{ sourceId: string }>()
@@ -144,7 +184,11 @@ export default function SourceDetail() {
     useEffect(() => {
         if (sourceFound) {
             // fetch the new first page
+            setLoading(true)
+            setHasMoreData(false)
             setCurrentPage(1)
+            setFilteredNovels([])
+            setFetchedNovels([])
             fetchNovels(1);
         }
     }, [sourceDetails, selectedFilter]);
@@ -167,8 +211,25 @@ export default function SourceDetail() {
             )
         }
 
+        // TODO: sort by chap
+        // if (selectedFilter.id === 'completed') {
+        //     filteredResults = filteredResults.sort((a, b) => {
+        //         // Get chapter counts as numbers
+        //         const chaptersA = typeof a.chapters === 'string' ? parseInt(a.chapters, 10) : (a.chapters || 0);
+        //         const chaptersB = typeof b.chapters === 'string' ? parseInt(b.chapters, 10) : (b.chapters || 0);
+
+        //         // Sort in descending order (highest chapter count first)
+        //         return chaptersB - chaptersA;
+        //     });
+        // }
+
         setFilteredNovels(filteredResults);
     }, [fetchedNovels, selectedSourceGenres, searchQuery]);
+
+    // Memoize the renderItem function
+    const renderItem = useCallback(({ item: novel }: { item: Novel }) => (
+        <NovelItem novel={novel} selectedFilter={selectedFilter} />
+    ), [selectedFilter]);
 
     return (
         <CustomView className="flex gap-6">
@@ -189,10 +250,11 @@ export default function SourceDetail() {
                         onSearch={(query) => setSearchQuery(query)}
                         onToggle={() => { }}
                     />
-                    <Pressable>
-                        {/* Random novel from the current source */}
-                        <MaterialCommunityIcons name="dice-multiple-outline" size={24} color="#4b5563" />
-                    </Pressable>
+                    <RandomNovel
+                        text={false}
+                        className={sourceDetails?.id ?? ''}
+                        containerClassName="flex justify-center items-center p-2"
+                    />
                 </View>
             </View>
 
@@ -243,55 +305,31 @@ export default function SourceDetail() {
                         <FlatList<Novel>
                             data={filteredNovels}
                             keyExtractor={(item: Novel, index) => `${index}-${item.id}`}
-                            renderItem={({ item: novel }: { item: Novel }) => (
-                                <Link href={
-                                    {
-                                        pathname: '/novel/[novelLink]',
-                                        params: {
-                                            novelLink: novel.link
-                                        }
-                                    }
-                                } asChild>
-                                    <Pressable className="flex-row items-center gap-4 p-4 border-b border-gray-200">
-                                        <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
-                                        <View className="flex-1">
-                                            <Text className="text-lg font-semibold">{novel.title}</Text>
-                                            <View className="flex-row gap-2">
-                                                {novel.genres.map((g: string, index: number) => (
-                                                    <Text key={index} className="text-gray-500">
-                                                        {g}
-                                                    </Text>
-                                                ))}
-                                            </View>
-                                            {
-                                                selectedFilter.id == 'updated' && novel.time && (
-                                                    <Text className="text-sm text-gray-600 mt-1 italic">
-                                                        Updated {novel.time}
-                                                    </Text>
-                                                )
-                                            }
-                                        </View>
-                                    </Pressable>
-                                </Link>
-                            )}
+                            renderItem={renderItem}
                             onEndReached={() => {
+                                // FIXME: VirtualizedList: You have a large list that is slow to update - make sure your renderItem function renders components that follow React performance best practices like PureComponent, shouldComponentUpdate
                                 if (!loading && hasMoreData) {
                                     fetchNovels();
                                 }
                             }}
                             onEndReachedThreshold={0.5}
                             initialNumToRender={10}
+                            windowSize={5}
+                            maxToRenderPerBatch={10}
+                            updateCellsBatchingPeriod={50}
+                            removeClippedSubviews={true}
                             ListFooterComponent={() => (
                                 loading ? (
                                     <View className="py-4 flex items-center justify-center">
-                                        <Text className="text-gray-500">
-                                            {
-                                                currentPage === 1 ?
-                                                    "Loading novels..." :
-                                                    "Loading more novels..."
-                                            }
 
-                                        </Text>
+                                        {
+                                            currentPage === 1 ?
+                                                <CustomLoading position="center" /> :
+                                                <Text className="text-gray-500">
+                                                    Loading more novels...
+                                                </Text>
+                                        }
+
                                     </View>
                                 ) : !hasMoreData ? (
                                     <View className="py-4 flex items-center justify-center">

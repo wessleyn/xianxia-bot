@@ -54,8 +54,8 @@ export interface SourceDefinition {
     getIcon(): Promise<string>;
     getGenres(): Promise<string[]>;
 
+    getRandomNovel?(): Promise<string>;
     getNovelMetaData(link?: string): Promise<NovelMetaData>
-    // Base novel fetching method - all sources must implement this
     getNovels(page?: number): Promise<NovelPageResult>;
 
     // Optional filter methods

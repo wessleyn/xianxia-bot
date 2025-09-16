@@ -1,4 +1,5 @@
 import CustomView from "@components/custom/CustomView";
+import RandomNovel from "@components/reusable/RandomNovel";
 import SourceImage from "@components/reusable/SourceImage";
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -49,11 +50,10 @@ export default function Explore() {
           </Link>
         </View>
         <View className="flex-row">
-          <TouchableOpacity className="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm">
-            <MaterialCommunityIcons name="dice-multiple-outline" size={24} color="#4b5563" />
-            <Text className="font-medium">Random</Text>
-            {/* TODO: Triggers a random novel selection and redirects to the novel page */}
-          </TouchableOpacity>
+          <RandomNovel
+            text
+            containerClassName="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm"
+          />
           <Link href={'/downloads'} asChild >
             <Pressable className="flex-1 flex-row gap-4 bg-gray-200 p-4 rounded-xl shadow-sm">
               <MaterialCommunityIcons name="download-outline" size={24} color="#4b5563" />

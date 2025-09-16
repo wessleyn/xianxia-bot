@@ -1,4 +1,4 @@
-import sources from "../constants/sources";
+import sources from "@constants/sources";
 
 export function findNovelSource(link: string) {
     let clas

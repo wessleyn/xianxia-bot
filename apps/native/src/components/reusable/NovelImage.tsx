@@ -56,20 +56,24 @@ export default function NovelImage({ image, size = 128, className }: NovelImageP
     };
 
     return (
-        <View style={[imageSize, { borderRadius: 8, overflow: 'hidden' }]} className="relative">
+        <View style={[imageSize, { borderRadius: 0, overflow: 'hidden' }]} className="relative">
             {/* Blinking Skeleton */}
             {(!loaded || error) && (
-                <Animated.View 
+                <Animated.View
                     style={[imageSize, skeletonStyle]}
                     className="rounded-lg"
                 />
             )}
-            
+
             {/* Actual Image */}
             {!error && (
                 <Image
                     source={{ uri: image }}
-                    style={[imageSize, { position: loaded ? 'relative' : 'absolute' }]}
+                    style={[imageSize, {
+                        position: loaded ? 'relative' : 'absolute',
+                        resizeMode: 'contain',
+                        borderRadius: 50,
+                    }]}
                     className={`rounded-lg ${className}`}
                     onLoad={handleImageLoad}
                     onError={handleImageError}

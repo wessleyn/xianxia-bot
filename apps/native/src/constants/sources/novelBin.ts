@@ -29,6 +29,26 @@ export class NovelBin implements SourceDefinition {
 
     private novelPage: Document | null = null;
 
+    async fetchPage(url: string, cache: RequestCache) {
+        try {
+            const response = await fetch(`${url}`, {
+                cache
+            });
+
+            if (!response.ok) {
+                throw ("Network access failed.");
+            }
+            const html = await response.text();
+
+            const { document } = parseHTML(html);
+
+            return document
+        } catch (error) {
+            console.error("Error fetching page:", error);
+            throw error
+        }
+    }
+
     constructor() { }
 
     getId() {
@@ -79,25 +99,10 @@ export class NovelBin implements SourceDefinition {
         }
     }
 
-    async getNovelPage(link: string) {
-        const response = await fetch(link || this.novel.link, {
-            cache: 'force-cache'
-        })
-
-        if (!response.ok) {
-            console.error("Failed to fetch novel image!");
-        }
-
-        const html = await response.text();
-        const { document } = parseHTML(html);
-
-        return document
-    }
-
     async getNovelImage(link?: string) {
         try {
             if (!this.novelPage) {
-                this.novelPage = await this.getNovelPage(link || this.novel.link);
+                this.novelPage = await this.fetchPage(link || this.novel.link, "force-cache");
             }
 
             const metaImage = this.novelPage.querySelector('meta[itemprop="image"]')?.getAttribute('content');
@@ -126,7 +131,7 @@ export class NovelBin implements SourceDefinition {
         try {
             // Get the novel page document
             if (!this.novelPage) {
-                this.novelPage = await this.getNovelPage(link || this.novel.link);
+                this.novelPage = await this.fetchPage(link || this.novel.link, "force-cache");
             }
 
             // Extract metadata from the page
@@ -204,16 +209,7 @@ export class NovelBin implements SourceDefinition {
     }
 
     async getNovels(page: number = 1): Promise<NovelPageResult> {
-        const response = await fetch(`${this.baseUrl}`, {
-            cache: 'reload'
-        });
-
-        if (!response.ok) {
-            throw ("Failed to fetch novel list");
-        }
-        const html = await response.text();
-
-        const { document } = parseHTML(html);
+        const document = await this.fetchPage(this.baseUrl, 'reload')
 
         const divs = document.querySelectorAll('.list-new .row')
 
@@ -260,4 +256,71 @@ export class NovelBin implements SourceDefinition {
         // TODO: Implement the real updated novels fetch
         return this.getNovels(page);
     }
+
+    async getCompletedNovels(page: number = 1, rand?: number): Promise<NovelPageResult> {
+
+        const url = this.baseUrl + `/sort/novelbin-complete?page=${page}`;
+
+        const html = await this.fetchPage(url, 'force-cache');
+
+        const novelsLinks = html.querySelectorAll('.list.list-novel .row h3 a');
+
+        const novelsArray = Array.from(novelsLinks);
+        if (rand !== undefined) {
+            return {
+                novels: [
+                    {
+                        link: novelsArray[rand].getAttribute("href")
+                    } as Novel
+                ]
+
+            } as NovelPageResult
+        }
+
+        const novelPromises = novelsArray.map(async (linkElement, index) => {
+            const link = linkElement.getAttribute('href')!;
+
+            try {
+                const metaData = await this.getNovelMetaData(link);
+
+                return {
+                    id: normalizeText(metaData.name),
+                    title: metaData.name,
+                    image: metaData.cover,
+                    genres: metaData.genres,
+                    chapters: metaData.chapters,
+                    link,
+                };
+            } catch (error) {
+                console.error(`[NovelBin] getCompletedNovels: Error processing novel at ${link}:`, error);
+                return null;
+            }
+        });
+
+        // TODO: pragmatically check this instead of hardcoding
+        let currentPage = 1, maxPage = 136;
+      
+        const results = await Promise.all(novelPromises);
+        const filteredResults = results.filter(novel => novel !== null);
+
+        console.log(`[NovelBin] getCompletedNovels: Has next page: ${currentPage < maxPage}`);
+
+        return {
+            novels: filteredResults,
+            hasNextPage: currentPage < maxPage
+        };
+    }
+
+    async getRandomNovel(): Promise<string> {
+
+        const randomPageNum = Math.floor(Math.random() * 5);
+
+        const novels = await this.getCompletedNovels(
+            randomPageNum == 0 ? 1 : randomPageNum,
+            Math.floor(Math.random() * 28)
+        );
+
+        return novels.novels[0].link
+    }
+
 }
