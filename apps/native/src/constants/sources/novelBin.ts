@@ -1,6 +1,6 @@
 import { parseHTML } from "linkedom";
 import { normalizeText } from "../../utils/normalizeText";
-import { Novel, NovelPageResult, SourceDefinition } from "../types";
+import { Novel, NovelMetaData, NovelPageResult, SourceDefinition } from "../types";
 
 type iconResponse = {
     hasIcon: boolean;
@@ -8,7 +8,7 @@ type iconResponse = {
     format: string;
 };
 
-const placeholderImage = ''
+const placeholderImage = 'https://a.a/a.png'
 
 export class NovelBin implements SourceDefinition {
     // Inbuilt Source Properties
@@ -17,7 +17,7 @@ export class NovelBin implements SourceDefinition {
     private mainCategory = "Fantasy";
     private language = "English";
     private isRaw = false;
-   
+
     // Runtime Variables
     private novel: Novel = {
         id: '',
@@ -26,6 +26,8 @@ export class NovelBin implements SourceDefinition {
         image: '',
         genres: [],
     };
+
+    private novelPage: Document | null = null;
 
     constructor() { }
 
@@ -46,6 +48,7 @@ export class NovelBin implements SourceDefinition {
     async getIcon() {
         try {
             const response = await fetch(`https://favicone.com/${this.baseUrl}?s32`, { cache: 'force-cache' });
+            if (!response.ok) return placeholderImage
             const data = await response.text();
             const parsedData = JSON.parse(data) as iconResponse;
             return parsedData.hasIcon ? parsedData.url : placeholderImage;
@@ -76,29 +79,38 @@ export class NovelBin implements SourceDefinition {
         }
     }
 
-    async getNovelImage() {
-        try {
-            const response = await fetch(this.novel.link, {
-                cache: 'force-cache'
-            })
-            if (!response.ok) {
-                console.error("Failed to fetch novel image");
-                return placeholderImage;
-            }
-            const html = await response.text();
-            const { document } = parseHTML(html);
+    async getNovelPage(link: string) {
+        const response = await fetch(link || this.novel.link, {
+            cache: 'force-cache'
+        })
 
-            const metaImage = document.querySelector('meta[itemprop="image"]')?.getAttribute('content');
+        if (!response.ok) {
+            console.error("Failed to fetch novel image!");
+        }
+
+        const html = await response.text();
+        const { document } = parseHTML(html);
+
+        return document
+    }
+
+    async getNovelImage(link?: string) {
+        try {
+            if (!this.novelPage) {
+                this.novelPage = await this.getNovelPage(link || this.novel.link);
+            }
+
+            const metaImage = this.novelPage.querySelector('meta[itemprop="image"]')?.getAttribute('content');
             if (metaImage) {
                 return metaImage;
             }
 
-            const bookImage = document.querySelector('div.book img.lazy')?.getAttribute('src');
+            const bookImage = this.novelPage.querySelector('div.book img.lazy')?.getAttribute('src');
             if (bookImage) {
                 return bookImage;
             }
 
-            const anyImage = document.querySelector('img.lazy[alt*="novel"]')?.getAttribute('src');
+            const anyImage = this.novelPage.querySelector('img.lazy[alt*="novel"]')?.getAttribute('src');
             if (anyImage) {
                 return anyImage;
             }
@@ -107,6 +119,87 @@ export class NovelBin implements SourceDefinition {
         } catch (error) {
             console.error("Error fetching novel image:", error);
             return placeholderImage;
+        }
+    }
+
+    async getNovelMetaData(link?: string): Promise<NovelMetaData> {
+        try {
+            // Get the novel page document
+            if (!this.novelPage) {
+                this.novelPage = await this.getNovelPage(link || this.novel.link);
+            }
+
+            // Extract metadata from the page
+            const name = this.novelPage.querySelector('h3.title[itemprop="name"]')?.textContent?.trim() || '';
+            const cover = await this.getNovelImage()
+
+            // Get genres
+            const genreLinks = this.novelPage.querySelectorAll('.info-meta li:nth-child(2) a');
+            const genres: string[] = [];
+            genreLinks.forEach(el => {
+                const text = el.textContent?.trim();
+                if (text) genres.push(text);
+            });
+
+            // Get status
+            const statusEl = this.novelPage.querySelector('.info-meta li:nth-child(3) a')?.textContent?.trim() || 'Unknown';
+
+            // Get author
+            const author = this.novelPage.querySelector('.info li:nth-child(1) a')?.textContent?.trim() || 'Unknown';
+
+            // Get language
+            const language = this.novelPage.querySelector('meta[itemprop="inLanguage"]')?.getAttribute('content') || 'English';
+
+            // Get rating
+            const ratingValue = parseFloat(this.novelPage.querySelector('span[itemprop="ratingValue"]')?.textContent?.trim() || '0');
+            const ratingMax = parseFloat(this.novelPage.querySelector('span[itemprop="bestRating"]')?.textContent?.trim() || '10');
+
+            // Get chapter count 
+            const chapterText = this.novelPage.querySelector('a.chapter-title')?.textContent?.trim() || '';
+            const chapterMatch = chapterText.match(/Chapter\s+(\d+)/i);
+            const chapters = chapterMatch ? chapterMatch[1] : 'Unknown';
+
+            // Get description
+            const desc = this.novelPage.querySelector('div.desc-text')?.textContent?.trim() || 'No description available';
+
+            return {
+                name,
+                cover,
+                source: {
+                    name: this.name,
+                    icon: await this.getIcon()
+                },
+                desc,
+                genres,
+                chapters,
+                rating: {
+                    val: ratingValue || 0,
+                    outOf: ratingMax || 10,
+                },
+                status: statusEl,
+                language,
+                author,
+            };
+        } catch (error) {
+            console.error("Error fetching novel metadata:", error);
+            return {
+                name: "Unknown",
+                cover: placeholderImage,
+                source: {
+                    name: this.name,
+                    icon: await this.getIcon()
+                },
+                desc: "Error fetching novel details",
+                genres: [],
+                chapters: "Unknown",
+                rating: {
+                    val: 0,
+                    outOf: 10,
+                },
+                status: "Unknown",
+                language: "Unknown",
+                author: "Unknown",
+            };
         }
     }
 

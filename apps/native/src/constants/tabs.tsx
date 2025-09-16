@@ -29,7 +29,7 @@ const tabs = [
     ),
   },
   {
-    name: 'explore/index',
+    name: 'index',
     title: 'Explore',
     icon: ({ color, size }: IconProps) => (
       <MaterialIcons

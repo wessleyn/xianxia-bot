@@ -9,6 +9,22 @@ export type Novel = {
     genres: string[];
 };
 
+export interface NovelMetaData {
+    name: string;
+    cover: string
+    desc: string;
+    genres: string[];
+    chapters: string;
+    status: string;
+    language: string;
+    author: string;
+    rating: { val: number; outOf: number; };
+    source: {
+        name: string;
+        icon: string;
+    }
+}
+
 export type Source = {
     id: string;
     name: string;
@@ -38,6 +54,7 @@ export interface SourceDefinition {
     getIcon(): Promise<string>;
     getGenres(): Promise<string[]>;
 
+    getNovelMetaData(link?: string): Promise<NovelMetaData>
     // Base novel fetching method - all sources must implement this
     getNovels(page?: number): Promise<NovelPageResult>;
 

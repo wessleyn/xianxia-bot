@@ -5,11 +5,14 @@ const CustomModal = ({ ...Props }: Props) => {
     return (
         <Modal {...Props} transparent>
             <View style={StyleSheet.absoluteFill}>
-                <BlurView
-                    intensity={60}
-                    tint="light"
-                    style={StyleSheet.absoluteFill}
-                />
+                {
+                    Props.blur &&
+                    <BlurView
+                        intensity={60}
+                        tint="light"
+                        style={StyleSheet.absoluteFill}
+                    />
+                }
                 <TouchableWithoutFeedback onPress={Props.onRequestClose}>
                     <View style={StyleSheet.absoluteFill} />
                 </TouchableWithoutFeedback>
@@ -40,6 +43,7 @@ const CustomModal = ({ ...Props }: Props) => {
 interface Props extends ModalProps {
     className?: string
     bar?: boolean
+    blur?: boolean
     position?: 'bottom' | 'center' | 'full'
 }
 

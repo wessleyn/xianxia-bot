@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Image, Text, View } from "react-native";
 
 interface SourceImageProps {
-    id: string;
+    id?: string;
     icon: string;
     name: string;
     size?: number;

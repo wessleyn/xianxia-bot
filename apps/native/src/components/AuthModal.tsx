@@ -105,6 +105,7 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
             className="px-4 py-8 "
             position="bottom"
             transparent
+            blur
             bar
         >
             <View className='px-6 w-full'>

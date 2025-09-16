@@ -119,6 +119,7 @@ export default function SourceDetail() {
                 } catch (error) {
                     console.error("Error in sourceInstance.getNovels():", error);
                     setFetchError(true);
+                    return
                 }
                 const { novels, hasNextPage } = result;
                 setHasMoreData(hasNextPage);
@@ -175,12 +176,12 @@ export default function SourceDetail() {
             <View className="w-full flex-row items-center justify-between px-4">
                 <BackButton />
                 <View className="flex-row items-center gap-4">
-                    /**
-                    * TODO: Implement server side searching
-                    * - Add a search method to source classes
-                    * - Send the search query to the website's search endpoint
-                    * - Parse and return those specific results
-                    */
+                    {/* 
+                      TODO: Implement server side searching
+                      - Add a search method to source classes
+                      - Send the search query to the website's search endpoint
+                      - Parse and return those specific results
+                    */}
                     <AnimatedSearchInput
                         headerName=""
                         iconPosition="right"
@@ -192,9 +193,7 @@ export default function SourceDetail() {
                         {/* Random novel from the current source */}
                         <MaterialCommunityIcons name="dice-multiple-outline" size={24} color="#4b5563" />
                     </Pressable>
-
                 </View>
-
             </View>
 
             {
@@ -245,7 +244,14 @@ export default function SourceDetail() {
                             data={filteredNovels}
                             keyExtractor={(item: Novel, index) => `${index}-${item.id}`}
                             renderItem={({ item: novel }: { item: Novel }) => (
-                                <Link href={`/novel/${novel.link}`} asChild>
+                                <Link href={
+                                    {
+                                        pathname: '/novel/[novelLink]',
+                                        params: {
+                                            novelLink: novel.link
+                                        }
+                                    }
+                                } asChild>
                                     <Pressable className="flex-row items-center gap-4 p-4 border-b border-gray-200">
                                         <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
                                         <View className="flex-1">
