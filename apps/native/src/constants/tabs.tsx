@@ -51,7 +51,7 @@ const tabs = [
     ),
   },
   {
-    name: '(account)/account/index',
+    name: 'account/index',
     title: 'Account',
     icon: ({ color, size }: IconProps) => (
       <MaterialIcons

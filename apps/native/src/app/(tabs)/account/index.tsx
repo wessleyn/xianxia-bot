@@ -1,11 +1,11 @@
 import AuthModal from '@components/AuthModal';
 import CustomSafeArea from "@components/custom/CustomSafeArea";
+import SettingsSection from "@components/SettingsSection";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAccountStore } from '@stores/account';
 import { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-toast-message';
-import SettingsSection from "@components/SettingsSection";
 
 export default function Account() {
   const { isLoggedIn, user, logout } = useAccountStore();

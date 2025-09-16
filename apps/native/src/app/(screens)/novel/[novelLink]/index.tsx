@@ -67,7 +67,7 @@ export default function NovelDetail() {
                         className="rounded-lg" />
                 </View>
                 <View className="flex gap-8 w-4/6">
-                    <Text className="text-lg">{novelMetadata.name}</Text>
+                    <Text className="text-lg w-3/4">{novelMetadata.name}</Text>
                     <View className="flex-row items-center p-2 border-2 border-gray-400 rounded-xl w-9/12">
                         <Ionicons name="library-outline" size={24} color="#4b5563" />
                         <Text className="text-gray-600"> Add to Library</Text>
@@ -131,7 +131,6 @@ export default function NovelDetail() {
             <CustomModal
                 visible={true}
                 onRequestClose={() => { }}
-                animationType="slide"
                 className="px-4 py-8 h-[15%]"
                 position="bottom"
                 transparent

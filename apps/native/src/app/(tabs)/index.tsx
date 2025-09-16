@@ -36,7 +36,7 @@ export default function Explore() {
       {/* Navigation Matrix */}
       <View className="px-4 text-center">
         <View className="flex-row mb-4">
-          <Link href={'/local'} asChild>
+          <Link href={'/local'} push asChild>
             <Pressable className="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm">
               <AntDesign name="folder1" size={24} color="#4b5563" />
               <Text className="font-medium">Local Storage</Text>

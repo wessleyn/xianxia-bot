@@ -1,13 +1,13 @@
 import { useAccountStore } from '@stores/account';
 import '@styles/global.css';
 import { supabase } from '@utils/supabase';
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 import { SQLiteProvider } from 'expo-sqlite';
 import { useEffect } from 'react';
 import Toast from 'react-native-toast-message';
 import 'react-native-url-polyfill/auto';
 
-const AppLayout = () => {
+const RootLayout = () => {
   const { setSession } = useAccountStore();
 
   useEffect(() => {
@@ -27,10 +27,18 @@ const AppLayout = () => {
 
   return (
     <SQLiteProvider databaseName='xianxu.db'>
-      <Slot />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name='(tabs)' />
+        <Stack.Screen name='(screens)' />
+
+      </Stack>
       <Toast />
     </SQLiteProvider>
   )
 }
 
-export default AppLayout
+export default RootLayout
