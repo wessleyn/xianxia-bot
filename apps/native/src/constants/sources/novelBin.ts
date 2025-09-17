@@ -208,6 +208,45 @@ export class NovelBin implements SourceDefinition {
         }
     }
 
+    async getNovelChapters(link?: string, page: number = 1): Promise<{ title: string; link: string; }[]> {
+        try {
+            // Extract novel ID from the link
+            const novelUrl = new URL(link || this.novel.link);
+            const pathSegments = novelUrl.pathname.split('/');
+            const novelId = pathSegments[pathSegments.length - 1];
+
+            // Use the API endpoint to fetch all chapters at once
+            const apiUrl = `https://novelbin.me/ajax/chapter-archive?novelId=${novelId}`;
+
+            const response = await fetch(apiUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Referer': this.baseUrl
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`API request failed with status: ${response.status}`);
+            }
+
+            const html = await response.text();
+            const { document } = parseHTML(html);
+
+            // Find all chapter links in the response
+            const chapterElements = document.querySelectorAll('.list-chapter a');
+
+            const chapters = Array.from(chapterElements).map(el => ({
+                title: el.querySelector('.chapter-title')?.textContent?.trim().replace(/\s+/g, ' ') || 'No title',
+                link: el.getAttribute('href') || ''
+            }));
+
+            return chapters;
+        } catch (error) {
+            console.error("Error fetching chapters:", error);
+            throw error
+        }
+    }
+
     async getNovels(page: number = 1): Promise<NovelPageResult> {
         const document = await this.fetchPage(this.baseUrl, 'reload')
 
@@ -250,6 +289,18 @@ export class NovelBin implements SourceDefinition {
             novels: results.filter(novel => novel !== null),
             hasNextPage: false
         }
+    }
+
+    async getRandomNovel(): Promise<string> {
+
+        const randomPageNum = Math.floor(Math.random() * 5);
+
+        const novels = await this.getCompletedNovels(
+            randomPageNum == 0 ? 1 : randomPageNum,
+            Math.floor(Math.random() * 28)
+        );
+
+        return novels.novels[0].link
     }
 
     async getUpdatedNovels(page: number = 1): Promise<NovelPageResult> {
@@ -299,7 +350,7 @@ export class NovelBin implements SourceDefinition {
 
         // TODO: pragmatically check this instead of hardcoding
         let currentPage = 1, maxPage = 136;
-      
+
         const results = await Promise.all(novelPromises);
         const filteredResults = results.filter(novel => novel !== null);
 
@@ -311,16 +362,6 @@ export class NovelBin implements SourceDefinition {
         };
     }
 
-    async getRandomNovel(): Promise<string> {
 
-        const randomPageNum = Math.floor(Math.random() * 5);
-
-        const novels = await this.getCompletedNovels(
-            randomPageNum == 0 ? 1 : randomPageNum,
-            Math.floor(Math.random() * 28)
-        );
-
-        return novels.novels[0].link
-    }
 
 }

@@ -1,6 +1,7 @@
 import CustomLoading from "@components/custom/CustomLoading";
 import CustomRating from "@components/custom/CustomRating";
 import CustomView from "@components/custom/CustomView";
+import NovelModal from "@components/NovelModal";
 import BackButton from "@components/reusable/BackButton";
 import NovelImage from "@components/reusable/NovelImage";
 import SourceImage from "@components/reusable/SourceImage";
@@ -12,7 +13,6 @@ import { findNovelSource } from "@utils/sources/findNovelSource";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import NovelModal from "@components/NovelModal";
 
 export default function NovelDetail() {
     const params = useLocalSearchParams<{ novelLink: string }>()
@@ -111,23 +111,34 @@ export default function NovelDetail() {
                 </View>
             </View>
 
-            <View className="flex-row flex-wrap gap-2">
-                {
-                    novelMetadata.genres.map((genre, index) => (
-                        <Text key={index} className="border-2 border-gray-400 rounded-xl p-2  text-center text-gray-600 ">{genre}</Text>
-                    ))
-                }
+            <View className="h-12" >
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    className="flex-row flex-wrap gap-4 "
+                >
+                    {
+                        novelMetadata.genres.map((genre, index) => (
+                            <Text
+                                key={index}
+                                className={`border-2 border-gray-400 rounded-xl p-2  ${index > 0 ? 'ml-4' : ''} text-center text-gray-600 `}>
+                                {genre}
+                            </Text>
+                        ))
+                    }
+                </ScrollView>
             </View>
 
-            <View className="h-32">
-                <ScrollView >
+            <View className="h-[11rem]">
+                <ScrollView
+                    showsVerticalScrollIndicator={false}>
                     <Text>
                         {novelMetadata.desc}
                     </Text>
                 </ScrollView>
             </View>
 
-            <NovelModal />
+            <NovelModal novelLink={novelLink} />
         </CustomView>
     );
 }

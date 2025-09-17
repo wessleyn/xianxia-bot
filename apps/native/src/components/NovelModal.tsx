@@ -5,8 +5,11 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDistance } from 'date-fns';
+import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { findNovelSource } from '../utils/sources/findNovelSource';
+import CustomLoading from './custom/CustomLoading';
 import CustomMovableModal from "./custom/CustomMovableModal";
 
 // Data type definitions
@@ -14,6 +17,7 @@ interface Chapter {
     id: string;
     number: number;
     title: string;
+    link: string
     isRead: boolean;
     lastReadAt?: string;
 }
@@ -36,51 +40,14 @@ interface Bookmark {
     position: number; // percentage or position in chapter
 }
 
-const NovelModal = () => {
+const NovelModal = ({ novelLink }: { novelLink: string }) => {
     const [navigationTab, setNavigationTab] = useState<novelDetailTabType>('chapters');
+    const [chapters, setChapters] = useState<Chapter[]>();
 
-    // Sample data for chapters
-    const [chapters, setChapters] = useState<Chapter[]>([
-        { id: 'ch1', number: 1, title: 'The Beginning', isRead: true },
-        { id: 'ch2', number: 2, title: 'The Journey', isRead: true },
-        { id: 'ch3', number: 3, title: 'The Challenge', isRead: false },
-        { id: 'ch4', number: 4, title: 'The Discovery', isRead: false },
-        { id: 'ch5', number: 5, title: 'The Revelation', isRead: false },
-        { id: 'ch6', number: 6, title: 'The Confrontation', isRead: false },
-        { id: 'ch7', number: 7, title: 'The Decision', isRead: false },
-        { id: 'ch8', number: 8, title: 'The Battle', isRead: false },
-        { id: 'ch9', number: 9, title: 'The Victory', isRead: false },
-        { id: 'ch10', number: 10, title: 'New Horizons', isRead: false },
-        { id: 'ch11', number: 11, title: 'The Aftermath', isRead: false },
-        { id: 'ch12', number: 12, title: 'Rising Powers', isRead: false },
-        { id: 'ch13', number: 13, title: 'New Allies', isRead: false },
-        { id: 'ch14', number: 14, title: 'Ancient Secrets', isRead: false },
-        { id: 'ch15', number: 15, title: 'The Training', isRead: false },
-        { id: 'ch16', number: 16, title: 'Hidden Enemies', isRead: false },
-        { id: 'ch17', number: 17, title: 'The Betrayal', isRead: false },
-        { id: 'ch18', number: 18, title: 'Final Preparations', isRead: false },
-        { id: 'ch19', number: 19, title: 'Ultimate Showdown', isRead: false },
-        { id: 'ch20', number: 20, title: 'Ascension', isRead: false },
-    ]);
-
-    // Sample data for volumes
     const [volumes, setVolumes] = useState<Volume[]>([
-        { id: 'vol1', number: 1, title: 'Origins', startingChapter: 1, chapterCount: 5, isComplete: true },
-        { id: 'vol2', number: 2, title: 'Ascension', startingChapter: 6, chapterCount: 5, isComplete: false },
-        { id: 'vol3', number: 3, title: 'Destiny', startingChapter: 11, chapterCount: 8, isComplete: false },
     ]);
 
-    // Sample data for bookmarks
     const [bookmarks, setBookmarks] = useState<Bookmark[]>([
-        // Empty initial state, uncomment to test with data
-        {
-            id: 'bm1',
-            chapterId: 'ch2',
-            chapterTitle: 'Chapter 2: The Journey',
-            createdAt: '2025-09-17T14:30:00Z',
-            notes: 'The protagonist discovers the sacred scroll',
-            position: 45
-        }
     ]);
 
     useEffect(() => {
@@ -99,6 +66,26 @@ const NovelModal = () => {
         AsyncStorage.setItem('lastOpenedTab', navigationTab);
     }, [navigationTab]);
 
+    useEffect(() => {
+        const fetchChapters = async () => {
+            const source = findNovelSource(novelLink);
+            const instance = new source();
+            const fetchedChapters = await instance.getNovelChapters(novelLink);
+            const formatedChapters = fetchedChapters.map((ch, index) => ({
+                ...ch,
+                // Clean up the title text to properly handle line breaks and extra spaces
+                title: ch.title.replace(/\s+/g, ' ').trim(),
+                isRead: false,
+                id: `${index}-${ch.title}`,
+                number: index + 1
+            }));
+
+            setChapters(formatedChapters)
+        }
+
+        fetchChapters();
+    }, []);
+
     const handleTabPress = (tabKey: novelDetailTabType) => {
         setNavigationTab(tabKey);
     };
@@ -108,7 +95,7 @@ const NovelModal = () => {
             position="bottom"
         >
             {/* Bottom Navigation section - always visible */}
-            <View className="flex-row justify-between items-center mt-6">
+            <View className="flex-row justify-between items-center mt-6 mb-4">
                 <View className="flex-row gap-3 p-2">
                     {novelDetailTabs.map(tab => {
                         const isActive = navigationTab === tab.key;
@@ -142,43 +129,54 @@ const NovelModal = () => {
                 {/* Tab content based on selected tab */}
                 {navigationTab === 'chapters' && (
                     <View>
-                        {chapters.length === 0 ? (
-                            <View className="py-8 flex items-center justify-center">
-                                <MaterialCommunityIcons name="format-list-bulleted-square" size={48} color="#9ca3af" />
-                                <Text className="text-gray-500 mt-4">No chapters available</Text>
-                                <Text className="text-gray-400 text-sm text-center mt-1">
-                                    Check back later for new chapters
-                                </Text>
-                            </View>
-                        ) : (
-                            <ScrollView 
-                                showsVerticalScrollIndicator={false} 
-                                contentContainerStyle={{ paddingBottom: 20 }}
-                            >
-                                {chapters.map((item, index) => {
-                                    const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
-                                    return (
-                                        <Pressable key={item.id} className="py-3">
-                                            <View className="flex-col items-start">
-                                                <View className="flex-row justify-between items-center w-full">
-                                                    <View className="flex-row items-center">
-                                                        {isActiveChapter && (
-                                                            <MaterialIcons name="play-arrow" size={24} color="#16a34a" style={{ marginRight: 4 }} />
-                                                        )}
-                                                        <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
-                                                            {item.title}
-                                                        </Text>
-                                                    </View>
-                                                </View>
-                                                <Text className={`${isActiveChapter ? 'text-gray-800' : 'text-gray-500'}`}>
-                                                    # {item.number}
-                                                </Text>
-                                            </View>
-                                        </Pressable>
-                                    );
-                                })}
-                            </ScrollView>
-                        )}
+                        {
+                            chapters === undefined ?
+                                <CustomLoading
+                                    className='bg-transparent'
+                                    position='center' />
+                                : chapters.length === 0 ? (
+                                    <View className="py-8 flex items-center justify-center">
+                                        <MaterialCommunityIcons name="format-list-bulleted-square" size={48} color="#9ca3af" />
+                                        <Text className="text-gray-500 mt-4">No chapters available</Text>
+                                        <Text className="text-gray-400 text-sm text-center mt-1">
+                                            Check back later for new chapters
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <ScrollView
+                                        showsVerticalScrollIndicator={false}
+                                        contentContainerStyle={{ paddingBottom: 20 }}
+                                    >
+                                        {
+                                            chapters.map((item, index) => {
+                                                const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
+                                                return (
+                                                    <Link asChild href={{
+                                                        pathname: '/(screens)/[chapterLink]',
+                                                        params: { chapterLink: item.link }
+                                                    }}
+                                                        key={item.id}
+                                                    >
+                                                        <Pressable className="flex-col items-start py-3">
+                                                            <View className="flex-row justify-between items-center w-full">
+                                                                <View className="flex-row items-center">
+                                                                    {isActiveChapter && (
+                                                                        <MaterialIcons name="play-arrow" size={24} color="#16a34a" style={{ marginRight: 4 }} />
+                                                                    )}
+                                                                    <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
+                                                                        {item.title}
+                                                                    </Text>
+                                                                </View>
+                                                            </View>
+                                                            <Text className={`${isActiveChapter ? 'text-gray-800' : 'text-gray-500'}`}>
+                                                                # {item.number}
+                                                            </Text>
+                                                        </Pressable>
+                                                    </Link>
+                                                );
+                                            })}
+                                    </ScrollView>
+                                )}
                     </View>
                 )}
 
@@ -193,8 +191,8 @@ const NovelModal = () => {
                                 </Text>
                             </View>
                         ) : (
-                            <ScrollView 
-                                showsVerticalScrollIndicator={false} 
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
                                 contentContainerStyle={{ paddingBottom: 20 }}
                             >
                                 {volumes.map((item, index) => (
@@ -230,8 +228,8 @@ const NovelModal = () => {
                                 </Text>
                             </View>
                         ) : (
-                            <ScrollView 
-                                showsVerticalScrollIndicator={false} 
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
                                 contentContainerStyle={{ paddingBottom: 20 }}
                             >
                                 {bookmarks.map((item) => (
