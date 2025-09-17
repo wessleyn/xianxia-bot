@@ -152,7 +152,7 @@ const NovelModal = () => {
                             </View>
                         ) : (
                             <ScrollView 
-                                showsVerticalScrollIndicator={true} 
+                                showsVerticalScrollIndicator={false} 
                                 contentContainerStyle={{ paddingBottom: 20 }}
                             >
                                 {chapters.map((item, index) => {
@@ -194,7 +194,7 @@ const NovelModal = () => {
                             </View>
                         ) : (
                             <ScrollView 
-                                showsVerticalScrollIndicator={true} 
+                                showsVerticalScrollIndicator={false} 
                                 contentContainerStyle={{ paddingBottom: 20 }}
                             >
                                 {volumes.map((item, index) => (
@@ -231,7 +231,7 @@ const NovelModal = () => {
                             </View>
                         ) : (
                             <ScrollView 
-                                showsVerticalScrollIndicator={true} 
+                                showsVerticalScrollIndicator={false} 
                                 contentContainerStyle={{ paddingBottom: 20 }}
                             >
                                 {bookmarks.map((item) => (

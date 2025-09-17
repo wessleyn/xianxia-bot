@@ -1,7 +1,6 @@
 import CustomLoading from "@components/custom/CustomLoading";
 import CustomRating from "@components/custom/CustomRating";
 import CustomView from "@components/custom/CustomView";
-import NovelModal from "@components/NovelModal";
 import BackButton from "@components/reusable/BackButton";
 import NovelImage from "@components/reusable/NovelImage";
 import SourceImage from "@components/reusable/SourceImage";
@@ -13,6 +12,7 @@ import { findNovelSource } from "@utils/sources/findNovelSource";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import NovelModal from "@components/NovelModal";
 
 export default function NovelDetail() {
     const params = useLocalSearchParams<{ novelLink: string }>()

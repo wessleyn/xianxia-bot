@@ -5,216 +5,132 @@ import Animated, {
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
-    withSpring
+    withSpring,
 } from "react-native-reanimated";
 
-const SCREEN_HEIGHT = Dimensions.get("window").height;
-const BOTTOM_POSITION_HEIGHT = SCREEN_HEIGHT * 0.15; // 15% height at bottom
-const CENTER_POSITION_HEIGHT = SCREEN_HEIGHT * 0.50;  // 50% height at center
-const FULL_POSITION_HEIGHT = SCREEN_HEIGHT;          // Full height
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const CustomMovableModal = ({ ...Props }: Props) => {
-    // Track current position state
-    const [currentPosition, setCurrentPosition] = useState<'bottom' | 'center' | 'full'>(
-        Props.position || 'bottom'
-    );
+const POSITIONS = {
+    bottom: SCREEN_HEIGHT * 0.15, // 15% height
+    center: SCREEN_HEIGHT * 0.5,  // 50% height
+    full: SCREEN_HEIGHT,          // 100% height
+};
 
-    // Shared values for animation
+interface Props {
+    className?: string;
+    children: React.ReactNode;
+    position?: keyof typeof POSITIONS; // default: bottom
+    fixedPosition?: boolean;           // if true, modal snaps back to initial position
+}
+
+const CustomMovableModal = ({
+    className,
+    children,
+    position = "bottom",
+    fixedPosition = false,
+}: Props) => {
+    const [currentPosition, setCurrentPosition] = useState<
+        keyof typeof POSITIONS
+    >(position);
+
     const translateY = useSharedValue(0);
-    const contentHeight = useSharedValue(
-        Props.position === 'full' ? FULL_POSITION_HEIGHT :
-            Props.position === 'center' ? CENTER_POSITION_HEIGHT :
-                BOTTOM_POSITION_HEIGHT
-    );
+    const contentHeight = useSharedValue(POSITIONS[position]);
 
-    // Create a shared value to track drag progress (0 to 1)
-    const dragProgress = useSharedValue(0);
-
-    // Update height when position prop changes
     useEffect(() => {
-        if (Props.position !== currentPosition) {
-            setCurrentPosition(Props.position || 'bottom');
-            contentHeight.value = withSpring(
-                Props.position === 'full' ? FULL_POSITION_HEIGHT :
-                    Props.position === 'center' ? CENTER_POSITION_HEIGHT :
-                        BOTTOM_POSITION_HEIGHT,
-                { damping: 20, stiffness: 120 }
-            );
-            translateY.value = withSpring(0, { damping: 20, stiffness: 120 });
-        }
-    }, [Props.position]);
-
-    // Handle position changes
-    const updatePosition = useCallback((position: 'bottom' | 'center' | 'full') => {
         if (position !== currentPosition) {
             setCurrentPosition(position);
+            contentHeight.value = withSpring(POSITIONS[position], {
+                damping: 20,
+                stiffness: 120,
+            });
+            translateY.value = withSpring(0);
         }
-    }, [currentPosition]);
+    }, [position]);
 
-    // Gesture logic
+    const updatePosition = useCallback(
+        (newPosition: keyof typeof POSITIONS) => {
+            if (newPosition !== currentPosition) {
+                setCurrentPosition(newPosition);
+            }
+        },
+        [currentPosition]
+    );
+
+    // Gesture only for drag handle
     const gesture = Gesture.Pan()
-        .onStart(() => {
-            // Reset drag state when gesture begins
-            translateY.value = 0;
-        })
         .onUpdate((event) => {
-            // Get current height based on position
-            const currentHeight =
-                currentPosition === 'full' ? FULL_POSITION_HEIGHT :
-                    currentPosition === 'center' ? CENTER_POSITION_HEIGHT :
-                        BOTTOM_POSITION_HEIGHT;
-
-            // Determine drag direction
             const isDraggingDown = event.translationY > 0;
-
-            // Apply minimal resistance at extremes
-            if ((currentPosition === 'bottom' && isDraggingDown) ||
-                (currentPosition === 'full' && !isDraggingDown)) {
-                // At extremes (bottom trying to go lower, or full trying to go higher)
-                // Just show a small movement for feedback
+            if (
+                (currentPosition === "bottom" && isDraggingDown) ||
+                (currentPosition === "full" && !isDraggingDown)
+            ) {
                 translateY.value = event.translationY * 0.2;
                 return;
             }
-
-            // Handle normal drag between positions
-            let nextHeight;
-            if (isDraggingDown) {
-                // Dragging down - determine target height
-                nextHeight = currentPosition === 'full' ? CENTER_POSITION_HEIGHT : BOTTOM_POSITION_HEIGHT;
-            } else {
-                // Dragging up - determine target height
-                nextHeight = currentPosition === 'bottom' ? CENTER_POSITION_HEIGHT : FULL_POSITION_HEIGHT;
-            }
-
-            // Calculate the drag progress (0-1) - use a smaller threshold for easier dragging
-            // 20% of screen height is enough to trigger transition
-            const dragThreshold = SCREEN_HEIGHT * 0.2;
-            const dragDistance = Math.min(Math.abs(event.translationY), dragThreshold);
-            const progress = dragDistance / dragThreshold;
-            dragProgress.value = progress;
-
-            // Calculate the height change
-            const heightDiff = nextHeight - currentHeight;
-
-            // Update height in real-time as user drags
-            if (isDraggingDown) {
-                // When dragging down, decrease height
-                contentHeight.value = currentHeight - (heightDiff * progress * -1);
-            } else {
-                // When dragging up, increase height
-                contentHeight.value = currentHeight + (heightDiff * progress);
-            }
-
-            // Add a small translation for tactile feedback
             translateY.value = event.translationY * 0.1;
         })
         .onEnd((event) => {
-            // Reset drag progress
-            dragProgress.value = 0;
-
-            // Handle gesture end and determine where modal should settle
-            const currentHeight =
-                currentPosition === 'full' ? FULL_POSITION_HEIGHT :
-                    currentPosition === 'center' ? CENTER_POSITION_HEIGHT :
-                        BOTTOM_POSITION_HEIGHT;
-
             const velocity = event.velocityY;
-            const endTranslation = translateY.value;
+            let newPosition: keyof typeof POSITIONS = currentPosition;
 
-            let newPosition: 'bottom' | 'center' | 'full' = currentPosition;
-
-            // Determine new position based on gesture velocity and distance
             if (Math.abs(velocity) > 500) {
-                // Fast swipe
                 if (velocity > 0) {
-                    // Swiping down
-                    if (currentPosition === 'full') {
-                        newPosition = 'center';
-                    } else if (currentPosition === 'center') {
-                        newPosition = 'bottom';
-                    }
+                    if (currentPosition === "full") newPosition = "center";
+                    else if (currentPosition === "center") newPosition = "bottom";
                 } else {
-                    // Swiping up
-                    if (currentPosition === 'bottom') {
-                        newPosition = 'center';
-                    } else if (currentPosition === 'center') {
-                        newPosition = 'full';
-                    }
+                    if (currentPosition === "bottom") newPosition = "center";
+                    else if (currentPosition === "center") newPosition = "full";
                 }
             } else {
-                // Slow swipe - check translation threshold
-                const translationPercent = endTranslation / currentHeight;
-
-                if (translationPercent > 0.15) {
-                    // Move down one position
-                    if (currentPosition === 'full') {
-                        newPosition = 'center';
-                    } else if (currentPosition === 'center') {
-                        newPosition = 'bottom';
-                    }
-                } else if (translationPercent < -0.15) {
-                    // Move up one position
-                    if (currentPosition === 'bottom') {
-                        newPosition = 'center';
-                    } else if (currentPosition === 'center') {
-                        newPosition = 'full';
-                    }
+                if (event.translationY > SCREEN_HEIGHT * 0.15) {
+                    if (currentPosition === "full") newPosition = "center";
+                    else if (currentPosition === "center") newPosition = "bottom";
+                } else if (event.translationY < -SCREEN_HEIGHT * 0.15) {
+                    if (currentPosition === "bottom") newPosition = "center";
+                    else if (currentPosition === "center") newPosition = "full";
                 }
             }
 
-            // If fixedPosition is true, always return to initial position
-            if (Props.fixedPosition) {
-                newPosition = Props.position || 'bottom';
+            if (fixedPosition) {
+                newPosition = position;
             }
 
-            // Animate to new position
             runOnJS(updatePosition)(newPosition);
 
             translateY.value = withSpring(0, { damping: 20, stiffness: 120 });
-            contentHeight.value = withSpring(
-                newPosition === 'full' ? FULL_POSITION_HEIGHT :
-                    newPosition === 'center' ? CENTER_POSITION_HEIGHT :
-                        BOTTOM_POSITION_HEIGHT,
-                { damping: 20, stiffness: 120 }
-            );
+            contentHeight.value = withSpring(POSITIONS[newPosition], {
+                damping: 20,
+                stiffness: 120,
+            });
         });
 
-    // Animated styles
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            height: contentHeight.value,
-            transform: [{ translateY: translateY.value }]
-        };
-    });
+    const animatedStyle = useAnimatedStyle(() => ({
+        height: contentHeight.value,
+        transform: [{ translateY: translateY.value }],
+    }));
 
     return (
-        <View {...Props} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
-            <GestureDetector gesture={gesture}>
-                <Animated.View className="flex-1 relative">
-                    <Animated.View
-                        style={animatedStyle}
-                        className={`bg-gray-100 relative w-full rounded-t-3xl overflow-hidden ${Props.className}`}>
-                        {/* Modal drag handle */}
-                        <View className='absolute top-2 left-0 right-0 flex justify-center items-center z-10'>
-                            <View className='bg-gray-500 dark:bg-gray-300 rounded-lg w-[3.6rem] h-2'></View>
+        <View
+            style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 1000 }}
+        >
+            <Animated.View className="flex-1 relative">
+                <Animated.View
+                    style={animatedStyle}
+                    className={`bg-gray-100 relative w-full rounded-t-3xl overflow-hidden ${className}`}
+                >
+                    {/* Drag handle (only draggable part) */}
+                    <GestureDetector gesture={gesture}>
+                        <View className="absolute top-2 left-0 right-0 flex justify-center items-center z-10">
+                            <View className="bg-gray-400 dark:bg-gray-300 rounded-lg w-14 h-2" />
                         </View>
+                    </GestureDetector>
 
-                        {/* Scrollable content container */}
-                        <View className="w-full h-full pt-6 px-4">
-                            {Props.children}
-                        </View>
-                    </Animated.View>
+                    {/* Content (not draggable, can scroll freely) */}
+                    <View className="w-full h-full pt-6 px-4">{children}</View>
                 </Animated.View>
-            </GestureDetector>
+            </Animated.View>
         </View>
     );
-}
+};
 
-interface Props {
-    className?: string
-    children: React.ReactNode
-    position?: 'bottom' | 'center' | 'full'
-    fixedPosition?: boolean // When true, modal will return to initial position when not interacted with
-}
-
-export default CustomMovableModal
+export default CustomMovableModal;
