@@ -12,13 +12,13 @@ export default function History() {
 
       <Link asChild href={
         {
-          pathname: '/novel/[novelLink]',
+          pathname: '/chapter/[chapterLink]',
           params: {
-            novelLink: 'https://novelbin.me/novel-book/is-it-wrong-to-abusing-cartoon-tropes-in-dungeon'
+            chapterLink: 'https://novelbin.me/novel-book/is-it-wrong-to-abusing-cartoon-tropes-in-dungeon/chapter-1-1-1-only-gun-is-the-honored-one'
           }
         }
       } >
-        <Text className="text-blue-600 mt-10 underline underline-offset-1">Dev Link to Details</Text>
+        <Text className="text-blue-600 mt-10 underline underline-offset-1">Dev Link to Chapter</Text>
       </Link>
     </CustomView>
   );

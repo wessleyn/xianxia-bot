@@ -1,6 +1,6 @@
 import { parseHTML } from "linkedom";
 import { normalizeText } from "../../utils/normalizeText";
-import { Novel, NovelMetaData, NovelPageResult, SourceDefinition } from "../types";
+import { ChapterContent, Novel, NovelMetaData, NovelPageResult, SourceDefinition } from "../types";
 
 type iconResponse = {
     hasIcon: boolean;
@@ -205,6 +205,37 @@ export class NovelBin implements SourceDefinition {
                 language: "Unknown",
                 author: "Unknown",
             };
+        }
+    }
+
+    async getNovelChapterContent(link: string): Promise<ChapterContent> {
+        try {
+            const document = await this.fetchPage(link, 'force-cache');
+
+            const paragraphs = document.querySelectorAll('#chr-content p');
+            const content = Array.from(paragraphs).map(p => p.textContent?.trim()) || 'No content available';
+           
+            const titleEl = document.querySelector('#chr-content h4') || document.querySelector('.chr-title');
+            const title = titleEl?.textContent?.trim() || 'No title';
+
+            const prevChapterElement = document.querySelector('#prev_chap');
+            let prevChapter: string | null = null;
+            if (prevChapterElement) {
+                const isDisabled = prevChapterElement.hasAttribute('disabled');
+                const href = prevChapterElement.getAttribute('href') || '';
+
+                if (!isDisabled && href && !href.includes('/null')) {
+                    prevChapter = href;
+                }
+            }
+
+            const nextChapter = document.querySelector('#next_chap')?.getAttribute('href') || null;
+            const nextChapterTitle = document.querySelector('#next_chap')?.getAttribute('title') || null;
+
+            return { content, title, prevChapter, nextChapter, nextChapterTitle };
+        } catch (error) {
+            console.log(error);
+            throw error;
         }
     }
 

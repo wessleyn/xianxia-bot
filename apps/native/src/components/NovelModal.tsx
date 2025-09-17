@@ -152,7 +152,7 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                                                 const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
                                                 return (
                                                     <Link asChild href={{
-                                                        pathname: '/(screens)/[chapterLink]',
+                                                        pathname: '/chapter/[chapterLink]',
                                                         params: { chapterLink: item.link }
                                                     }}
                                                         key={item.id}

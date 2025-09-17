@@ -48,6 +48,14 @@ export interface NovelPageResult {
     hasNextPage: boolean;
 }
 
+export type ChapterContent = {
+        content: string[];
+        title: string;
+        prevChapter: string | null;
+        nextChapter: string | null;
+        nextChapterTitle: string | null;
+    }
+
 export interface SourceDefinition {
     getId(): string;
     getMetadata(): any;
@@ -57,6 +65,7 @@ export interface SourceDefinition {
     getRandomNovel?(): Promise<string>;
     getNovelMetaData(link?: string): Promise<NovelMetaData>
     getNovelChapters(link: string): Promise<{ title: string; link: string; date?: Date; }[]>;
+    getNovelChapterContent(link: string): Promise<ChapterContent>;
     getNovels(page?: number): Promise<NovelPageResult>;
 
     // Optional filter methods
