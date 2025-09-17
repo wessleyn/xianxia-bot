@@ -1,12 +1,11 @@
 import CustomLoading from "@components/custom/CustomLoading";
-import CustomModal from "@components/custom/CustomModal";
 import CustomRating from "@components/custom/CustomRating";
 import CustomView from "@components/custom/CustomView";
+import NovelModal from "@components/NovelModal";
 import BackButton from "@components/reusable/BackButton";
 import NovelImage from "@components/reusable/NovelImage";
 import SourceImage from "@components/reusable/SourceImage";
 import { NovelMetaData } from "@constants/types";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
@@ -128,33 +127,7 @@ export default function NovelDetail() {
                 </ScrollView>
             </View>
 
-            <CustomModal
-                visible={true}
-                onRequestClose={() => { }}
-                className="px-4 py-8 h-[15%]"
-                position="bottom"
-                transparent
-                bar
-            >
-                <View className="flex-row justify-between p-2 pb-0 items-end h-full">
-                    <View className="flex-row gap-4 p-2">
-                        <MaterialCommunityIcons name="format-list-bulleted-square" size={24} color="#4b5563" />
-                        <MaterialCommunityIcons name="view-grid-outline" size={24} color="#4b5563" />
-                        <FontAwesome name="bookmark-o" size={24} color="#4b5563" />
-                    </View>
-
-                    <View className="flex-row gap-1">
-                        <Text className=" bg-gray-300 py-3 text-center px-10 rounded-3xl rounded-r-none">Read</Text>
-                        <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
-                            <Octicons
-                                name="chevron-down"
-                                size={18}
-                                color="#4b5563"
-                            />
-                        </View>
-                    </View>
-                </View>
-            </CustomModal>
+            <NovelModal />
         </CustomView>
     );
 }

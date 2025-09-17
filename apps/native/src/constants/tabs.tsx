@@ -1,11 +1,20 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 type IconProps = {
     color?: string;
     size?: number;
 };
 
+export type novelDetailTabType = 'chapters' | 'volumes' | 'bookmarks';
 
-const tabs = [
+export interface NovelDetailTabInfo {
+  key: novelDetailTabType;
+  label: string;
+  renderIcon: (isActive: boolean) => React.ReactElement;
+}
+
+export const bottomNavTabs = [
   {
     name: 'history/index',
     title: 'History',
@@ -63,4 +72,38 @@ const tabs = [
   },
 ];
 
-export default tabs
+export const novelDetailTabs: NovelDetailTabInfo[] = [
+  {
+    key: 'chapters',
+    label: 'Chapters',
+    renderIcon: (isActive: boolean) => (
+      <MaterialCommunityIcons
+        name="format-list-bulleted-square"
+        size={24}
+        color={isActive ? "#1f2937" : "#4b5563"}
+      />
+    )
+  },
+  {
+    key: 'volumes',
+    label: 'Volumes',
+    renderIcon: (isActive: boolean) => (
+      <MaterialCommunityIcons
+        name="view-grid-outline"
+        size={24}
+        color={isActive ? "#1f2937" : "#4b5563"}
+      />
+    )
+  },
+  {
+    key: 'bookmarks',
+    label: 'Bookmarks',
+    renderIcon: (isActive: boolean) => (
+      <FontAwesome
+        name="bookmark-o"
+        size={24}
+        color={isActive ? "#1f2937" : "#4b5563"}
+      />
+    )
+  }
+];

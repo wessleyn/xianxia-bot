@@ -4,6 +4,7 @@ import { supabase } from '@utils/supabase';
 import { Stack } from "expo-router";
 import { SQLiteProvider } from 'expo-sqlite';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import 'react-native-url-polyfill/auto';
 
@@ -26,18 +27,20 @@ const RootLayout = () => {
   }, []);
 
   return (
-    <SQLiteProvider databaseName='xianxu.db'>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name='(tabs)' />
-        <Stack.Screen name='(screens)' />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SQLiteProvider databaseName='xianxu.db'>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name='(tabs)' />
+          <Stack.Screen name='(screens)' />
 
-      </Stack>
-      <Toast />
-    </SQLiteProvider>
+        </Stack>
+        <Toast />
+      </SQLiteProvider>
+    </GestureHandlerRootView>
   )
 }
 
