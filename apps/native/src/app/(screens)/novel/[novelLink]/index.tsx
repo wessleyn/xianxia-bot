@@ -9,6 +9,7 @@ import { NovelMetaData } from "@constants/types";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
+import { useNovelStore } from "@stores/novel";
 import { findNovelSource } from "@utils/sources/findNovelSource";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -17,22 +18,35 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 export default function NovelDetail() {
     const params = useLocalSearchParams<{ novelLink: string }>()
     const [novelMetadata, setNovelMetadata] = useState<NovelMetaData>()
+    const { setCurrentNovel } = useNovelStore()
     const [novelClassInstance, setNovelClassInstance] = useState<any>()
     const [sourceFound, setSourceFound] = useState(false)
     const novelLink = params.novelLink
 
     useEffect(() => {
+
+        const fetchData = async () => {
         try {
             const clas = findNovelSource(novelLink)
             const newInstance = new clas()
-            newInstance.getNovelMetaData(novelLink).then((data) => setNovelMetadata(data))
+            const data = await newInstance.getNovelMetaData(novelLink)
+            setCurrentNovel({
+                title: data.name,
+                author: data.author,
+                coverImage: data.cover,
+                novelLink: novelLink,
+                status: data.status,
+                chapters: data.chapters,
+            })
+            setNovelMetadata(data)
             setNovelClassInstance(newInstance)
             setSourceFound(true)
         } catch (e) {
             setSourceFound(false)
             console.error(e)
         }
-
+    }
+        fetchData()
     }, [])
 
     // console.log(novelMetadata)

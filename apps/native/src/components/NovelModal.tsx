@@ -9,6 +9,7 @@ import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { ReadNovel } from '../app/(tabs)/history';
+import { useNovelStore } from '../stores/novel';
 import { findNovelSource } from '../utils/sources/findNovelSource';
 import CustomLoading from './custom/CustomLoading';
 import CustomMovableModal from "./custom/CustomMovableModal";
@@ -43,8 +44,8 @@ interface Bookmark {
 
 const NovelModal = ({ novelLink }: { novelLink: string }) => {
     const [navigationTab, setNavigationTab] = useState<novelDetailTabType>('chapters');
+    const { lastReadChapterLink, setLastReadChapterLink } = useNovelStore();
     const [chapters, setChapters] = useState<Chapter[]>();
-    const [lastReadChapterLink, setLastReadChapterLink] = useState<string | null>(null);
 
     const [volumes, setVolumes] = useState<Volume[]>([
     ]);
@@ -70,8 +71,9 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
             );
             
             if (chapterHistory) {
-            setLastReadChapterLink(chapterHistory.lastReadChLink);
+                setLastReadChapterLink(chapterHistory.lastReadChLink);
             } else {
+                setLastReadChapterLink(null);
             }
         }
         checkReadingHistory();
@@ -107,6 +109,13 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
         setNavigationTab(tabKey);
     };
 
+    const hasChapters = chapters && chapters.length > 0;
+    const targetChapter =
+        lastReadChapterLink ??
+        (hasChapters ? chapters[0].link : null);
+
+    const isDisabled = !targetChapter; // disabled only if no chapters at all
+
     return (
         <CustomMovableModal
             position="bottom"
@@ -134,10 +143,10 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                             pathname: "/novel/[novelLink]/chapter/[chapterLink]",
                             params: {
                                 novelLink,
-                                chapterLink: lastReadChapterLink ? lastReadChapterLink : (chapters && chapters.length > 0 ? chapters[0].link : '')
+                                chapterLink:  lastReadChapterLink ?? (chapters && chapters.length > 0 ? chapters[0].link : '')
                             }
                         }}
-                        disabled={ !lastReadChapterLink && (chapters === undefined || (chapters && chapters.length === 0))}
+                        disabled={isDisabled}
                         asChild
                     >
                         <Text className="bg-gray-300 py-3 text-center px-10 rounded-3xl rounded-r-none">

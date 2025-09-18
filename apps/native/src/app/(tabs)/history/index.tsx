@@ -5,7 +5,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useHistoryStore } from '@stores/history';
 import { formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
@@ -67,8 +67,8 @@ const groupReadingsByDate = (readings: ReadNovel[]) => {
 
 export default function History() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [readNovels, setReadNovels] = useState<ReadNovel[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
+  const { readNovels } = useHistoryStore();
   const [loading, setLoading] = useState<boolean>(true);
 
   const toggleTag = (tag: string) => {
@@ -79,24 +79,30 @@ export default function History() {
 
   const isTagSelected = (tag: string) => selectedTags.includes(tag);
 
-  useEffect(() => {
-    const fetchReadNovels = async () => {
-      try {
-        const data = await AsyncStorage.getItem("readingHistory");
-        const parsedData: ReadNovel[] = data ? JSON.parse(data) : [];
-        // Sort novels by lastReadAt in descending order (latest first)
-        const sortedData = [...parsedData].sort((a, b) => 
-          new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime()
-        );
-        setReadNovels(sortedData);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
-    };
 
-    fetchReadNovels();
+  useEffect(() => {
+    useHistoryStore.getState().loadFromStorage();
+    setLoading(false);
   }, []);
+
+  // useEffect(() => {
+  //   const fetchReadNovels = async () => {
+  //     try {
+  //       const data = await AsyncStorage.getItem("readingHistory");
+  //       const parsedData: ReadNovel[] = data ? JSON.parse(data) : [];
+  //       // Sort novels by lastReadAt in descending order (latest first)
+  //       const sortedData = [...parsedData].sort((a, b) => 
+  //         new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime()
+  //       );
+  //       setReadNovels(sortedData);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchReadNovels();
+  // }, []);
 
   useEffect(() => {
     // Convert the ReadingHistory object to an array of ReadNovel objects
