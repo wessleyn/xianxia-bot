@@ -8,6 +8,7 @@ import { formatDistance } from 'date-fns';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { ReadNovel } from '../app/(tabs)/history';
 import { findNovelSource } from '../utils/sources/findNovelSource';
 import CustomLoading from './custom/CustomLoading';
 import CustomMovableModal from "./custom/CustomMovableModal";
@@ -43,6 +44,7 @@ interface Bookmark {
 const NovelModal = ({ novelLink }: { novelLink: string }) => {
     const [navigationTab, setNavigationTab] = useState<novelDetailTabType>('chapters');
     const [chapters, setChapters] = useState<Chapter[]>();
+    const [lastReadChapterLink, setLastReadChapterLink] = useState<string | null>(null);
 
     const [volumes, setVolumes] = useState<Volume[]>([
     ]);
@@ -58,6 +60,21 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
             }
         }
 
+        const checkReadingHistory = async () => {
+            const history = await AsyncStorage.getItem('readingHistory');
+            
+            const parsedHistory: ReadNovel[] = history ? JSON.parse(history) : [];
+            
+            const chapterHistory = parsedHistory.find(
+            (item) => item.novelLink === novelLink
+            );
+            
+            if (chapterHistory) {
+            setLastReadChapterLink(chapterHistory.lastReadChLink);
+            } else {
+            }
+        }
+        checkReadingHistory();
         checkLastOpenedTab();
     }, []);
 
@@ -112,7 +129,23 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                 </View>
 
                 <View className="flex-row gap-1">
-                    <Text className="bg-gray-300 py-3 text-center px-10 rounded-3xl rounded-r-none">Read</Text>
+                    <Link
+                        href={{
+                            pathname: "/novel/[novelLink]/chapter/[chapterLink]",
+                            params: {
+                                novelLink,
+                                chapterLink: lastReadChapterLink ? lastReadChapterLink : (chapters && chapters.length > 0 ? chapters[0].link : '')
+                            }
+                        }}
+                        disabled={ !lastReadChapterLink && (chapters === undefined || (chapters && chapters.length === 0))}
+                        asChild
+                    >
+                        <Text className="bg-gray-300 py-3 text-center px-10 rounded-3xl rounded-r-none">
+                            {
+                                lastReadChapterLink ? 'Continue' : 'Read'
+                            }
+                        </Text>
+                    </Link>
                     <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
                         <Octicons
                             name="chevron-down"
@@ -152,8 +185,8 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                                                 const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
                                                 return (
                                                     <Link asChild href={{
-                                                        pathname: '/chapter/[chapterLink]',
-                                                        params: { chapterLink: item.link }
+                                                        pathname: '/novel/[novelLink]/chapter/[chapterLink]',
+                                                        params: { chapterLink: item.link, novelLink }
                                                     }}
                                                         key={item.id}
                                                     >

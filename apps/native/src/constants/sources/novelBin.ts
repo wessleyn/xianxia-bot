@@ -13,7 +13,7 @@ const placeholderImage = 'https://a.a/a.png'
 export class NovelBin implements SourceDefinition {
     // Inbuilt Source Properties
     private name = "NovelBin";
-    private baseUrl = "https://www.novelbin.me/";
+    private baseUrl = "https://novelbin.me";
     private mainCategory = "Fantasy";
     private language = "English";
     private isRaw = false;
@@ -99,30 +99,39 @@ export class NovelBin implements SourceDefinition {
         }
     }
 
-    async getNovelImage(link?: string) {
+    getNovelImage(link?: string) {
+        // try {
+        //     if (!this.novelPage) {
+        //         this.novelPage = await this.fetchPage(link || this.novel.link, "force-cache");
+        //     }
+
+        //     const metaImage = this.novelPage.querySelector('meta[itemprop="image"]')?.getAttribute('content');
+        //     if (metaImage) {
+        //         return metaImage;
+        //     }
+
+        //     const bookImage = this.novelPage.querySelector('div.book img.lazy')?.getAttribute('src');
+        //     if (bookImage) {
+        //         return bookImage;
+        //     }
+
+        //     const anyImage = this.novelPage.querySelector('img.lazy[alt*="novel"]')?.getAttribute('src');
+        //     if (anyImage) {
+        //         return anyImage;
+        //     }
+
+        //     return placeholderImage;
+        // } catch (error) {
+        //     console.error("Error fetching novel image:", error);
+        //     return placeholderImage;
+        // }
+
         try {
-            if (!this.novelPage) {
-                this.novelPage = await this.fetchPage(link || this.novel.link, "force-cache");
-            }
-
-            const metaImage = this.novelPage.querySelector('meta[itemprop="image"]')?.getAttribute('content');
-            if (metaImage) {
-                return metaImage;
-            }
-
-            const bookImage = this.novelPage.querySelector('div.book img.lazy')?.getAttribute('src');
-            if (bookImage) {
-                return bookImage;
-            }
-
-            const anyImage = this.novelPage.querySelector('img.lazy[alt*="novel"]')?.getAttribute('src');
-            if (anyImage) {
-                return anyImage;
-            }
-
-            return placeholderImage;
+            const u = new URL(link ?? this.novel.link);
+            const novelId = u.pathname.split('/')[2];
+            const imageUrl = `${this.baseUrl}/media/novel/${novelId}.jpg`;
+            return imageUrl;
         } catch (error) {
-            console.error("Error fetching novel image:", error);
             return placeholderImage;
         }
     }
@@ -136,7 +145,7 @@ export class NovelBin implements SourceDefinition {
 
             // Extract metadata from the page
             const name = this.novelPage.querySelector('h3.title[itemprop="name"]')?.textContent?.trim() || '';
-            const cover = await this.getNovelImage()
+            const cover = await this.getNovelImage(link ?? this.novel.link);
 
             // Get genres
             const genreLinks = this.novelPage.querySelectorAll('.info-meta li:nth-child(2) a');
@@ -239,21 +248,20 @@ export class NovelBin implements SourceDefinition {
         }
     }
 
-    async getNovelChapters(link?: string, page: number = 1): Promise<{ title: string; link: string; }[]> {
+    async getNovelChapters(link?: string): Promise<{ title: string; link: string; }[]> {
         try {
-            // Extract novel ID from the link
             const novelUrl = new URL(link || this.novel.link);
             const pathSegments = novelUrl.pathname.split('/');
             const novelId = pathSegments[pathSegments.length - 1];
 
-            // Use the API endpoint to fetch all chapters at once
             const apiUrl = `https://novelbin.me/ajax/chapter-archive?novelId=${novelId}`;
 
             const response = await fetch(apiUrl, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Referer': this.baseUrl
-                }
+                },
+                cache: 'force-cache'
             });
 
             if (!response.ok) {

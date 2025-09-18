@@ -2,7 +2,7 @@ import CustomView from "@components/custom/CustomView";
 import RandomNovel from "@components/reusable/RandomNovel";
 import SourceImage from "@components/reusable/SourceImage";
 import { MaterialIcons } from '@expo/vector-icons';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link } from "expo-router";
 
@@ -38,7 +38,7 @@ export default function Explore() {
         <View className="flex-row mb-4">
           <Link href={'/local'} push asChild>
             <Pressable className="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm">
-              <AntDesign name="folder1" size={24} color="#4b5563" />
+              <FontAwesome5 name="folder" size={24} color="#4b5563" />
               <Text className="font-medium">Local Storage</Text>
             </Pressable>
           </Link>

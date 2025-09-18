@@ -5,10 +5,11 @@ interface NovelImageProps {
     image: string;
     name?: string;
     size?: number;
+    sizingMode?: 'cover' | 'contain';
     className?: string;
 }
 
-export default function NovelImage({ image, size = 128, className }: NovelImageProps) {
+export default function NovelImage({ image, size = 128, className, sizingMode = 'cover' }: NovelImageProps) {
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(false);
     const blinkAnim = useRef(new Animated.Value(0)).current;
@@ -24,7 +25,6 @@ export default function NovelImage({ image, size = 128, className }: NovelImageP
     // Set up blink animation
     useEffect(() => {
         if (!loaded && !error) {
-            // Simple blinking animation
             Animated.loop(
                 Animated.sequence([
                     Animated.timing(blinkAnim, {
@@ -56,25 +56,24 @@ export default function NovelImage({ image, size = 128, className }: NovelImageP
     };
 
     return (
-        <View style={[imageSize, { borderRadius: 0, overflow: 'hidden' }]} className="relative">
+        <View style={[imageSize, { overflow: 'hidden' }]} className="relative rounded-[20%]">
             {/* Blinking Skeleton */}
             {(!loaded || error) && (
                 <Animated.View
                     style={[imageSize, skeletonStyle]}
-                    className="rounded-lg"
+                    className="rounded-[20%]"
                 />
             )}
 
-            {/* Actual Image */}
             {!error && (
                 <Image
                     source={{ uri: image }}
                     style={[imageSize, {
                         position: loaded ? 'relative' : 'absolute',
-                        resizeMode: 'contain',
-                        borderRadius: 50,
+                        resizeMode: sizingMode,
+                        borderRadius: 20,
                     }]}
-                    className={`rounded-lg ${className}`}
+                    className={`w-full ${className}`}
                     onLoad={handleImageLoad}
                     onError={handleImageError}
                 />

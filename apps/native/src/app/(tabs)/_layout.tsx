@@ -1,11 +1,10 @@
 import HeaderBar from '@components/HeaderBar';
 import initializeDatabase from '@constants/database';
+import { bottomNavTabs } from '@constants/tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Tabs } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
-import { bottomNavTabs } from '../../constants/tabs';
-
 
 export default function TabLayout() {
 

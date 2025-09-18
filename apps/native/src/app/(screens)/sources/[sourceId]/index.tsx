@@ -5,6 +5,7 @@ import GenreFiltersCarousel from "@components/novelSource/GenreFiltersCarousel";
 import GenreFiltersModal from "@components/novelSource/GenreFiltersModal";
 import AnimatedSearchInput from "@components/reusable/AnimatedSearchInput";
 import BackButton from "@components/reusable/BackButton";
+import NovelImage from "@components/reusable/NovelImage";
 import RandomNovel from "@components/reusable/RandomNovel";
 import { FILTER_OPTIONS } from "@constants/constants";
 import sources from "@constants/sources";
@@ -14,7 +15,7 @@ import { getSupportedFilters } from "@utils/supportedFilter";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { FlatList, Image, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 
 
 const NovelItem = memo(({ novel, selectedFilter }: { novel: Novel, selectedFilter: FilterOption }) => (
@@ -27,7 +28,7 @@ const NovelItem = memo(({ novel, selectedFilter }: { novel: Novel, selectedFilte
         }
     } asChild>
         <Pressable className="flex-row items-center gap-4 p-4 border-b border-gray-200">
-            <Image source={{ uri: novel.image }} className="w-16 h-24 rounded-lg" />
+            <NovelImage image={novel.image} size={120} sizingMode="cover"  />
             <View className="flex-1">
                 <Text className="text-lg font-semibold">{novel.title}</Text>
                 <View className="flex-row gap-2">
