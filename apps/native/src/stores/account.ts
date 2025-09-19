@@ -1,5 +1,5 @@
-import { supabase } from '@utils/supabase'
 import { Session, User } from '@supabase/supabase-js'
+import { supabase } from '@utils/supabase'
 import { create } from 'zustand'
 
 type AccountStore = {
