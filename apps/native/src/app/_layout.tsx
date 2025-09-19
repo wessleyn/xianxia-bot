@@ -1,11 +1,14 @@
-import { supabase } from '@constants/supabase';
 import { useAccountStore } from '@stores/account';
 import '@styles/global.css';
-import { Slot } from "expo-router";
+import { supabase } from '@utils/supabase';
+import { Stack } from "expo-router";
+import { SQLiteProvider } from 'expo-sqlite';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import 'react-native-url-polyfill/auto';
 
-const AppLayout = () => {
+const RootLayout = () => {
   const { setSession } = useAccountStore();
 
   useEffect(() => {
@@ -14,7 +17,6 @@ const AppLayout = () => {
       setSession(session);
     });
 
-    // Check current session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -25,8 +27,21 @@ const AppLayout = () => {
   }, []);
 
   return (
-    <Slot />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SQLiteProvider databaseName='xianxu.db'>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name='(tabs)' />
+          <Stack.Screen name='(screens)' />
+
+        </Stack>
+        <Toast />
+      </SQLiteProvider>
+    </GestureHandlerRootView>
   )
 }
 
-export default AppLayout
+export default RootLayout

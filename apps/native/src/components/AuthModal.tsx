@@ -1,8 +1,9 @@
-import { Alert, Button, Text, TextInput, View } from 'react-native';
+import { Button, Text, TextInput, View } from 'react-native';
 
-import { supabase } from '@constants/supabase';
+import { useAccountStore } from '@stores/account';
+import { supabase } from '@utils/supabase';
 import React, { useState } from 'react';
-import { useAccountStore } from '../stores/account';
+import Toast from 'react-native-toast-message';
 import CustomModal from './custom/CustomModal';
 
 const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
@@ -34,9 +35,14 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                 setError(error.message);
                 console.log('Error sending OTP:', error.message);
             } else {
-                console.log('OTP sent to email:', email);
                 setOtpSent(true);
-                Alert.alert('Success', `OTP sent to ${email}. Please check your email.`);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: `OTP sent to ${email}. Please check your email.`,
+                    position: 'top',
+                    visibilityTime: 2000,
+                });
             }
         } catch (e) {
             console.error('Unexpected error:', e);
@@ -66,11 +72,16 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                 setError(error.message);
                 console.log('Error verifying OTP:', error.message);
             } else {
-                console.log('OTP verified, user logged in:', data.user);
                 setSession(data.session);
                 resetAuth()
                 toggleModal();
-                Alert.alert('Success', 'You have successfully logged in!');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: 'You have successfully logged in!',
+                    position: 'top',
+                    visibilityTime: 2000,
+                });
             }
         } catch (e) {
             console.error('Unexpected error:', e);
@@ -91,9 +102,11 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
             visible={showModal}
             onRequestClose={toggleModal}
             animationType="slide"
-            transparent={true}
             className="px-4 py-8 "
             position="bottom"
+            transparent
+            blur
+            bar
         >
             <View className='px-6 w-full'>
                 <Text className="text-2xl font-bold mb-6 text-center">

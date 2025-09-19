@@ -1,14 +1,22 @@
-
 model UserSettings {
-    userId String @id
-    user UserProfile @relation(fields: [userId], references: [id])
+    userId String      @id @db.Uuid
+    user   UserProfile @relation(fields: [userId], references: [id])
 
-    darkMode Boolean @default(false)
-    language String @default("en")
-    autoSync Boolean @default(true)
+    theme       Theme   @default(system)
+    language    String  @default("en")
+    autoSync    Boolean @default(true)
+    autoUpdates Boolean @default(true)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@schema("public")
+}
+
+enum Theme {
+    dark
+    light
+    system
 
     @@schema("public")
 }
