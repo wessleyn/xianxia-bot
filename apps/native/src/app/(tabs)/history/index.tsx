@@ -197,13 +197,16 @@ export default function History() {
             >
               <TouchableOpacity className="mb-4">
                 <View className="flex-row gap-4 ">
-                  <View className="w-max">
+                  <View className="w-max relative">
 
                     <NovelImage
                       image={item.coverImage ?? 'https://a.a/a.png'}
                       className="w-full"
                       size={100}
                     />
+                    <Text className="absolute top-1 right-1 bg-blue-500 p-2 border-2 border-gray-800 rounded-full">
+                      {`${item.progress}%`}
+                    </Text>
                   </View>
                   <View className="-mt-1 w-[70%]">
                     <Text className="text-xl">{item.title}</Text>
