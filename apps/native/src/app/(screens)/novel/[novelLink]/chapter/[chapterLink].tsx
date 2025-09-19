@@ -33,39 +33,57 @@ export default function Chapter() {
 
     useEffect(() => {
         const loadChapter = async () => {
-            const source = findNovelSource(params.chapterLink!);
-            if (!source) throw new Error("Source not found or unsupported.");
+            console.log(`Loading chapter: ${params.chapterLink}, novel: ${params.novelLink}`);
+            try {
+                const source = findNovelSource(params.chapterLink!);
+                if (!source) {
+                    console.error("Source not found or unsupported for:", params.chapterLink);
+                    throw new Error("Source not found or unsupported.");
+                }
+                console.log("Source found:", source.name);
 
-            const instance = new source();
-            const chapterData = await instance.getNovelChapterContent(params.chapterLink!);
-            const coverImage = currentNovel?.coverImage ?? instance.getNovelImage(params.novelLink!)
+                const instance = new source();
+                console.log("Fetching chapter content...");
+                const chapterData = await instance.getNovelChapterContent(params.chapterLink!);
+                console.log("Chapter content fetched:", chapterData.title);
+                
+                const coverImage = currentNovel?.coverImage ?? instance.getNovelImage(params.novelLink!);
+                console.log("Cover image:", coverImage);
 
-            setSourceInstance(instance)
-            setNovelImage(coverImage);
-            setChapterContent(chapterData);
+                setSourceInstance(instance);
+                setNovelImage(coverImage);
+                setChapterContent(chapterData);
 
-            const existing = readNovels.find(n => n.novelLink === params.novelLink);
-            if (existing) {
-                if (existing.lastReadChLink === params.chapterLink) {
-                    setReadingProgress(existing.progress);
+                const existing = readNovels.find(n => n.novelLink === params.novelLink);
+                console.log("Existing novel in history:", existing ? "Yes" : "No");
+                
+                if (existing) {
+                    if (existing.lastReadChLink === params.chapterLink) {
+                        console.log("Resuming reading at progress:", existing.progress);
+                        setReadingProgress(existing.progress);
+                    } else {
+                        console.log("Updating history with new chapter");
+                        upsertNovel({
+                            novelLink: params.novelLink!,
+                            lastReadChLink: params.chapterLink!,
+                            lastReadChTitle: chapterData.title,
+                            progress: readingProgress,
+                        });
+                    }
                 } else {
+                    console.log("Adding new novel to reading history");
                     upsertNovel({
                         novelLink: params.novelLink!,
                         lastReadChLink: params.chapterLink!,
-                        lastReadChTitle: chapterData.title,
+                        lastReadChTitle: chapterData.title ?? "Unknown Title",
+                        title: currentNovel?.title ?? "Unknown Title",
+                        author: currentNovel?.author ?? "Unknown Author",
+                        coverImage: coverImage,
                         progress: readingProgress,
                     });
                 }
-            } else {
-                upsertNovel({
-                    novelLink: params.novelLink!,
-                    lastReadChLink: params.chapterLink!,
-                    lastReadChTitle: chapterData.title ?? "Unknown Title",
-                    title: currentNovel?.title ?? "Unknown Title",
-                    author: currentNovel?.author ?? "Unknown Author",
-                    coverImage: coverImage,
-                    progress: readingProgress,
-                });
+            } catch (error) {
+                console.error("Error loading chapter:", error);
             }
         };
 

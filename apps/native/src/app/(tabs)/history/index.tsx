@@ -24,24 +24,21 @@ const formatSectionDate = (dateString: string) => {
   return formatDistanceToNow(date, { addSuffix: true });
 };
 
-// Group readings by date
 const groupReadingsByDate = (readings: ReadNovel[]) => {
-  // If no readings, return empty array
   if (!readings.length) return [];
 
   const groups: { [key: string]: ReadNovel[] } = {};
 
   readings.forEach(novel => {
-    const date = novel.lastReadAt!.split('T')[0]; // Get just the date part
+    const date = novel.lastReadAt!.split('T')[0];
     if (!groups[date]) {
       groups[date] = [];
     }
     groups[date].push(novel);
   });
 
-  // Convert to SectionList format
   return Object.keys(groups)
-    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) // Sort newest first
+    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
     .map(date => ({
       title: formatSectionDate(date),
       data: groups[date]
@@ -55,7 +52,6 @@ export default function History() {
   const { readNovels } = useHistoryStore();
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Filter counts to display on filter buttons
   const [filterCounts, setFilterCounts] = useState({
     device: 0,
     library: 0,
@@ -86,7 +82,6 @@ export default function History() {
   };
 
   useEffect(() => {
-    // Load history from storage and calculate initial filter counts
     const initialize = async () => {
       await useHistoryStore.getState().loadFromStorage();
       setLoading(false);
@@ -126,11 +121,9 @@ export default function History() {
   };
 
   useEffect(() => {
-    // Apply filters and group the results
     const filteredData = applyFilters(readNovels);
     setSections(groupReadingsByDate(filteredData));
 
-    // Update filter counts
     setFilterCounts(calculateFilterCounts(readNovels));
   }, [readNovels, selectedTags]);
 
@@ -238,7 +231,7 @@ export default function History() {
                     </Text>
                   </View>
                   <View className="-mt-1 w-[70%]">
-                    <Text className="text-xl">{item.title}</Text>
+                    <Text className="text-lg">{item.title}</Text>
                     <Text numberOfLines={1}>{item.author}</Text>
                     <Text className="text-gray-600 text-sm mt-2" numberOfLines={1}>
 

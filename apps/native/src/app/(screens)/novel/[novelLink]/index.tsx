@@ -54,14 +54,14 @@ export default function NovelDetail() {
     }, [])
 
     useEffect(() => {
-        if (novelLink) {
+        if (novelLink && novelMetadata) {
             upsertNovel({
                 novelLink: novelLink,
                 isInLibrary: isInLibrary,
                 isLiked: isLiked,
-                title: novelMetadata?.name || "Unknown Title",
-                author: novelMetadata?.author || "Unknown Author",
-                coverImage: novelMetadata?.cover
+                title: novelMetadata.name,
+                author: novelMetadata.author,
+                coverImage: novelMetadata.cover
             });
         }
     }, [isInLibrary, isLiked])

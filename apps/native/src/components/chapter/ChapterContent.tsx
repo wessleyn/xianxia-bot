@@ -107,9 +107,11 @@ const ChapterContent = ({
                     }}
                 >
                     <Pressable onPress={onPressContent}>
-                        <Text className="font-bold text-lg  mt-2">{chapterContent.title}</Text>
+                        <Text className="font-bold text-lg mt-2" style={{ fontFamily: 'Verdana-Bold' }}>
+                            {chapterContent.title}
+                        </Text>
                         {chapterContent.content.map((item, index) => (
-                            <Text key={index} className="mb-4">
+                            <Text key={index} className="mb-4" style={{ fontFamily: 'Verdana' }}>
                                 {item}
                             </Text>
                         ))}

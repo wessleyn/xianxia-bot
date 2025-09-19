@@ -14,7 +14,6 @@ import { findNovelSource } from '../utils/sources/findNovelSource';
 import CustomLoading from './custom/CustomLoading';
 import CustomMovableModal from "./custom/CustomMovableModal";
 
-// Data type definitions
 interface Chapter {
     id: string;
     number: number;
@@ -80,7 +79,6 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
         checkLastOpenedTab();
     }, []);
 
-    // Persist Navigation Tab in AsyncStorage whenever it changes
     useEffect(() => {
         AsyncStorage.setItem('lastOpenedTab', navigationTab);
     }, [navigationTab]);
