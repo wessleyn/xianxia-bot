@@ -27,7 +27,8 @@ const ChapterContent = ({
     const isMomentumScrollingRef = useRef<boolean>(false);
 
     const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        if (!contentHeight || !scrollViewHeight || isRestoring) return;
+        if (!contentHeight || !scrollViewHeight) return;
+        if (isRestoring || isMomentumScrollingRef.current) return; // <- suppress twitch
 
         const scrollY = event.nativeEvent.contentOffset.y;
         const maxScrollPosition = contentHeight - scrollViewHeight;
@@ -35,11 +36,13 @@ const ChapterContent = ({
         if (maxScrollPosition <= 0) return;
 
         const progress = Math.min(Math.max(scrollY / maxScrollPosition, 0), 1);
+        const newProgress = progress * 100;
 
-        if (Math.abs((progress * 100) - readingProgress) > 0.5) {
-            setReadingProgress(progress * 100);
+        // Only update if it changed significantly
+        if (Math.abs(newProgress - readingProgress) > 0.5) {
+            setReadingProgress(newProgress);
         }
-    }, [contentHeight, scrollViewHeight, isRestoring, setReadingProgress, readingProgress]);
+    }, [contentHeight, scrollViewHeight, isRestoring, readingProgress, setReadingProgress]);
 
     const handleSliderChange = useCallback((value: number) => {
         if (!scrollViewRef.current || !contentHeight || !scrollViewHeight) return;
@@ -47,18 +50,19 @@ const ChapterContent = ({
         const maxScrollPosition = contentHeight - scrollViewHeight;
         const targetScrollPosition = value * maxScrollPosition;
 
-        setIsRestoring(true);
+        setIsRestoring(true); // lock
 
         setReadingProgress(value * 100);
 
         scrollViewRef.current.scrollTo({
             y: targetScrollPosition,
-            animated: true
+            animated: false // <- disable animation, prevents twitching
         });
 
+        // unlock after a short delay
         setTimeout(() => {
             setIsRestoring(false);
-        }, 500);
+        }, 100);
     }, [contentHeight, scrollViewHeight, setReadingProgress]);
 
     useEffect(() => {

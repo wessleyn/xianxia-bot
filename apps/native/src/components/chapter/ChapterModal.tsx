@@ -58,7 +58,7 @@ const ChapterModal = ({
                     <Slider
                         style={{ width: 300, height: 10 }}
                         value={readingProgress / 100} // Convert percentage back to 0-1 range for slider
-                        onValueChange={handleSliderChange}
+                        onSlidingComplete={handleSliderChange} // <- prevents feedback while dragging
                         minimumValue={0}
                         maximumValue={1}
                         minimumTrackTintColor="#581c87"
