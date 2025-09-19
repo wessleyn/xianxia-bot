@@ -9,6 +9,7 @@ import { NovelMetaData } from "@constants/types";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
+import { useHistoryStore } from "@stores/history";
 import { useNovelStore } from "@stores/novel";
 import { findNovelSource } from "@utils/sources/findNovelSource";
 import { useLocalSearchParams } from "expo-router";
@@ -19,35 +20,51 @@ export default function NovelDetail() {
     const params = useLocalSearchParams<{ novelLink: string }>()
     const [novelMetadata, setNovelMetadata] = useState<NovelMetaData>()
     const { setCurrentNovel } = useNovelStore()
-    const [novelClassInstance, setNovelClassInstance] = useState<any>()
+    const { readNovels, upsertNovel } = useHistoryStore()
     const [sourceFound, setSourceFound] = useState(false)
     const novelLink = params.novelLink
 
-    useEffect(() => {
+    // Get liked and library status from history store
+    const novelInHistory = readNovels.find(n => n.novelLink === novelLink)
+    const [isInLibrary, setIsInLibrary] = useState(novelInHistory?.isInLibrary || false)
+    const [isLiked, setIsLiked] = useState(novelInHistory?.isLiked || false)
 
+    useEffect(() => {
         const fetchData = async () => {
-        try {
-            const clas = findNovelSource(novelLink)
-            const newInstance = new clas()
-            const data = await newInstance.getNovelMetaData(novelLink)
-            setCurrentNovel({
-                title: data.name,
-                author: data.author,
-                coverImage: data.cover,
-                novelLink: novelLink,
-                status: data.status,
-                chapters: data.chapters,
-            })
-            setNovelMetadata(data)
-            setNovelClassInstance(newInstance)
-            setSourceFound(true)
-        } catch (e) {
-            setSourceFound(false)
-            console.error(e)
+            try {
+                const clas = findNovelSource(novelLink)
+                const newInstance = new clas()
+                const data = await newInstance.getNovelMetaData(novelLink)
+                setCurrentNovel({
+                    title: data.name,
+                    author: data.author,
+                    coverImage: data.cover,
+                    novelLink: novelLink,
+                    status: data.status,
+                    chapters: data.chapters,
+                })
+                setNovelMetadata(data)
+                setSourceFound(true)
+            } catch (e) {
+                setSourceFound(false)
+                console.error(e)
+            }
         }
-    }
         fetchData()
     }, [])
+
+    useEffect(() => {
+        if (novelLink) {
+            upsertNovel({
+                novelLink: novelLink,
+                isInLibrary: isInLibrary,
+                isLiked: isLiked,
+                title: novelMetadata?.name || "Unknown Title",
+                author: novelMetadata?.author || "Unknown Author",
+                coverImage: novelMetadata?.cover
+            });
+        }
+    }, [isInLibrary, isLiked])
 
     // console.log(novelMetadata)
     if (!novelMetadata) return <CustomLoading position="center" />
@@ -63,8 +80,8 @@ export default function NovelDetail() {
                     <Pressable>
                         <Octicons name="share-android" size={24} color="#4b5563" />
                     </Pressable>
-                    <Pressable>
-                        <Octicons name="heart" size={24} color="#4b5563" />
+                    <Pressable onPress={() => setIsLiked(!isLiked)}>
+                        <Octicons name={isLiked ? "heart-fill" : "heart"} size={24} color="#4b5563" />
                     </Pressable>
                     <Pressable>
                         <MaterialCommunityIcons name="download-outline" size={30} color="#4b5563" />
@@ -81,10 +98,19 @@ export default function NovelDetail() {
                 </View>
                 <View className="flex gap-8 w-4/6">
                     <Text className="text-lg w-3/4">{novelMetadata.name}</Text>
-                    <View className="flex-row items-center p-2 border-2 border-gray-400 rounded-xl w-9/12">
-                        <Ionicons name="library-outline" size={24} color="#4b5563" />
-                        <Text className="text-gray-600"> Add to Library</Text>
-                    </View>
+                    <Pressable
+                        onPress={() => setIsInLibrary(!isInLibrary)}
+                        className={`flex-row items-center p-2 border-2 ${isInLibrary ? 'bg-gray-300 border-gray-500' : 'border-gray-400'} rounded-xl w-9/12`}
+                    >
+                        <Ionicons
+                            name={isInLibrary ? "library" : "library-outline"}
+                            size={24}
+                            color="#4b5563"
+                        />
+                        <Text className="text-gray-600">
+                            {isInLibrary ? " In Library" : " Add to Library"}
+                        </Text>
+                    </Pressable>
                 </View>
             </View>
 

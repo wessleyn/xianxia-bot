@@ -4,13 +4,16 @@ import { create } from 'zustand';
 export interface ReadNovel {
     id: string;
     novelLink: string;
-    lastReadChLink: string;
-    lastReadChTitle: string;
+    isLiked: boolean;
+    isInLibrary: boolean;
+    lastReadAt?: string;
+    lastReadChLink?: string;
+    lastReadChTitle?: string;
     progress: number; // 0-100
+
     title: string;
     author: string;
     coverImage?: string;
-    lastReadAt: string;
 }
 
 interface HistoryStore {
@@ -44,6 +47,8 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
                 {
                     id: novel.novelLink,
                     lastReadChLink: novel.lastReadChLink ?? "",
+                    isInLibrary: novel.isInLibrary ?? false,
+                    isLiked: novel.isLiked ?? false,
                     lastReadChTitle: novel.lastReadChTitle ?? "Unknown Title",
                     progress: novel.progress ?? 0,
                     title: novel.title ?? "Unknown Title",
@@ -56,7 +61,11 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
         }
 
         updated.sort(
-            (a, b) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime()
+            (a, b) => {
+                const dateA = a.lastReadAt ? new Date(a.lastReadAt).getTime() : 0;
+                const dateB = b.lastReadAt ? new Date(b.lastReadAt).getTime() : 0;
+                return dateB - dateA;
+            }
         );
 
         set({ readNovels: updated });
@@ -68,7 +77,11 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
         const parsed: ReadNovel[] = data ? JSON.parse(data) : [];
 
         parsed.sort(
-            (a, b) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime()
+            (a, b) => {
+                const dateA = a.lastReadAt ? new Date(a.lastReadAt).getTime() : 0;
+                const dateB = b.lastReadAt ? new Date(b.lastReadAt).getTime() : 0;
+                return dateB - dateA;
+            }
         );
 
         set({ readNovels: parsed });

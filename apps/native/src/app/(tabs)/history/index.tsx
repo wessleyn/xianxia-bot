@@ -5,27 +5,11 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
-import { useHistoryStore } from '@stores/history';
+import { ReadNovel, useHistoryStore } from '@stores/history';
 import { formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
-
-
-export interface ReadNovel {
-  id: string;
-
-  lastReadChLink: string;
-  lastReadChTitle: string;
-  progress: number; // percentage of chapter read (0-100)
-
-  novelLink: string;
-
-  title: string;
-  author: string;
-  coverImage?: string;
-  lastReadAt: string;
-}
 
 
 interface Section {
@@ -48,7 +32,7 @@ const groupReadingsByDate = (readings: ReadNovel[]) => {
   const groups: { [key: string]: ReadNovel[] } = {};
 
   readings.forEach(novel => {
-    const date = novel.lastReadAt.split('T')[0]; // Get just the date part
+    const date = novel.lastReadAt!.split('T')[0]; // Get just the date part
     if (!groups[date]) {
       groups[date] = [];
     }
@@ -71,6 +55,15 @@ export default function History() {
   const { readNovels } = useHistoryStore();
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Filter counts to display on filter buttons
+  const [filterCounts, setFilterCounts] = useState({
+    device: 0,
+    library: 0,
+    'new-chapters': 0,
+    completed: 0,
+    favorites: 0,
+  });
+
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
@@ -80,35 +73,66 @@ export default function History() {
   const isTagSelected = (tag: string) => selectedTags.includes(tag);
 
 
+  const calculateFilterCounts = (novels: ReadNovel[]) => {
+    const validNovels = novels.filter(n => n.lastReadAt !== undefined);
+
+    return {
+      device:0 , 
+      library: validNovels.filter(n => n.isInLibrary === true).length,
+      'new-chapters':0,
+      completed: 0,
+      favorites: validNovels.filter(n => n.isLiked === true).length,
+    };
+  };
+
   useEffect(() => {
-    useHistoryStore.getState().loadFromStorage();
-    setLoading(false);
+    // Load history from storage and calculate initial filter counts
+    const initialize = async () => {
+      await useHistoryStore.getState().loadFromStorage();
+      setLoading(false);
+    };
+
+    initialize();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchReadNovels = async () => {
-  //     try {
-  //       const data = await AsyncStorage.getItem("readingHistory");
-  //       const parsedData: ReadNovel[] = data ? JSON.parse(data) : [];
-  //       // Sort novels by lastReadAt in descending order (latest first)
-  //       const sortedData = [...parsedData].sort((a, b) => 
-  //         new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime()
-  //       );
-  //       setReadNovels(sortedData);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       setLoading(false);
-  //     }
-  //   };
 
-  //   fetchReadNovels();
-  // }, []);
+  const applyFilters = (novels: ReadNovel[]) => {
+    let filteredNovels = novels.filter(n => n.lastReadAt !== undefined);
+
+    if (selectedTags.length === 0) {
+      return filteredNovels;
+    }
+
+    return filteredNovels.filter(novel => {
+      return selectedTags.some(tag => {
+        switch (tag) {
+          case 'device':
+            return false;
+          case 'library':
+            return novel.isInLibrary === true;
+          case 'new-chapters':
+            // TODO: check against the actual novel data
+            return false;
+          case 'completed':
+            // TODO: check against the actual novel data
+            return false;
+          case 'favorites':
+            return novel.isLiked === true;
+          default:
+            return false;
+        }
+      });
+    });
+  };
 
   useEffect(() => {
-    // Convert the ReadingHistory object to an array of ReadNovel objects
-    const novelsArray = Object.values(readNovels);
-    setSections(groupReadingsByDate(novelsArray));
-  }, [readNovels]);
+    // Apply filters and group the results
+    const filteredData = applyFilters(readNovels);
+    setSections(groupReadingsByDate(filteredData));
+
+    // Update filter counts
+    setFilterCounts(calculateFilterCounts(readNovels));
+  }, [readNovels, selectedTags]);
 
   return (
     <CustomView className="px-5">
@@ -125,7 +149,7 @@ export default function History() {
               ) : (
                 <FontAwesome5 name="folder" size={20} color="#6b7280" />
               )}
-              <Text>On Device</Text>
+              <Text>On Device ({filterCounts.device})</Text>
             </Pressable>
             <Pressable
               className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('library') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
@@ -136,7 +160,7 @@ export default function History() {
               ) : (
                 <MaterialIcons name="library-books" size={20} color="#6b7280" />
               )}
-              <Text>Library</Text>
+              <Text>Library ({filterCounts.library})</Text>
             </Pressable>
             <Pressable
               className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('new-chapters') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
@@ -147,7 +171,7 @@ export default function History() {
               ) : (
                 <MaterialCommunityIcons name="timer-sync-outline" size={20} color="#6b7280" />
               )}
-              <Text>New Chapters</Text>
+              <Text>New Chapters ({filterCounts['new-chapters']})</Text>
             </Pressable>
             <Pressable
               className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('completed') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
@@ -158,7 +182,7 @@ export default function History() {
               ) : (
                 <Ionicons name="checkmark-done-outline" size={20} color="#6b7280" />
               )}
-              <Text>Completed</Text>
+              <Text>Completed ({filterCounts.completed})</Text>
             </Pressable>
             <Pressable
               className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('favorites') ? 'bg-gray-300 border-gray-300' : 'border-gray-400 bg-none'}`}
@@ -169,7 +193,7 @@ export default function History() {
               ) : (
                 <Octicons name="heart" size={20} color="#6b7280" />
               )}
-              <Text>Favourites</Text>
+              <Text>Favorites ({filterCounts.favorites})</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -186,13 +210,18 @@ export default function History() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }: { item: ReadNovel }) => (
             <Link
-              href={{
-                pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
-                params: {
-                  novelLink: item.novelLink,
-                  chapterLink: item.lastReadChLink
+              href={
+                item.lastReadChLink ? {
+                  pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
+                  params: {
+                    novelLink: item.novelLink,
+                    chapterLink: item.lastReadChLink
+                  }
+                } : {
+                  pathname: '/(screens)/novel/[novelLink]',
+                  params: { novelLink: item.novelLink }
                 }
-              }}
+              }
               asChild
             >
               <TouchableOpacity className="mb-4">
@@ -212,7 +241,13 @@ export default function History() {
                     <Text className="text-xl">{item.title}</Text>
                     <Text numberOfLines={1}>{item.author}</Text>
                     <Text className="text-gray-600 text-sm mt-2" numberOfLines={1}>
-                      Chapter {item.lastReadChLink.split('-').pop()}: {item.lastReadChTitle}
+
+                      {
+                        item.lastReadChTitle?.includes("Unknown Title")
+                          ? "Start Reading"
+                          : `Chapter ${item.lastReadChLink!.split('-').pop()}: ${item.lastReadChTitle}`
+                      }
+
                     </Text>
                   </View>
                 </View>

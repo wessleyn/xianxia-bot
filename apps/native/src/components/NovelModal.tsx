@@ -8,7 +8,7 @@ import { formatDistance } from 'date-fns';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { ReadNovel } from '../app/(tabs)/history';
+import { ReadNovel } from '../stores/history';
 import { useNovelStore } from '../stores/novel';
 import { findNovelSource } from '../utils/sources/findNovelSource';
 import CustomLoading from './custom/CustomLoading';
@@ -70,7 +70,7 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
             (item) => item.novelLink === novelLink
             );
             
-            if (chapterHistory) {
+            if (chapterHistory && chapterHistory.lastReadChLink) {
                 setLastReadChapterLink(chapterHistory.lastReadChLink);
             } else {
                 setLastReadChapterLink(null);

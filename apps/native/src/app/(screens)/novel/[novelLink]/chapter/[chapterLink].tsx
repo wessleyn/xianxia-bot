@@ -6,7 +6,6 @@ import CustomLoading from "@components/custom/CustomLoading";
 import { ChapterContent, SourceDefinition } from "@constants/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useHistoryStore } from '@stores/history';
 import { useNovelStore } from "@stores/novel";
 import { findNovelSource } from "@utils/sources/findNovelSource";
@@ -21,8 +20,6 @@ export default function Chapter() {
     const [sourceInstance, setSourceInstance] = useState<SourceDefinition | null>(null);
     const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
     const [isFetchingChapter, setIsFetchingChapter] = useState(false);
-    const [isInLib, setIsInLib] = useState(false);
-
     const [novelImage, setNovelImage] = useState("");
     const [showModal, setShowModal] = useState(false);
 
@@ -30,16 +27,11 @@ export default function Chapter() {
     const { readNovels, upsertNovel } = useHistoryStore();
     const { setLastReadChapterLink, currentNovel } = useNovelStore()
 
+    const [isInLib, setIsInLib] = useState(readNovels.find(n => n.novelLink === params.novelLink)?.isInLibrary || false);
+
     const sliderHandlerRef = useRef<(value: number) => void>(() => { });
 
     useEffect(() => {
-
-        const fetchLibStatus = async () => {
-            const library = await AsyncStorage.getItem("library");
-            const parsedLibrary: string[] = library ? JSON.parse(library) : [];
-            setIsInLib(parsedLibrary.includes(params.novelLink!));
-        }
-
         const loadChapter = async () => {
             const source = findNovelSource(params.chapterLink!);
             if (!source) throw new Error("Source not found or unsupported.");
@@ -78,7 +70,6 @@ export default function Chapter() {
         };
 
         loadChapter();
-        fetchLibStatus();
     }, []);
 
     useEffect(() => {
@@ -93,17 +84,13 @@ export default function Chapter() {
     }, [readingProgress, chapterContent]);
 
     useEffect(() => {
-        const upsertLibrary = async () => {
-            const library = await AsyncStorage.getItem("library");
-            const parsedLibrary: string[] = library ? JSON.parse(library) : [];
-            await AsyncStorage.setItem("library",
-                JSON.stringify(
-                    isInLib ? [...parsedLibrary, params.novelLink]
-                        : parsedLibrary.filter(link => link !== params.novelLink)
-                ));
-        };
-        upsertLibrary();
-    }, [isInLib]);
+        if (params.novelLink) {
+            upsertNovel({
+                novelLink: params.novelLink!,
+                isInLibrary: isInLib
+            });
+        }
+    }, [isInLib, params.novelLink]);
 
 
     const handleSliderChange = useCallback((value: number) => {
