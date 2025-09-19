@@ -205,7 +205,7 @@ export default function History() {
                       size={100}
                     />
                     <Text className="absolute top-1 right-1 bg-blue-500 p-2 border-2 border-gray-800 rounded-full">
-                      {`${item.progress}%`}
+                      {`${Math.floor(item.progress)}%`}
                     </Text>
                   </View>
                   <View className="-mt-1 w-[70%]">

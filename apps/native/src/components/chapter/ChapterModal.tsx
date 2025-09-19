@@ -10,9 +10,11 @@ type ChapterModalProps = {
     visible: boolean;
     onRequestClose: () => void;
     readingProgress: number;
-    chapterContent: any; // Replace with your chapter content type
+    chapterContent: any
     params: { novelLink: string; chapterLink: string };
     handleSliderChange: (value: number) => void;
+    handleNextChapter: () => void
+    handlePrevChapter: () => void
     novelImage: string;
 }
 
@@ -23,6 +25,8 @@ const ChapterModal = ({
     chapterContent,
     params,
     handleSliderChange,
+    handleNextChapter,
+    handlePrevChapter,
     novelImage,
 }: ChapterModalProps) => {
 
@@ -42,22 +46,15 @@ const ChapterModal = ({
                     {Math.floor(readingProgress)}%, {chapterContent.title}
                 </Text>
                 <View className="flex-row items-center justify-between mt-4">
-                    <Link
-                        href={{
-                            pathname: "/novel/[novelLink]/chapter/[chapterLink]",
-                            params: {
-                                novelLink: params.novelLink,
-                                chapterLink: chapterContent.nextChapter!,
-                            },
-                        }}
+                    <Pressable
                         disabled={!chapterContent.prevChapter}
-                        replace={true}
+                        onPress={handlePrevChapter}
                     >
                         <FontAwesome
                             name="chevron-left"
                             size={20}
                             color={`${chapterContent.prevChapter ? '#4b5563' : 'white'}`} />
-                    </Link>
+                    </Pressable>
                     <Slider
                         style={{ width: 300, height: 10 }}
                         value={readingProgress / 100} // Convert percentage back to 0-1 range for slider
@@ -68,22 +65,15 @@ const ChapterModal = ({
                         thumbTintColor="#581c87"
                         maximumTrackTintColor="#c084fc"
                     />
-                    <Link
-                        href={{
-                            pathname: "/novel/[novelLink]/chapter/[chapterLink]",
-                            params: {
-                                novelLink: params.novelLink,
-                                chapterLink: chapterContent.nextChapter!,
-                            },
-                        }}
-                        replace={true}
+                    <Pressable
+                        onPress={handleNextChapter}
                         disabled={!chapterContent.nextChapter}
                     >
                         <FontAwesome
                             name="chevron-right"
                             size={18}
                             color={`${chapterContent.nextChapter ? '#4b5563' : 'white'}`} />
-                    </Link>
+                    </Pressable>
                 </View>
             </View>
 

@@ -24,23 +24,23 @@ const ChapterContent = ({
     const [scrollViewHeight, setScrollViewHeight] = useState<number>(0);
     const [isRestoring, setIsRestoring] = useState<boolean>(true);
 
-    // Handle scroll events to update reading progress
+    const isMomentumScrollingRef = useRef<boolean>(false);
+
     const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
         if (!contentHeight || !scrollViewHeight || isRestoring) return;
 
         const scrollY = event.nativeEvent.contentOffset.y;
         const maxScrollPosition = contentHeight - scrollViewHeight;
 
-        if (maxScrollPosition <= 0) return; // Avoid division by zero
+        if (maxScrollPosition <= 0) return;
 
-        // Calculate progress as a value between 0 and 1
         const progress = Math.min(Math.max(scrollY / maxScrollPosition, 0), 1);
 
-        // Convert to percentage (0-100) when storing in state
-        setReadingProgress(progress * 100);
-    }, [contentHeight, scrollViewHeight, isRestoring, setReadingProgress]);
+        if (Math.abs((progress * 100) - readingProgress) > 0.5) {
+            setReadingProgress(progress * 100);
+        }
+    }, [contentHeight, scrollViewHeight, isRestoring, setReadingProgress, readingProgress]);
 
-    // Handle slider change to scroll to position
     const handleSliderChange = useCallback((value: number) => {
         if (!scrollViewRef.current || !contentHeight || !scrollViewHeight) return;
 
@@ -48,38 +48,36 @@ const ChapterContent = ({
         const targetScrollPosition = value * maxScrollPosition;
 
         setIsRestoring(true);
-        // prevent scroll updates
+
         setReadingProgress(value * 100);
 
-        scrollViewRef.current.scrollTo({ y: targetScrollPosition, animated: false });
+        scrollViewRef.current.scrollTo({
+            y: targetScrollPosition,
+            animated: true
+        });
 
-        // Small delay to re-enable scroll tracking
         setTimeout(() => {
             setIsRestoring(false);
-        }, 200);
+        }, 500);
     }, [contentHeight, scrollViewHeight, setReadingProgress]);
 
-    // Update the ref when the handler changes
     useEffect(() => {
         if (sliderHandlerRef) {
             sliderHandlerRef.current = handleSliderChange;
         }
     }, [handleSliderChange, sliderHandlerRef]);
 
-    // Set initial scroll position when component mounts or when progress changes externally
     useEffect(() => {
         if (scrollViewRef.current && contentHeight && scrollViewHeight) {
             const maxScrollPosition = contentHeight - scrollViewHeight;
-            // Convert percentage (0-100) back to fraction (0-1) for scroll position
             const targetScrollPosition = (readingProgress / 100) * maxScrollPosition;
 
             setIsRestoring(true);
             scrollViewRef.current.scrollTo({ y: targetScrollPosition, animated: false });
 
-            // Release after the layout stabilizes
             setTimeout(() => setIsRestoring(false), 300);
         }
-    }, [chapterContent, contentHeight, scrollViewHeight, readingProgress]);
+    }, [chapterContent, contentHeight, scrollViewHeight]);
 
     return (
         <View>
@@ -88,7 +86,13 @@ const ChapterContent = ({
                 showsVerticalScrollIndicator={false}
                 className="text-gray-500 px-2 text-center flex gap-2"
                 onScroll={handleScroll}
-                scrollEventThrottle={16} // Update about every 16ms for smooth tracking
+                scrollEventThrottle={32}
+                onMomentumScrollBegin={() => { isMomentumScrollingRef.current = true; }}
+                onMomentumScrollEnd={() => {
+                    isMomentumScrollingRef.current = false;
+                    setIsRestoring(true);
+                    setTimeout(() => setIsRestoring(false), 100);
+                }}
                 onLayout={(event) => {
                     setScrollViewHeight(event.nativeEvent.layout.height);
                 }}
@@ -99,16 +103,15 @@ const ChapterContent = ({
                     }}
                 >
                     <Pressable onPress={onPressContent}>
-                        <Text className="font-bold text-lg mb-4 mt-2">{chapterContent.title}</Text>
+                        <Text className="font-bold text-lg  mt-2">{chapterContent.title}</Text>
                         {chapterContent.content.map((item, index) => (
                             <Text key={index} className="mb-4">
                                 {item}
                             </Text>
                         ))}
                     </Pressable>
+                    {children}
                 </View>
-
-                {children}
             </ScrollView>
         </View>
     );

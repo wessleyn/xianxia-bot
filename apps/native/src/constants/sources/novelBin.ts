@@ -241,7 +241,7 @@ export class NovelBin implements SourceDefinition {
             const nextChapter = document.querySelector('#next_chap')?.getAttribute('href') || null;
             const nextChapterTitle = document.querySelector('#next_chap')?.getAttribute('title') || null;
 
-            return { content, title, prevChapter, nextChapter, nextChapterTitle };
+            return { content, title, link, prevChapter, nextChapter, nextChapterTitle };
         } catch (error) {
             console.log(error);
             throw error;

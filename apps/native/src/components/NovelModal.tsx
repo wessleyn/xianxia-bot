@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDistance } from 'date-fns';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { ReadNovel } from '../app/(tabs)/history';
 import { useNovelStore } from '../stores/novel';
 import { findNovelSource } from '../utils/sources/findNovelSource';
@@ -121,7 +121,7 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
             position="bottom"
         >
             {/* Bottom Navigation section - always visible */}
-            <View className="flex-row justify-between items-center mt-6 mb-4">
+            <View className="flex-row justify-between items-center mt-6 mb-6">
                 <View className="flex-row gap-3 p-2">
                     {novelDetailTabs.map(tab => {
                         const isActive = navigationTab === tab.key;
@@ -149,11 +149,16 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                         disabled={isDisabled}
                         asChild
                     >
-                        <Text className="bg-gray-300 py-3 text-center px-10 rounded-3xl rounded-r-none">
+                        <TouchableOpacity className='bg-gray-300 py-3 flex justify-center items-center px-10 rounded-3xl rounded-r-none'>
                             {
-                                lastReadChapterLink ? 'Continue' : 'Read'
-                            }
-                        </Text>
+                                isDisabled ? <ActivityIndicator size='small' color="#4b5563" /> :
+                                    <Text className="">
+                                        {
+                                            lastReadChapterLink ? 'Continue' : 'Read'
+                                        }
+                                    </Text> 
+                                                   }
+                        </TouchableOpacity>
                     </Link>
                     <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
                         <Octicons

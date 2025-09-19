@@ -49,12 +49,13 @@ export interface NovelPageResult {
 }
 
 export type ChapterContent = {
-        content: string[];
-        title: string;
-        prevChapter: string | null;
-        nextChapter: string | null;
-        nextChapterTitle: string | null;
-    }
+    content: string[];
+    title: string;
+    link: string
+    prevChapter: string | null;
+    nextChapter: string | null;
+    nextChapterTitle: string | null;
+}
 
 export interface SourceDefinition {
     getId(): string;
