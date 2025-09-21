@@ -43,12 +43,17 @@ const ChapterModal = ({
         setIsModalVisible(false)
         handleAnonNav(link)
     }
+
+    const onCloseModal = () => {
+        setIsModalVisible(false)
+        onRequestClose()
+    }
     const historyNovel = readNovels.find(n => n.novelLink === params.novelLink);
 
     return (
         <CustomModal
             visible={visible}
-            onRequestClose={onRequestClose}
+            onRequestClose={onCloseModal}
             position="bottom"
             bar
             blur
