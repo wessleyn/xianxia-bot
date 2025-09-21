@@ -169,7 +169,6 @@ const NovelModal = ({
                 {
                     !handleNav &&
                     <View className="flex-row gap-1">
-                        (
                         <Link
                             href={{
                                 pathname: "/novel/[novelLink]/chapter/[chapterLink]",
@@ -192,7 +191,6 @@ const NovelModal = ({
                                 }
                             </TouchableOpacity>
                         </Link>
-                        )
                         <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
                             <Octicons
                                 name="chevron-down"
@@ -331,7 +329,8 @@ const NovelModal = ({
                     </View>
                 )}
             </View>
-        </CustomMovableModal>)
+        </CustomMovableModal>
+    )
 }
 
 
