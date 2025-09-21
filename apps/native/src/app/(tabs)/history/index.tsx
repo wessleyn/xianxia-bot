@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { ReadNovel, useHistoryStore } from '@stores/history';
-import { formatDistanceToNow, isToday, isYesterday } from 'date-fns';
+import { formatSectionDate } from "@utils/format";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
@@ -16,13 +16,6 @@ interface Section {
   title: string;
   data: ReadNovel[];
 }
-
-const formatSectionDate = (dateString: string) => {
-  const date = new Date(dateString);
-  if (isToday(date)) return "Today";
-  if (isYesterday(date)) return "Yesterday";
-  return formatDistanceToNow(date, { addSuffix: true });
-};
 
 const groupReadingsByDate = (readings: ReadNovel[]) => {
   if (!readings.length) return [];

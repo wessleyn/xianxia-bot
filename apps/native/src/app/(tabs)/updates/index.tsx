@@ -1,53 +1,98 @@
 import CustomView from "@components/custom/CustomView";
 import NovelImage from "@components/reusable/NovelImage";
-import { MaterialIcons, Octicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { formatSectionDate } from "@utils/format";
+import fetchServerUpdates, { UpdateInfo } from "@utils/sources/fetchUpdates";
+import { formatDistance } from "date-fns";
 import { Link } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 
 interface Section {
   title: string;
-  data: any[];
+  data: UpdateInfo[];
 }
+
+const groupUpdatesByDate = (updates: UpdateInfo[]) => {
+  if (!updates.length) return [];
+
+  const groups: { [key: string]: UpdateInfo[] } = {};
+
+  updates.forEach(novel => {
+    const date = novel.latestUpdateDate!.toISOString().split('T')[0];
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(novel);
+  });
+
+  return Object.keys(groups)
+    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+    .map(date => ({
+      title: formatSectionDate(date),
+      data: groups[date]
+    }));
+};
+
 export default function Updates() {
-  const [latestNovels, setLatestNovels] = useState<any[]>([
-    {
-      coverImage: "https://novelbin.me/media/novel/apocalypse-storage-queen-everything-i-need-is-in-my-space.jpg",
-      name: "Apocalypse Storage Queen: Everything I Need Is in My Space ",
-      novelLink: "https://novelbin.me/novel-book/apocalypse-storage-queen-everything-i-need-is-in-my-space",
-      newChLink: "https://novelbin.me/novel-book/apocalypse-storage-queen-everything-i-need-is-in-my-space/chapter-77-lilian-awakening",
-      newChTitle: "Chapter 77: Lilian Awakening ",
-      newChCount: 1
-    },
-  ])
+  const [latestNovels, setLatestNovels] = useState<any[]>([])
 
   const [updatedNovels, setUpdatedNovels] = useState<Section[]>([])
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      
+  const fetchUpdates = async () => {
+    try {
+      setRefreshing(true);
+      const data = await fetchServerUpdates();
+      data.sort((a, b) => new Date(b.latestUpdateDate).getTime() - new Date(a.latestUpdateDate).getTime());
+      await AsyncStorage.setItem("updates", JSON.stringify(data))
+      setLatestNovels(data.splice(0, 3))
+      setUpdatedNovels(groupUpdatesByDate(data))
+
+    } catch (error) {
+      console.error("Error fetching updates:", error);
+      Toast.show({
+        text1: "Error",
+        text2: "Error Fetching Updates",
+        type: "error",
+        position: "bottom"
+      })
+    } finally {
       setRefreshing(false);
-      setUpdatedNovels([
-        {
-          title: "4 days Ago",
-          data: [
-            {
-              coverImage: "https://novelbin.me/media/novel/apocalypse-storage-queen-everything-i-need-is-in-my-space.jpg",
-              name: "Apocalypse Storage Queen: Everything I Need Is in My Space ",
-              novelLink: "https://novelbin.me/novel-book/apocalypse-storage-queen-everything-i-need-is-in-my-space",
-              newChLink: "https://novelbin.me/novel-book/apocalypse-storage-queen-everything-i-need-is-in-my-space/chapter-77-lilian-awakening",
-              newChTitle: "Chapter 77: Lilian Awakening ",
-              genres: "Romance, Adult, Comedy",
-              newChCount: 1
-            }
-          ]
+      Toast.show({
+        text1: "Success",
+        text2: "Updated Successfully",
+        type: "success",
+        position: "bottom",
+      })
+
+    }
+
+   }
+  const onRefresh = useCallback(fetchUpdates, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const settings = await AsyncStorage.getItem("autoCheckUpdates")
+      const parsedSettings = settings ? JSON.parse(settings) : false
+
+      if (parsedSettings) {
+        fetchUpdates();
+      } else {
+        const storedUpdates = await AsyncStorage.getItem("updates")
+        if (storedUpdates) {
+          const parsedUpdates = JSON.parse(storedUpdates) as UpdateInfo[]
+          setLatestNovels(parsedUpdates.splice(0, 3))
+          setUpdatedNovels(groupUpdatesByDate(parsedUpdates))
         }
-      ]);
-    }, 2000);
+      }
+
+    }
+    fetchData();
   }, []);
 
   return (
@@ -68,72 +113,75 @@ export default function Updates() {
         </View>
       </View>
 
-      <View className="flex-col gap-4 px-2 ">
-        <Text className="font-medium text-xl">Latest</Text>
-        <View>
-          <ScrollView
-            horizontal
-            pagingEnabled      
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                colors={["#6b7280"]}
-                refreshing={refreshing}
-                onRefresh={onRefresh} />
-            }
-          >
-            {
-              latestNovels.map(novel => (
-                <View key={novel.novelLink} className="flex-row gap-4 mr-4 w-[21rem]">
-                  <Link
-                    href={{
-                      pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
-                      params: {
-                        novelLink: novel.novelLink,
-                        chapterLink: novel.newChLink
-                      }
-                    }}
-                    asChild
-                  >
-                    <TouchableOpacity className="flex-row gap-2 items-center">
-                      <NovelImage
-                        image={novel.coverImage}
-                        className="w-full"
-                        size={100}
-                      />
-                      <View className="flex-col gap-1 w-[64%]">
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail">
-                          {novel.name}
-                        </Text>
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          className="text-gray-700"
-                        >
-                          {novel.newChTitle}
-                        </Text>
-                        <View className="flex-row gap-2 items-center">
-                          <View className="w-3 h-3 bg-red-500 rounded-[100%]"></View>
+      {
+        latestNovels.length > 0 && <View className="flex-col gap-4 px-2 ">
+          <Text className="font-medium text-xl">Latest</Text>
+          <View>
+            <ScrollView
+              horizontal
+              pagingEnabled
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+            >
+              {
+                latestNovels.map((novel: UpdateInfo) => (
+                  <View key={novel.novelLink} className="flex-row gap-4 mr-4 w-[21rem]">
+                    <Link
+                      href={{
+                        pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
+                        params: {
+                          novelLink: novel.novelLink,
+                          chapterLink: novel.newChLink
+                        }
+                      }}
+                      asChild
+                    >
+                      <TouchableOpacity className="flex-row gap-2 items-center">
+                        <NovelImage
+                          image={novel.coverImage}
+                          className="w-full"
+                          size={100}
+                        />
+                        <View className="flex-col gap-1 w-[64%]">
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail">
+                            {novel.name}
+                          </Text>
                           <Text
                             numberOfLines={1}
                             ellipsizeMode="tail"
-                            className="text-sm text-gray-500"
+                            className="text-gray-700"
                           >
-                            {novel.newChCount} New {novel.newChCount > 1 ? "Chapters" : "Chapter"}
+                            {novel.newChTitle}
                           </Text>
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            className="text-gray-700"
+                          >
+                            {formatDistance(novel.latestUpdateDate, new Date(), { addSuffix: true })}
+                          </Text>
+                          <View className="flex-row gap-2 items-center">
+                            <View className="w-3 h-3 bg-red-500 rounded-[100%]"></View>
+                            <Text
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              className="text-sm text-gray-500"
+                            >
+                              {novel.newChCount} New {novel.newChCount > 1 ? "Chapters" : "Chapter"}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    </TouchableOpacity>
-                  </Link>
-                </View>
-              ))
-           }
-          </ScrollView>
+                      </TouchableOpacity>
+                    </Link>
+                  </View>
+                ))
+              }
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      }
 
       <View className="flex-col gap-2 px-2 mt-4">
         <SectionList
@@ -171,7 +219,14 @@ export default function Updates() {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {item.genres}
+                    {item.author}
+                  </Text>
+                  <Text
+                    className="text-gray-600"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}
                   </Text>
                   <View className="flex-row gap-2 items-center">
                     <View className="w-2 h-2 bg-red-500 rounded-full"></View>
@@ -184,6 +239,21 @@ export default function Updates() {
                 </View>
               </TouchableOpacity>
             </Link>
+          )}
+          refreshControl={
+            <RefreshControl
+              colors={["#6b7280"]}
+              refreshing={refreshing}
+              onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={() => (
+            <View className="items-center justify-center h-[50vh]">
+              <MaterialCommunityIcons name="timer-sync-outline" size={64} color="#6b7280" />
+              <Text className="text-xl font-medium text-gray-500 mt-4">No Updates</Text>
+              <Text className="text-sm text-gray-400 mt-2 text-center px-8">
+                {refreshing ? "Refreshing..." : "                Pull To Refresh"}
+              </Text>
+            </View>
           )}
         />
       </View>

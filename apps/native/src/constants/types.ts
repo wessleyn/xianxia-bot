@@ -75,6 +75,7 @@ export interface SourceDefinition {
     getRandomNovel?(): Promise<string>;
     getNovelMetaData(link?: string): Promise<NovelMetaData>
     getNovelImage(link: string): string;
+    getLatestCh(link?: string): Promise<Date>
     getNovelChapters(link: string): Promise<{ title: string; link: string; date?: Date; }[]>;
     getNovelChapterContent(link: string): Promise<ChapterContent>;
     getNovels(page?: number): Promise<NovelPageResult>;
