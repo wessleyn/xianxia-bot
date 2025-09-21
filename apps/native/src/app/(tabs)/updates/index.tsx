@@ -7,13 +7,23 @@ import fetchServerUpdates, { UpdateInfo } from "@utils/sources/fetchUpdates";
 import { formatDistance } from "date-fns";
 import { Link } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { RefreshControl, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
+import { ReadNovel } from "../../../stores/history";
 
 
 interface Section {
   title: string;
   data: UpdateInfo[];
+}
+
+interface TabDataType extends ReadNovel {
+  newChLink?: string
+  newChTitle?: string
+  newChCount?: number
+  latestUpdateDate?: Date
+
+
 }
 
 const groupUpdatesByDate = (updates: UpdateInfo[]) => {
@@ -39,19 +49,32 @@ const groupUpdatesByDate = (updates: UpdateInfo[]) => {
 
 export default function Updates() {
   const [latestNovels, setLatestNovels] = useState<any[]>([])
-
   const [updatedNovels, setUpdatedNovels] = useState<Section[]>([])
-
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<'all' | 'library' | 'liked'>('all')
+  const [tabData, setTabData] = useState<TabDataType[]>([])
 
   const fetchUpdates = async () => {
     try {
       setRefreshing(true);
-      const data = await fetchServerUpdates();
+      const data = await fetchServerUpdates(selectedTab);
       data.sort((a, b) => new Date(b.latestUpdateDate).getTime() - new Date(a.latestUpdateDate).getTime());
       await AsyncStorage.setItem("updates", JSON.stringify(data))
-      setLatestNovels(data.splice(0, 3))
-      setUpdatedNovels(groupUpdatesByDate(data))
+      if (selectedTab === 'all') {
+        setLatestNovels(data.splice(0, data.length == 2 ? 1 : data.length == 3 ? 2 : 3))
+        setUpdatedNovels(groupUpdatesByDate(data))
+      } else {
+        setTabData(tabData.filter(t => data.find(d => d.novelLink === t.novelLink)).map(t => {
+          const d = data.find(d => d.novelLink === t.novelLink);
+          return {
+            ...t,
+            newChLink: d!.newChLink,
+            newChTitle: d!.newChTitle,
+            newChCount: d!.newChCount,
+            latestUpdateDate: d!.latestUpdateDate
+          }
+        }))
+      }
 
     } catch (error) {
       console.error("Error fetching updates:", error);
@@ -59,7 +82,8 @@ export default function Updates() {
         text1: "Error",
         text2: "Error Fetching Updates",
         type: "error",
-        position: "bottom"
+        position: "bottom",
+        bottomOffset: 100,
       })
     } finally {
       setRefreshing(false);
@@ -68,11 +92,13 @@ export default function Updates() {
         text2: "Updated Successfully",
         type: "success",
         position: "bottom",
+        bottomOffset: 100,
       })
 
     }
 
-   }
+  }
+
   const onRefresh = useCallback(fetchUpdates, []);
 
   useEffect(() => {
@@ -95,26 +121,66 @@ export default function Updates() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (selectedTab == 'all') return
+        setRefreshing(true);
+        const data = await AsyncStorage.getItem("readingHistory")
+        const parsedData = await JSON.parse(data ?? '[]') as ReadNovel[]
+        let filteredData = []
+        switch (selectedTab) {
+          case 'library':
+            filteredData = parsedData.filter(n => n.isInLibrary)
+            break
+          case 'liked':
+            filteredData = parsedData.filter(n => n.isLiked)
+            break
+        }
+        setTabData(filteredData)
+      } catch (error) {
+        console.error("Error fetching updates:", error);
+        Toast.show({
+          text1: "Error",
+          text2: "Error Fetching Updates",
+          type: "error",
+          position: "bottom",
+          bottomOffset: 100,
+        })
+      } finally {
+        setRefreshing(false);
+        fetchUpdates()
+      }
+    }
+    fetchData()
+  }, [selectedTab])
+
   return (
     <CustomView className="flex gap-3 px-6">
 
       <View className="flex-row gap-2 pr-4 justify-between">
-        <View className="w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center">
+        <Pressable
+          onPress={() => setSelectedTab('all')}
+          className={`w-1/3 flex-row gap-4 border-2 border-[#6b7280]  p-3 rounded-xl items-center justify-center ${selectedTab === 'all' ? 'bg-gray-200' : ''}`}>
           <MaterialIcons name="local-library" size={20} color="#6b7280" />
           <Text>All</Text>
-        </View>
-        <View className="w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center">
+        </Pressable>
+        <Pressable
+          onPress={() => setSelectedTab('library')}
+          className={`w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center ${selectedTab === 'library' ? 'bg-gray-200' : ''}`}>
           <MaterialIcons name="library-books" size={20} color="#6b7280" />
           <Text>Library</Text>
-        </View>
-        <View className="w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center">
+        </Pressable>
+        <Pressable
+          onPress={() => setSelectedTab('liked')}
+          className={`w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center ${selectedTab === 'liked' ? 'bg-gray-200' : ''}`}>
           <Octicons name="heart" size={20} color="#6b7280" />
           <Text>Liked</Text>
-        </View>
+        </Pressable>
       </View>
 
       {
-        latestNovels.length > 0 && <View className="flex-col gap-4 px-2 ">
+        latestNovels.length > 0 && selectedTab === 'all' && <View className="flex-col gap-4 px-2 ">
           <Text className="font-medium text-xl">Latest</Text>
           <View>
             <ScrollView
@@ -183,80 +249,175 @@ export default function Updates() {
         </View>
       }
 
-      <View className="flex-col gap-2 px-2 mt-4">
-        <SectionList
-          sections={updatedNovels}
-          keyExtractor={(item, index) => `${index}-${item.novelLink}`}
-          renderSectionHeader={({ section }: { section: Section }) => (
-            <Text className="text-lg mb-4">{section.title}</Text>
-          )}
-          renderItem={({ item }) => (
-            <Link
-              href={{
-                pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
-                params: {
-                  novelLink: item.novelLink,
-                  chapterLink: item.newChLink
-                }
-              }}
-              asChild
-            >
-              <TouchableOpacity className="flex-row gap-2 items-center">
-                <NovelImage
-                  image={item.coverImage}
-                  className="w-full"
-                  size={70}
-                />
-                <View className="flex-col gap-1 w-3/4">
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {item.name}
+      {
+        selectedTab === 'all' ? (
+          <View className="flex-col gap-2 px-2 mt-4">
+            <SectionList
+              sections={updatedNovels}
+              keyExtractor={(item, index) => `${index}-${item.novelLink}`}
+              renderSectionHeader={({ section }: { section: Section }) => (
+                <Text className="text-lg mb-4">{section.title}</Text>
+              )}
+              renderItem={({ item }) => (
+                <Link
+                  href={{
+                    pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
+                    params: {
+                      novelLink: item.novelLink,
+                      chapterLink: item.newChLink
+                    }
+                  }}
+                  asChild
+                >
+                  <TouchableOpacity className="flex-row gap-2 items-center">
+                    <NovelImage
+                      image={item.coverImage}
+                      className="w-full"
+                      size={70}
+                    />
+                    <View className="flex-col gap-1 w-3/4">
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.name}
+                      </Text>
+                      <Text
+                        className="text-gray-600"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.author}
+                      </Text>
+                      <Text
+                        className="text-gray-600"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}
+                      </Text>
+                      <View className="flex-row gap-2 items-center">
+                        <View className="w-2 h-2 bg-red-500 rounded-full"></View>
+                        <Text
+                          className="text-sm text-gray-500"
+                        >
+                          {item.newChCount} New {item.newChCount > 1 ? "Chapters" : "Chapter"}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </Link>
+              )}
+              refreshControl={
+                <RefreshControl
+                  colors={["#6b7280"]}
+                  refreshing={refreshing}
+                  onRefresh={onRefresh} />
+              }
+              ListEmptyComponent={() => (
+                <View className="items-center justify-center h-[50vh]">
+                  <MaterialCommunityIcons name="timer-sync-outline" size={64} color="#6b7280" />
+                  <Text className="text-xl font-medium text-gray-500 mt-4">
+                    {refreshing ? 'Updating' : latestNovels.length > 0 ? 'No More Updates' : 'No Updates'}
                   </Text>
-                  <Text
-                    className="text-gray-600"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {item.author}
+                  <Text className="text-sm text-gray-400 mt-2 text-center px-8">
+                    {refreshing ? "..." : "Pull To Refresh"}
                   </Text>
-                  <Text
-                    className="text-gray-600"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}
-                  </Text>
-                  <View className="flex-row gap-2 items-center">
-                    <View className="w-2 h-2 bg-red-500 rounded-full"></View>
-                    <Text
-                      className="text-sm text-gray-500"
-                    >
-                      {item.newChCount} New {item.newChCount > 1 ? "Chapters" : "Chapter"}
-                    </Text>
-                  </View>
                 </View>
-              </TouchableOpacity>
-            </Link>
-          )}
-          refreshControl={
-            <RefreshControl
-              colors={["#6b7280"]}
-              refreshing={refreshing}
-              onRefresh={onRefresh} />
-          }
-          ListEmptyComponent={() => (
-            <View className="items-center justify-center h-[50vh]">
-              <MaterialCommunityIcons name="timer-sync-outline" size={64} color="#6b7280" />
-              <Text className="text-xl font-medium text-gray-500 mt-4">No Updates</Text>
-              <Text className="text-sm text-gray-400 mt-2 text-center px-8">
-                {refreshing ? "Refreshing..." : "                Pull To Refresh"}
-              </Text>
-            </View>
-          )}
-        />
-      </View>
+              )}
+            />
+          </View>
+        ) : (
+          <FlatList
+            className="mt-4"
+            keyExtractor={(item => item.novelLink)}
+            data={tabData}
+            renderItem={({ item }) => (
+              <Link
+                href={{
+                  pathname: '/(screens)/novel/[novelLink]/chapter/[chapterLink]',
+                  params: {
+                    novelLink: item.novelLink,
+                    chapterLink: item.newChLink!
+                  }
+                }}
+                disabled={!item.newChLink}
+                asChild
+              >
+                <TouchableOpacity className="flex-row gap-2 items-center">
+                  <NovelImage
+                    image={item.coverImage!}
+                    className="w-full"
+                    size={70}
+                  />
+                  <View className="flex-col gap-1 w-3/4">
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.title}
+                    </Text>
+                    <Text
+                      className="text-gray-600"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.author}
+                    </Text>
+
+                    {
+                      item.latestUpdateDate &&
+                      <Text
+                        className="text-gray-600"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}
+                      </Text>
+
+                    }
+
+                    {
+                      item.newChCount &&
+                      <View className="flex-row gap-2 items-center">
+                        <View className="w-2 h-2 bg-red-500 rounded-full"></View>
+                        <Text
+                          className="text-sm text-gray-500"
+                        >
+                          {item.newChCount} New {item.newChCount > 1 ? "Chapters" : "Chapter"}
+                        </Text>
+                      </View>
+                    }
+                  </View>
+                </TouchableOpacity>
+              </Link>
+            )}
+            refreshControl={
+              <RefreshControl
+                colors={["#6b7280"]}
+                refreshing={refreshing}
+                onRefresh={tabData && onRefresh}
+
+              />
+            }
+            ListEmptyComponent={() => (
+              <View className="items-center justify-center h-[50vh]">
+                <MaterialCommunityIcons name="timer-sync-outline" size={64} color="#6b7280" />
+                <Text className="text-xl font-medium text-gray-500 mt-4">
+                  {selectedTab == 'liked' ? 'No liked novels' : 'No novels in the library'}</Text>
+                <Text className="text-sm text-gray-400 mt-2 text-center px-8">
+                  {
+                    refreshing ? "Refreshing..." :
+                      selectedTab == 'liked' ?
+                        'Like novels and they\'ll appear here' :
+                        'Add Novels to Library to see updates here.'
+                  }
+                </Text>
+              </View>
+            )}
+          />
+        )
+      }
     </CustomView>
   );
 }

@@ -3,9 +3,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ReadNovel } from "@stores/history";
 import { findNovelSource } from "./findNovelSource";
 
-export default async function fetchUpdates() {
+export type updateFrom = 'all' | 'library' | 'liked';
+
+export default async function fetchUpdates(updateFrom?: updateFrom): Promise<UpdateInfo[]> {
     console.log("Fetching update settings from AsyncStorage...");
-    const setting = JSON.parse(await AsyncStorage.getItem('updateFrom') ?? '"Readings"') as UpdateType
+    let setting = JSON.parse(await AsyncStorage.getItem('updateFrom') ?? '"Readings"') as UpdateType
     console.log("Update setting:", setting);
 
     console.log("Fetching reading history from AsyncStorage...");
@@ -13,6 +15,22 @@ export default async function fetchUpdates() {
     console.log("History length:", history.length);
 
     let filteredNovels: ReadNovel[]
+
+    if (updateFrom) {
+        switch (updateFrom) {
+            case 'all':
+                setting = setting
+                break
+            case 'library':
+                setting = 'Library'
+                break
+            case 'liked':
+                setting = 'Favourites'
+            default:
+                setting = setting
+                break
+        }
+    }
 
     switch (setting) {
         case "Readings":
