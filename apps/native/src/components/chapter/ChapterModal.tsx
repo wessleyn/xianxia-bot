@@ -1,9 +1,12 @@
 import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons"
 import Slider from "@react-native-community/slider"
+import { useHistoryStore } from "@stores/history"
 import { Link } from "expo-router"
+import { useState } from "react"
 import { Pressable, Text, TouchableOpacity, View } from "react-native"
 import { useNovelStore } from "../../stores/novel"
 import CustomModal from "../custom/CustomModal"
+import NovelModal from "../NovelModal"
 import NovelImage from "../reusable/NovelImage"
 
 type ChapterModalProps = {
@@ -15,6 +18,7 @@ type ChapterModalProps = {
     handleSliderChange: (value: number) => void;
     handleNextChapter: () => void
     handlePrevChapter: () => void
+    handleAnonNav: (link: string) => void
     novelImage: string;
 }
 
@@ -27,10 +31,20 @@ const ChapterModal = ({
     handleSliderChange,
     handleNextChapter,
     handlePrevChapter,
+    handleAnonNav,
     novelImage,
 }: ChapterModalProps) => {
 
     const { currentNovel } = useNovelStore()
+    const { readNovels } = useHistoryStore();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleChapterNav = (link: string) => {
+        setIsModalVisible(false)
+        handleAnonNav(link)
+    }
+    const historyNovel = readNovels.find(n => n.novelLink === params.novelLink);
+
     return (
         <CustomModal
             visible={visible}
@@ -79,13 +93,17 @@ const ChapterModal = ({
 
             {/* Book info */}
             <View className="flex-row  gap-2">
-                <View className="flex-row gap-3 items-center bg-gray-300 rounded-xl p-4 w-1/2">
+                <Pressable
+                    onPress={() => setIsModalVisible(true)}
+                    className="flex-row gap-3 items-center bg-gray-300 rounded-xl p-4 w-1/2">
                     <Octicons name="three-bars" size={25} color="#4b5563" />
                     <View className="flex-col gap-2">
                         <Text>Contents</Text>
-                        <Text className="text-gray-500 text-sm">{currentNovel?.chapters} Chapters</Text>
+                        <Text className="text-gray-500 text-sm">
+                            {currentNovel ? currentNovel.chapters : historyNovel!.chapters.length} Chapters
+                        </Text>
                     </View>
-                </View>
+                </Pressable>
                 <Link
                     href={{
                         pathname: "/novel/[novelLink]",
@@ -116,6 +134,13 @@ const ChapterModal = ({
                     <Text>Download</Text>
                 </TouchableOpacity>
             </View>
+            <NovelModal
+                novelLink={params.novelLink}
+                position="center"
+                fixedPosition={true}
+                visible={isModalVisible}
+                handleNav={handleChapterNav}
+            />
         </CustomModal>)
 }
 

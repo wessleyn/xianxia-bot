@@ -48,6 +48,14 @@ export interface NovelPageResult {
     hasNextPage: boolean;
 }
 
+export type NovelSourceMetadata = {
+    name: string,
+    baseUrl: string,
+    mainCategory: string,
+    language: string,
+    isRaw: boolean,
+}
+
 export type ChapterContent = {
     content: string[];
     title: string;
@@ -58,8 +66,9 @@ export type ChapterContent = {
 }
 
 export interface SourceDefinition {
+    supportedHostnames?: string[];
     getId(): string;
-    getMetadata(): any;
+    getMetadata(): NovelSourceMetadata;
     getIcon(): Promise<string>;
     getGenres(): Promise<string[]>;
 

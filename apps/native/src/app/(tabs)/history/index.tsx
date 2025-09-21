@@ -73,9 +73,9 @@ export default function History() {
     const validNovels = novels.filter(n => n.lastReadAt !== undefined);
 
     return {
-      device:0 , 
+      device: 0,
       library: validNovels.filter(n => n.isInLibrary === true).length,
-      'new-chapters':0,
+      'new-chapters': 0,
       completed: 0,
       favorites: validNovels.filter(n => n.isLiked === true).length,
     };
@@ -121,10 +121,11 @@ export default function History() {
   };
 
   useEffect(() => {
-    const filteredData = applyFilters(readNovels);
+    const filteredNovels = readNovels.filter(n => n.lastReadAt !== undefined);
+    const filteredData = applyFilters(filteredNovels);
     setSections(groupReadingsByDate(filteredData));
 
-    setFilterCounts(calculateFilterCounts(readNovels));
+    setFilterCounts(calculateFilterCounts(filteredNovels));
   }, [readNovels, selectedTags]);
 
   return (

@@ -12,6 +12,7 @@ const placeholderImage = 'https://a.a/a.png'
 
 export class NovelBin implements SourceDefinition {
     // Inbuilt Source Properties
+    public supportedHostnames = ["novelbin.me", "novelbin.com"];
     private name = "NovelBin";
     private baseUrl = "https://novelbin.me";
     private mainCategory = "Fantasy";

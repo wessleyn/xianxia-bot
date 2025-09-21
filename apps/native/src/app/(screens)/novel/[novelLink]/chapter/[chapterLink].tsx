@@ -67,6 +67,7 @@ export default function Chapter() {
                             novelLink: params.novelLink!,
                             lastReadChLink: params.chapterLink!,
                             lastReadChTitle: chapterData.title,
+                            lastReadAt: new Date().toISOString(),
                             progress: readingProgress,
                         });
                     }
@@ -75,10 +76,11 @@ export default function Chapter() {
                     upsertNovel({
                         novelLink: params.novelLink!,
                         lastReadChLink: params.chapterLink!,
-                        lastReadChTitle: chapterData.title ?? "Unknown Title",
+                        lastReadChTitle: chapterData.title,
                         title: currentNovel?.title ?? "Unknown Title",
                         author: currentNovel?.author ?? "Unknown Author",
                         coverImage: coverImage,
+                        lastReadAt: new Date().toISOString(),
                         progress: readingProgress,
                     });
                 }
@@ -96,6 +98,7 @@ export default function Chapter() {
                 novelLink: params.novelLink!,
                 lastReadChLink: chapterContent.link,
                 lastReadChTitle: chapterContent.title,
+                lastReadAt: new Date().toISOString(),
                 progress: readingProgress,
             });
         }
@@ -138,7 +141,17 @@ export default function Chapter() {
         setIsFetchingChapter(false)
     }
 
-    if (!chapterContent) return <CustomLoading position="center" />;
+    const handleAnonNav = async (link: string) => {
+        setIsFetchingChapter(true)
+        setReadingProgress(0);
+        setShowModal(false)
+        setLastReadChapterLink(link)
+        const chapterData = await sourceInstance!.getNovelChapterContent(link);
+        setChapterContent(chapterData)
+        setIsFetchingChapter(false)
+    }
+
+    if (!chapterContent) return <CustomLoading position="center" className="bg-white" />;
 
     return (
         <CustomView className="px-2">
@@ -215,6 +228,7 @@ export default function Chapter() {
                 handleSliderChange={handleSliderChange}
                 handleNextChapter={handleNextChapter}
                 handlePrevChapter={handlePrevChapter}
+                handleAnonNav={handleAnonNav}
                 novelImage={novelImage}
             />
         </CustomView>
