@@ -28,7 +28,6 @@ const ChapterContent = ({
 
     const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
         if (!contentHeight || !scrollViewHeight) return;
-        if (isRestoring || isMomentumScrollingRef.current) return; // <- suppress twitch
 
         const scrollY = event.nativeEvent.contentOffset.y;
         const maxScrollPosition = contentHeight - scrollViewHeight;
@@ -39,7 +38,7 @@ const ChapterContent = ({
         const newProgress = progress * 100;
 
         // Only update if it changed significantly
-        if (Math.abs(newProgress - readingProgress) > 0.5) {
+        if (Math.abs(newProgress - readingProgress) > 1) {
             setReadingProgress(newProgress);
         }
     }, [contentHeight, scrollViewHeight, isRestoring, readingProgress, setReadingProgress]);
@@ -50,19 +49,13 @@ const ChapterContent = ({
         const maxScrollPosition = contentHeight - scrollViewHeight;
         const targetScrollPosition = value * maxScrollPosition;
 
-        setIsRestoring(true); // lock
 
         setReadingProgress(value * 100);
 
         scrollViewRef.current.scrollTo({
             y: targetScrollPosition,
-            animated: false // <- disable animation, prevents twitching
         });
 
-        // unlock after a short delay
-        setTimeout(() => {
-            setIsRestoring(false);
-        }, 100);
     }, [contentHeight, scrollViewHeight, setReadingProgress]);
 
     useEffect(() => {
