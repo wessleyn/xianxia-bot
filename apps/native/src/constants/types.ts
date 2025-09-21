@@ -88,3 +88,5 @@ export interface SourceDefinition {
     getOldestNovels?(page?: number): Promise<NovelPageResult>;
     getCompletedNovels?(page?: number): Promise<NovelPageResult>;
 }
+
+export type UpdateType = "Readings" | "Favourites" | "Library"
