@@ -21,3 +21,6 @@ expo-env.d.ts
 
 # env vars
 .env
+
+# Service Account JSON
+xianxu-f90198e324ce.json

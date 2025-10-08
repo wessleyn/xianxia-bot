@@ -35,7 +35,6 @@ export default function DashboardHeader() {
         } bg-white dark:bg-gray-800 sticky top-0 z-10 transition-shadow duration-300`}
     >
       <div className="px-4 md:px-6 py-4 flex items-center justify-between">
-        {/* Page Title and Sidebar TOggle */}
         <div className="flex items-center">
           <button
             className="mr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -48,7 +47,6 @@ export default function DashboardHeader() {
           </h1>
         </div>
 
-        {/* Search Bar - Hidden on mobile */}
         <div className="hidden md:flex flex-1 mx-10 max-w-xl">
           <div className="flex items-center w-full">
             <div className="flex items-center justify-center pl-3 pr-2">
@@ -70,7 +68,6 @@ export default function DashboardHeader() {
         </div>
       </div>
 
-      {/* Mobile Search - Visible only on small screens */}
       <div className="md:hidden px-4 pb-4">
         <div className="flex items-center w-full">
           <div className="flex items-center justify-center pl-3 pr-2">
