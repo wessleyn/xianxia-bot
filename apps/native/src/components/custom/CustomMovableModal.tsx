@@ -21,6 +21,7 @@ interface Props {
     children: React.ReactNode;
     position?: keyof typeof POSITIONS; // default: bottom
     fixedPosition?: boolean;           // if true, modal snaps back to initial position
+    visible?: boolean;                
 }
 
 const CustomMovableModal = ({
@@ -28,6 +29,7 @@ const CustomMovableModal = ({
     children,
     position = "bottom",
     fixedPosition = false,
+    visible = true,
 }: Props) => {
     const [currentPosition, setCurrentPosition] = useState<
         keyof typeof POSITIONS
@@ -108,6 +110,10 @@ const CustomMovableModal = ({
         height: contentHeight.value,
         transform: [{ translateY: translateY.value }],
     }));
+
+    if (!visible) {
+        return null;
+    }
 
     return (
         <View

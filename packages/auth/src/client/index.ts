@@ -1,15 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-export default function createSupabaseClient({ isNative = false }) {
-    // We'll use the default cookie configuration managed by Supabase
+export default function createSupabaseClient({ isWeb = false }) {
 
-    if (isNative) {
+    if (isWeb) {
         return createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         )
     }
-    // For web extension - use cookie-based auth
     return createClient(
         import.meta.env.WXT_SUPABASE_URL!,
         import.meta.env.WXT_SUPABASE_ANON_KEY!,

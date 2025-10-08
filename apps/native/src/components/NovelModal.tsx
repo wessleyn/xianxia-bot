@@ -5,16 +5,15 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDistance } from 'date-fns';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { ReadNovel } from '../stores/history';
+import { ReadNovel, useHistoryStore } from '../stores/history';
 import { useNovelStore } from '../stores/novel';
 import { findNovelSource } from '../utils/sources/findNovelSource';
 import CustomLoading from './custom/CustomLoading';
 import CustomMovableModal from "./custom/CustomMovableModal";
 
-// Data type definitions
 interface Chapter {
     id: string;
     number: number;
@@ -42,9 +41,24 @@ interface Bookmark {
     position: number; // percentage or position in chapter
 }
 
-const NovelModal = ({ novelLink }: { novelLink: string }) => {
+interface Props {
+    novelLink: string,
+    position?: string,
+    fixedPosition?: boolean,
+    visible?: boolean,
+    handleNav?: (link: string) => void
+}
+
+const NovelModal = ({
+    novelLink, position = "bottom",
+    fixedPosition = false,
+    visible = true,
+    handleNav
+}: Props) => {
     const [navigationTab, setNavigationTab] = useState<novelDetailTabType>('chapters');
     const { lastReadChapterLink, setLastReadChapterLink } = useNovelStore();
+    const { upsertNovel, readNovels } = useHistoryStore()
+    const router = useRouter()
     const [chapters, setChapters] = useState<Chapter[]>();
 
     const [volumes, setVolumes] = useState<Volume[]>([
@@ -63,13 +77,13 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
 
         const checkReadingHistory = async () => {
             const history = await AsyncStorage.getItem('readingHistory');
-            
+
             const parsedHistory: ReadNovel[] = history ? JSON.parse(history) : [];
-            
+
             const chapterHistory = parsedHistory.find(
-            (item) => item.novelLink === novelLink
+                (item) => item.novelLink === novelLink
             );
-            
+
             if (chapterHistory && chapterHistory.lastReadChLink) {
                 setLastReadChapterLink(chapterHistory.lastReadChLink);
             } else {
@@ -80,7 +94,6 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
         checkLastOpenedTab();
     }, []);
 
-    // Persist Navigation Tab in AsyncStorage whenever it changes
     useEffect(() => {
         AsyncStorage.setItem('lastOpenedTab', navigationTab);
     }, [navigationTab]);
@@ -99,6 +112,13 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                 number: index + 1
             }));
 
+            // if novel is already in the lib, persist chapter count
+            if (readNovels.find(n => n.novelLink == novelLink)) {
+                upsertNovel({
+                    novelLink: novelLink,
+                    chapters: formatedChapters.map(ch => ch.link)
+                })
+            }
             setChapters(formatedChapters)
         }
 
@@ -109,6 +129,14 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
         setNavigationTab(tabKey);
     };
 
+    const handleChapterNav = (link: string) => {
+        router.navigate({
+            pathname: '/novel/[novelLink]/chapter/[chapterLink]',
+            params: { chapterLink: link, novelLink }
+        })
+
+    }
+
     const hasChapters = chapters && chapters.length > 0;
     const targetChapter =
         lastReadChapterLink ??
@@ -118,7 +146,9 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
 
     return (
         <CustomMovableModal
-            position="bottom"
+            position={position as 'bottom' | 'center' | 'full'}
+            fixedPosition={fixedPosition}
+            visible={visible}
         >
             {/* Bottom Navigation section - always visible */}
             <View className="flex-row justify-between items-center mt-6 mb-6">
@@ -136,38 +166,40 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                         );
                     })}
                 </View>
-
-                <View className="flex-row gap-1">
-                    <Link
-                        href={{
-                            pathname: "/novel/[novelLink]/chapter/[chapterLink]",
-                            params: {
-                                novelLink,
-                                chapterLink:  lastReadChapterLink ?? (chapters && chapters.length > 0 ? chapters[0].link : '')
-                            }
-                        }}
-                        disabled={isDisabled}
-                        asChild
-                    >
-                        <TouchableOpacity className='bg-gray-300 py-3 flex justify-center items-center px-10 rounded-3xl rounded-r-none'>
-                            {
-                                isDisabled ? <ActivityIndicator size='small' color="#4b5563" /> :
-                                    <Text className="">
-                                        {
-                                            lastReadChapterLink ? 'Continue' : 'Read'
-                                        }
-                                    </Text> 
-                                                   }
-                        </TouchableOpacity>
-                    </Link>
-                    <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
-                        <Octicons
-                            name="chevron-down"
-                            size={18}
-                            color="#4b5563"
-                        />
+                {
+                    !handleNav &&
+                    <View className="flex-row gap-1">
+                        <Link
+                            href={{
+                                pathname: "/novel/[novelLink]/chapter/[chapterLink]",
+                                params: {
+                                    novelLink,
+                                    chapterLink: lastReadChapterLink ?? (chapters && chapters.length > 0 ? chapters[0].link : '')
+                                }
+                            }}
+                            disabled={isDisabled}
+                            asChild
+                        >
+                            <TouchableOpacity className='bg-gray-300 py-3 flex justify-center items-center px-10 rounded-3xl rounded-r-none'>
+                                {
+                                    isDisabled ? <ActivityIndicator size='small' color="#4b5563" /> :
+                                        <Text className="">
+                                            {
+                                                lastReadChapterLink ? 'Continue' : 'Read'
+                                            }
+                                        </Text>
+                                }
+                            </TouchableOpacity>
+                        </Link>
+                        <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
+                            <Octicons
+                                name="chevron-down"
+                                size={18}
+                                color="#4b5563"
+                            />
+                        </View>
                     </View>
-                </View>
+                }
             </View>
 
             {/* Content revealed when modal expands - based on selected tab */}
@@ -198,28 +230,24 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                                             chapters.map((item, index) => {
                                                 const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
                                                 return (
-                                                    <Link asChild href={{
-                                                        pathname: '/novel/[novelLink]/chapter/[chapterLink]',
-                                                        params: { chapterLink: item.link, novelLink }
-                                                    }}
+                                                    <Pressable
+                                                        onPress={() => handleNav ? handleNav(item.link) : handleChapterNav(item.link)}
                                                         key={item.id}
-                                                    >
-                                                        <Pressable className="flex-col items-start py-3">
-                                                            <View className="flex-row justify-between items-center w-full">
-                                                                <View className="flex-row items-center">
-                                                                    {isActiveChapter && (
-                                                                        <MaterialIcons name="play-arrow" size={24} color="#16a34a" style={{ marginRight: 4 }} />
-                                                                    )}
-                                                                    <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
-                                                                        {item.title}
-                                                                    </Text>
-                                                                </View>
+                                                        className="flex-col items-start py-3">
+                                                        <View className="flex-row justify-between items-center w-full">
+                                                            <View className="flex-row items-center">
+                                                                {isActiveChapter && (
+                                                                    <MaterialIcons name="play-arrow" size={24} color="#16a34a" style={{ marginRight: 4 }} />
+                                                                )}
+                                                                <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
+                                                                    {item.title}
+                                                                </Text>
                                                             </View>
-                                                            <Text className={`${isActiveChapter ? 'text-gray-800' : 'text-gray-500'}`}>
-                                                                # {item.number}
-                                                            </Text>
-                                                        </Pressable>
-                                                    </Link>
+                                                        </View>
+                                                        <Text className={`${isActiveChapter ? 'text-gray-800' : 'text-gray-500'}`}>
+                                                            # {item.number}
+                                                        </Text>
+                                                    </Pressable>
                                                 );
                                             })}
                                     </ScrollView>
@@ -301,7 +329,8 @@ const NovelModal = ({ novelLink }: { novelLink: string }) => {
                     </View>
                 )}
             </View>
-        </CustomMovableModal>)
+        </CustomMovableModal>
+    )
 }
 
 

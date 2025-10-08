@@ -6,7 +6,7 @@ import BackButton from "@components/reusable/BackButton";
 import NovelImage from "@components/reusable/NovelImage";
 import SourceImage from "@components/reusable/SourceImage";
 import { NovelMetaData } from "@constants/types";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { MaterialIcons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { useHistoryStore } from "@stores/history";
@@ -54,14 +54,14 @@ export default function NovelDetail() {
     }, [])
 
     useEffect(() => {
-        if (novelLink) {
+        if (novelLink && novelMetadata) {
             upsertNovel({
                 novelLink: novelLink,
                 isInLibrary: isInLibrary,
                 isLiked: isLiked,
-                title: novelMetadata?.name || "Unknown Title",
-                author: novelMetadata?.author || "Unknown Author",
-                coverImage: novelMetadata?.cover
+                title: novelMetadata.name,
+                author: novelMetadata.author,
+                coverImage: novelMetadata.cover
             });
         }
     }, [isInLibrary, isLiked])
@@ -102,8 +102,8 @@ export default function NovelDetail() {
                         onPress={() => setIsInLibrary(!isInLibrary)}
                         className={`flex-row items-center p-2 border-2 ${isInLibrary ? 'bg-gray-300 border-gray-500' : 'border-gray-400'} rounded-xl w-9/12`}
                     >
-                        <Ionicons
-                            name={isInLibrary ? "library" : "library-outline"}
+                        <MaterialIcons
+                            name={isInLibrary ? "library-add-check" : "library-add"}
                             size={24}
                             color="#4b5563"
                         />

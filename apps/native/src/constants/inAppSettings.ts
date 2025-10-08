@@ -8,6 +8,7 @@ export const inAppSettings = [
     "autoCheckUpdates",
     "autoBackup",
     "downloadPath",
+    "updateFrom"
 ];
  
 // Settings that should be synced with the server

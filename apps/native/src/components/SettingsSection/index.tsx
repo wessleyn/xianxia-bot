@@ -1,5 +1,6 @@
 import { supportedLanguages } from '@//constants/supportedLanguages';
 import { inAppSettings, Theme } from '@constants/inAppSettings';
+import { UpdateType } from '@constants/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAccountStore } from '@stores/account';
 import { pullSettings } from '@utils/pullSettings';
@@ -10,8 +11,10 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 
+
 const SettingsSection = () => {
     const { isLoggedIn, user } = useAccountStore()
+    const [updatedNovels, setUpdatedNovels] = useState<UpdateType>("Readings");
     const { colorScheme, setColorScheme } = useColorScheme();
     const [isAutoSync, setIsAutoSync] = useState(false);
     const [theme, setTheme] = useState<Theme>('system');
@@ -24,11 +27,12 @@ const SettingsSection = () => {
     const [downloadPath, setDownloadPath] = useState('');
     const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+    const [isUpdateFromMenuOpen, setIsUpdateFromMenuOpen] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
     const handlePullSettings = async () => {
         if (!user?.id) return;
-console.log("pulling")
+        console.log("pulling")
         try {
             setIsSyncing(true);
             const serverSettings = await pullSettings(user.id);
@@ -144,6 +148,10 @@ console.log("pulling")
         setAutoBackup(prev => !prev);
         await AsyncStorage.setItem('autoBackup', JSON.stringify(!autoBackup));
     };
+    const toggleUpdateFrom = async (val : UpdateType) => {
+        setUpdatedNovels(val);
+        await AsyncStorage.setItem('updateFrom', JSON.stringify(val));
+    };
 
     // TODO: Implement folder picker
     const selectDownloadFolder = async () => {
@@ -231,6 +239,9 @@ console.log("pulling")
                     case "downloadPath":
                         setDownloadPath(value);
                         break;
+                    case "updateFrom":
+                        setUpdatedNovels(value as UpdateType);
+                        break;
                 }
             } else {
                 if (setting === 'autoSync') setIsAutoSync(false);
@@ -241,6 +252,7 @@ console.log("pulling")
                 if (setting === 'showSuggestions') setShowSuggestions(true);
                 if (setting === 'autoCheckUpdates') setAutoCheckUpdates(true);
                 if (setting === 'autoBackup') setAutoBackup(false);
+                if (setting === 'updatedNovels') setUpdatedNovels("Readings");
                 if (setting === 'downloadPath') setDownloadPath(FileSystem.documentDirectory + 'Downloads');
             }
         };
@@ -422,6 +434,41 @@ console.log("pulling")
                     onValueChange={toggleAutoCheckUpdates}
                 />
             </View>
+
+            {/* Selection: Readings, Favourites, Library */}
+            <Pressable
+                className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'
+                onPress={() => setIsUpdateFromMenuOpen(!isUpdateFromMenuOpen)}
+            >
+                <Text className="text-lg">Update From</Text>
+                <Text className="text-gray-500">{updatedNovels}</Text>
+            </Pressable>
+
+            {isUpdateFromMenuOpen && (
+                <View className="bg-gray-100 rounded-md p-2 mb-2">
+                    {['Readings', 'Favourites', 'Library'].map(option => (
+                        <Pressable
+                            key={option}
+                            className={`py-3 px-2 rounded-md mb-1 ${updatedNovels === option ? 'bg-blue-100' : ''
+                                }`}
+                            onPress={() => {
+                                toggleUpdateFrom(option as UpdateType);
+                                setIsUpdateFromMenuOpen(false);
+                            }}
+                        >
+                            <Text
+                                className={
+                                    updatedNovels === option
+                                        ? 'text-blue-600 font-medium'
+                                        : 'text-gray-600'
+                                }
+                            >
+                                {option}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
+            )}
 
 
             {/* Auto Backup */}

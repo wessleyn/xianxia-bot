@@ -2,7 +2,7 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import { User } from '@supabase/supabase-js';
-import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
+import { IconLogout, IconSettings, IconTrash, IconUser } from '@tabler/icons-react';
 import Link from 'next/link';
 import { Fragment, useEffect, useState } from 'react';
 
@@ -70,6 +70,17 @@ const UserMenu = () => {
                                     } flex w-full items-center px-4 py-2 text-sm`}>
                                     <IconSettings className="mr-3 h-5 w-5" aria-hidden="true" />
                                     Settings
+                                </Link>
+                            )}
+                        </MenuItem>
+                    </div>
+                    <div>
+                        <MenuItem>
+                            {({ focus }) => (
+                                <Link href="/dashboard/delete-account" className={`${focus ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'
+                                    } flex w-full items-center px-4 py-2 text-sm`}>
+                                    <IconTrash className="mr-3 h-5 w-5" aria-hidden="true" />
+                                    Delete Account
                                 </Link>
                             )}
                         </MenuItem>

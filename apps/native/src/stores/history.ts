@@ -4,16 +4,19 @@ import { create } from 'zustand';
 export interface ReadNovel {
     id: string;
     novelLink: string;
+    title: string;
+    author: string;
+    coverImage?: string;
+    chapters: string[]
+
     isLiked: boolean;
     isInLibrary: boolean;
+
     lastReadAt?: string;
     lastReadChLink?: string;
     lastReadChTitle?: string;
     progress: number; // 0-100
 
-    title: string;
-    author: string;
-    coverImage?: string;
 }
 
 interface HistoryStore {
@@ -39,12 +42,12 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
             updated[index] = {
                 ...updated[index],
                 ...novel,
-                lastReadAt: new Date().toISOString(),
             };
         } else {
             updated = [
                 ...current,
                 {
+                    // TODO: novelink is sufficient as id!!
                     id: novel.novelLink,
                     lastReadChLink: novel.lastReadChLink ?? "",
                     isInLibrary: novel.isInLibrary ?? false,
@@ -54,7 +57,8 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
                     title: novel.title ?? "Unknown Title",
                     author: novel.author ?? "Unknown Author",
                     coverImage: novel.coverImage,
-                    lastReadAt: new Date().toISOString(),
+                    chapters: novel.chapters ?? [],
+                    lastReadAt: novel.lastReadAt,
                     ...novel,
                 },
             ];

@@ -7,12 +7,14 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link } from "expo-router";
 
 import { Novel, Source } from "@constants/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 export default function Explore() {
   const [enabledSources, setEnabledSources] = useState<Source[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
   const db = useSQLiteContext();
 
   useEffect(() => {
@@ -20,7 +22,13 @@ export default function Explore() {
       const sources = await db.getAllAsync<Source>('SELECT * FROM sources WHERE enabled = 1;')
       setEnabledSources(sources);
     }
+    const checkSettings = async () => {
+      const setting = await AsyncStorage.getItem('showSuggestions')
+      const parsedSettings = JSON.parse(setting ?? 'true') as boolean
+      setShowSuggestions(parsedSettings)
+    }
 
+    checkSettings();
     fetchSources();
   }, []);
 
@@ -64,53 +72,55 @@ export default function Explore() {
       </View>
 
       {/* Suggested Novels Carousel */}
-      <View className="mb-4">
-        <View className="flex-row justify-between px-4 mb-4">
-          <Text className="text-lg font-semibold">Suggestions</Text>
-          {suggestedNovels.length > 0 && <Link href={'/suggestions'} asChild>
-            <TouchableOpacity>
-              <Text className="text-blue-500">More</Text>
-            </TouchableOpacity>
-          </Link>}
-        </View>
+      {
+        showSuggestions && <View className="mb-4">
+          <View className="flex-row justify-between px-4 mb-4">
+            <Text className="text-lg font-semibold">Suggestions</Text>
+            {suggestedNovels.length > 0 && <Link href={'/suggestions'} asChild>
+              <TouchableOpacity>
+                <Text className="text-blue-500">More</Text>
+              </TouchableOpacity>
+            </Link>}
+          </View>
 
-        <FlatList
-          data={suggestedNovels}
-          renderItem={({ item }) => (
-            <Link href={`/novel/${item.id}`} asChild>
-              <Pressable style={{ width: CARD_WIDTH }} className="mr-3">
-                <View className="h-44 rounded-xl overflow-hidden relative">
-                  <Image
-                    source={{ uri: item.image }}
-                    className="w-full h-full rounded-xl"
-                    style={{ resizeMode: 'cover' }}
-                  />
-                  <View className="absolute bottom-0 left-0 right-0 bg-black/60 p-2.5 rounded-b-xl">
-                    <Text className="text-white font-bold text-base" numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
-                    <Text className="text-gray-300 text-xs mt-0.5" numberOfLines={1} ellipsizeMode="tail">{item.tags}</Text>
+          <FlatList
+            data={suggestedNovels}
+            renderItem={({ item }) => (
+              <Link href={`/novel/${item.id}`} asChild>
+                <Pressable style={{ width: CARD_WIDTH }} className="mr-3">
+                  <View className="h-44 rounded-xl overflow-hidden relative">
+                    <Image
+                      source={{ uri: item.image }}
+                      className="w-full h-full rounded-xl"
+                      style={{ resizeMode: 'cover' }}
+                    />
+                    <View className="absolute bottom-0 left-0 right-0 bg-black/60 p-2.5 rounded-b-xl">
+                      <Text className="text-white font-bold text-base" numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
+                      <Text className="text-gray-300 text-xs mt-0.5" numberOfLines={1} ellipsizeMode="tail">{item.tags}</Text>
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            </Link>
-          )}
-          ListEmptyComponent={() => (
-            <View className="flex h-[5vh] w-3/4 items-center justify-center px-4">
-              <Text className=" text-gray-500 text-wrap text-center ">
-                Start Reading or Import History to get recommendations.
-              </Text>
-            </View>
-          )}
-          keyExtractor={(item: Novel) => item.id}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingLeft: 16, paddingRight: 8 }}
-          pagingEnabled={false}
-          snapToAlignment="center"
-          snapToInterval={CARD_WIDTH + 12} // Card width + margin
-          decelerationRate="fast"
-          className="py-2"
-        />
-      </View>
+                </Pressable>
+              </Link>
+            )}
+            ListEmptyComponent={() => (
+              <View className="flex h-[5vh] w-3/4 items-center justify-center px-4">
+                <Text className=" text-gray-500 text-wrap text-center ">
+                  Start Reading or Import History to get recommendations.
+                </Text>
+              </View>
+            )}
+            keyExtractor={(item: Novel) => item.id}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 16, paddingRight: 8 }}
+            pagingEnabled={false}
+            snapToAlignment="center"
+            snapToInterval={CARD_WIDTH + 12} // Card width + margin
+            decelerationRate="fast"
+            className="py-2"
+          />
+        </View>
+      }
 
       {/* Supported and enabled Sources */}
       <View className="flex-1">

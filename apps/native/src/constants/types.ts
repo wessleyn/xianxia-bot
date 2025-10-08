@@ -48,6 +48,14 @@ export interface NovelPageResult {
     hasNextPage: boolean;
 }
 
+export type NovelSourceMetadata = {
+    name: string,
+    baseUrl: string,
+    mainCategory: string,
+    language: string,
+    isRaw: boolean,
+}
+
 export type ChapterContent = {
     content: string[];
     title: string;
@@ -58,14 +66,16 @@ export type ChapterContent = {
 }
 
 export interface SourceDefinition {
+    supportedHostnames?: string[];
     getId(): string;
-    getMetadata(): any;
+    getMetadata(): NovelSourceMetadata;
     getIcon(): Promise<string>;
     getGenres(): Promise<string[]>;
 
     getRandomNovel?(): Promise<string>;
     getNovelMetaData(link?: string): Promise<NovelMetaData>
     getNovelImage(link: string): string;
+    getLatestCh(link?: string): Promise<Date>
     getNovelChapters(link: string): Promise<{ title: string; link: string; date?: Date; }[]>;
     getNovelChapterContent(link: string): Promise<ChapterContent>;
     getNovels(page?: number): Promise<NovelPageResult>;
@@ -79,3 +89,5 @@ export interface SourceDefinition {
     getOldestNovels?(page?: number): Promise<NovelPageResult>;
     getCompletedNovels?(page?: number): Promise<NovelPageResult>;
 }
+
+export type UpdateType = "Readings" | "Favourites" | "Library"

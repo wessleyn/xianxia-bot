@@ -1,3 +1,4 @@
+import parseRelativeTime from "@utils/parseRelativeTime";
 import { parseHTML } from "linkedom";
 import { normalizeText } from "../../utils/normalizeText";
 import { ChapterContent, Novel, NovelMetaData, NovelPageResult, SourceDefinition } from "../types";
@@ -12,6 +13,7 @@ const placeholderImage = 'https://a.a/a.png'
 
 export class NovelBin implements SourceDefinition {
     // Inbuilt Source Properties
+    public supportedHostnames = ["novelbin.me", "novelbin.com"];
     private name = "NovelBin";
     private baseUrl = "https://novelbin.me";
     private mainCategory = "Fantasy";
@@ -133,6 +135,21 @@ export class NovelBin implements SourceDefinition {
             return imageUrl;
         } catch (error) {
             return placeholderImage;
+        }
+    }
+
+    async getLatestCh(link?: string) {
+        try {
+            // Get the novel page document
+            if (!this.novelPage) {
+                this.novelPage = await this.fetchPage(link || this.novel.link, "force-cache");
+            }
+
+            const time = this.novelPage.querySelector('.item-time')?.textContent?.trim() || '';
+            return parseRelativeTime(time);
+        } catch (error) {
+            console.error("Error fetching latest chapter:", error);
+            throw error;
         }
     }
 
