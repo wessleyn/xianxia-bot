@@ -8,6 +8,7 @@
     "dev:web": "turbo dev --filter=web",
     "dev:ext": "turbo dev --filter=ext",
     "devBuild": "cd apps/native && eas workflow:run ./.eas/workflows/create-development-builds.yml",
+    "interBuild": "cd apps/native && eas workflow:run ./.eas/workflows/deploy-to-internal.yml",
     "preBuild": "cd apps/native && eas workflow:run ./.eas/workflows/publish-preview-update.yml",
     "proBuild": "cd apps/native && eas workflow:run ./.eas/workflows/deploy-to-production.yml",
     "build:docs": "turbo build --filter=docs",

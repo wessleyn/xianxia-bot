@@ -17,6 +17,14 @@
         "image": "ubuntu-22.04-jdk-17-ndk-r21e"
       }
     },
+    "internal": {
+      "distribution": "internal",
+      "channel": "internal",
+      "autoIncrement": true,
+      "android": {
+        "image": "ubuntu-22.04-jdk-17-ndk-r21e"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "android": {
@@ -25,6 +33,15 @@
     }
   },
   "submit": {
-    "production": {}
+    "internal": {
+      "android": {
+        "track": "internal"
+      }
+    },
+    "production": {
+      "android": {
+        "track": "production"
+      }
+    }
   }
 }

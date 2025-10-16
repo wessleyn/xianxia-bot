@@ -1,10 +1,11 @@
-name: Deploy to production
+name: Deploy to Internal Testing
 
 on:
   push:
-    branches: ['main']
-    
+    branches: ['native']
+
 defaults:
+  
   run:
     working_directory: ./apps/native
 
@@ -12,25 +13,37 @@ jobs:
   fingerprint:
     name: Fingerprint
     type: fingerprint
+
   get_android_build:
-    name: Check for existing android build
+    name: Check for existing Android build
     needs: [fingerprint]
     type: get-build
     params:
       fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
-      profile: production
+      profile: internal
+
   build_android:
-    name: Build Android
+    name: Build Android (Internal)
     needs: [get_android_build]
     if: ${{ !needs.get_android_build.outputs.build_id }}
     type: build
     params:
       platform: android
-      profile: production
+      profile: internal
+
   submit_android_build:
-    name: Submit Android Build
+    name: Submit Android Build to Internal Track
     needs: [build_android]
     type: submit
+    env:
+      EXPO_DEBUG: "1"
     params:
       build_id: ${{ needs.build_android.outputs.build_id }}
-      profile: production
+      profile: internal
+
+  publish_internal_update:
+    name: Publish Internal Update
+    needs: [submit_android_build]
+    type: update
+    params:
+      branch: ${{ github.ref_name }}

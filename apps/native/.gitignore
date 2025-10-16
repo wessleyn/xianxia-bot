@@ -23,4 +23,4 @@ expo-env.d.ts
 .env
 
 # Service Account JSON
-xianxu-f90198e324ce.json
+service-account.json
