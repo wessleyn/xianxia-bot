@@ -1,9 +1,8 @@
-import { ReactNode } from 'react'
 import { View, ViewProps } from 'react-native'
 
-const CustomView = ({children, ...props}: {children: ReactNode} & ViewProps) => {
+const CustomView = ({children, ...props}: ViewProps) => {
   return (
-      <View {...props} className={'flex-1 bg-white ' + props.className}>
+      <View {...props} className={'flex-1 bg-white dark:bg-black text-slate-800' + props.className}>
           {children}
     </View>
   )

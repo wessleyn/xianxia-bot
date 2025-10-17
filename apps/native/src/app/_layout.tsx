@@ -13,7 +13,7 @@ import 'react-native-url-polyfill/auto';
 
 const RootLayout = () => {
   const { setSession } = useAccountStore();
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [appLoaded, setAppLoaded] = useState(false);
   const { setColorScheme } = useColorScheme();
 
   useEffect(() => {
@@ -24,25 +24,20 @@ const RootLayout = () => {
         'Verdana-Italic': require('./../../assets/fonts/Verdana/Verdana-Italic.ttf'),
         'Verdana-BoldItalic': require('./../../assets/fonts/Verdana/Verdana-BoldItalic.ttf'),
       });
-      setFontsLoaded(true);
     }
 
      async function checkColorTheme() {
        const theme = await AsyncStorage.getItem('theme')
-       console.log('Loaded theme from storage:', theme);
       if (theme) {
         setColorScheme(theme as 'light' | 'dark' | 'system')
       }
     }
 
-    checkColorTheme();
-    loadFonts();
-  }, []);
-
-  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
+      checkColorTheme();
+      loadFonts();
       setSession(session);
+      setAppLoaded(true);
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -54,7 +49,7 @@ const RootLayout = () => {
     };
   }, []);
 
-  if (!fontsLoaded) {
+  if (!appLoaded) {
     return null;
   }
 

@@ -48,7 +48,7 @@
           "backgroundColor": "#ffffff",
           "dark":{
             "image": "./assets/splash-icon-dark-1024.png",
-            "backgroundColor": "#000000"
+            "backgroundColor": "#151515"
           }
         }
       ],

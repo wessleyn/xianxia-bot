@@ -10,11 +10,12 @@ import { Novel, Source } from "@constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 
 export default function Explore() {
   const [enabledSources, setEnabledSources] = useState<Source[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
+  const colorScheme = useColorScheme();
   const db = useSQLiteContext();
 
   useEffect(() => {
@@ -34,38 +35,51 @@ export default function Explore() {
 
   const suggestedNovels = [] as Novel[];
 
-  // Get screen width for carousel sizing
   const { width } = Dimensions.get('window');
-  const CARD_WIDTH = width * 0.40; // Cards take ~40% of screen width
+  const CARD_WIDTH = width * 0.40;
+  const isDark = colorScheme === 'dark';
 
   return (
-    <CustomView className="flex-1 gap-2">
+    <CustomView className="flex-1 gap-2 dark:bg-black">
 
       {/* Navigation Matrix */}
       <View className="px-4 text-center">
         <View className="flex-row mb-4">
           <Link href={'/local'} push asChild>
-            <Pressable className="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm">
-              <FontAwesome5 name="folder" size={24} color="#4b5563" />
-              <Text className="font-medium">Local Storage</Text>
+            <Pressable className="flex-1 flex-row align gap-4 bg-gray-200 dark:bg-gray-800 p-4 mr-4 rounded-xl shadow-sm">
+              <FontAwesome5
+                name="folder"
+                size={24}
+                color={isDark ? "#0369a1" : "#4b5563"}
+              />
+              <Text className="font-medium dark:text-sky-700 dark:font-bold mt-1">Local Storage</Text>
             </Pressable>
           </Link>
           <Link href={'/bookmarks'} asChild >
-            <Pressable className="flex-1 flex-row gap-4 bg-gray-200 p-4 rounded-xl shadow-sm">
-              <MaterialIcons name="bookmark-outline" size={24} color="#4b5563" />
-              <Text className="font-medium">Bookmarks</Text>
+            <Pressable className="flex-1 flex-row gap-4 bg-gray-200 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+              <MaterialIcons
+                name="bookmark-outline"
+                size={24}
+                color={isDark ? "#0369a1" : "#4b5563"}
+              />
+              <Text className="font-medium dark:text-sky-700 dark:font-bold mt-1">Bookmarks</Text>
             </Pressable>
           </Link>
         </View>
         <View className="flex-row">
           <RandomNovel
+            isDark={isDark}
             text
-            containerClassName="flex-1 flex-row gap-4 bg-gray-200 p-4 mr-4 rounded-xl shadow-sm"
+            containerClassName="flex-1 flex-row gap-4 bg-gray-200 dark:bg-gray-800 p-4 mr-4 rounded-xl shadow-sm"
           />
           <Link href={'/downloads'} asChild >
-            <Pressable className="flex-1 flex-row gap-4 bg-gray-200 p-4 rounded-xl shadow-sm">
-              <MaterialCommunityIcons name="download-outline" size={24} color="#4b5563" />
-              <Text className="font-medium">Downloads</Text>
+            <Pressable className="flex-1 flex-row gap-4 bg-gray-200 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+              <MaterialCommunityIcons
+                name="download-outline"
+                size={24}
+                color={isDark ? "#0369a1" : "#4b5563"}
+              />
+              <Text className="font-medium dark:text-sky-700 dark:font-bold mt-1">Downloads</Text>
             </Pressable>
           </Link>
         </View>
@@ -75,10 +89,10 @@ export default function Explore() {
       {
         showSuggestions && <View className="mb-4">
           <View className="flex-row justify-between px-4 mb-4">
-            <Text className="text-lg font-semibold">Suggestions</Text>
+            <Text className="text-lg font-semibold dark:text-gray-400">Suggestions</Text>
             {suggestedNovels.length > 0 && <Link href={'/suggestions'} asChild>
               <TouchableOpacity>
-                <Text className="text-blue-500">More</Text>
+                <Text className="text-blue-500 dark:text-sky-700 dark:font-bold">More</Text>
               </TouchableOpacity>
             </Link>}
           </View>
@@ -125,10 +139,10 @@ export default function Explore() {
       {/* Supported and enabled Sources */}
       <View className="flex-1">
         <View className="flex-row justify-between px-4 mb-4">
-          <Text className="text-lg font-semibold">Sources</Text>
+          <Text className="text-lg font-semibold dark:text-gray-400">Sources</Text>
           <Link href={'/sources'} asChild>
             <TouchableOpacity>
-              <Text className="text-blue-500">Catalog</Text>
+              <Text className="text-blue-500 dark:text-sky-700 dark:font-bold">Catalog</Text>
             </TouchableOpacity>
           </Link>
         </View>
@@ -146,7 +160,7 @@ export default function Explore() {
                     size={64}
                   />
                 </View>
-                <Text className="text-center mt-2" numberOfLines={1}>{item.name}</Text>
+                <Text className="text-center dark:text-gray-400 mt-2" numberOfLines={1}>{item.name}</Text>
               </Pressable>
             </Link>
           )}

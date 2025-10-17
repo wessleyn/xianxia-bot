@@ -7,6 +7,7 @@ import findRandomNovel from '../../utils/sources/findRandomNovel';
 
 const RandomNovel = ({
     text = false,
+    isDark = false,
     className = '',
     containerClassName = ""
 }) => {
@@ -54,10 +55,14 @@ const RandomNovel = ({
             {isLoadingRandom ? (
                 <ActivityIndicator size="small" color="#4b5563" />
             ) : (
-                <MaterialCommunityIcons name="dice-multiple-outline" size={24} color="#4b5563" />
+                    <MaterialCommunityIcons
+                        name="dice-multiple-outline"
+                        size={24}
+                        color={isDark ? "#0369a1" : "#4b5563"}
+                    />
             )}
             {
-                text && <Text className="font-medium">Random</Text>
+                text && <Text className="font-medium dark:text-sky-700 dark:font-bold">Random</Text>
             }
         </Pressable>
     );
