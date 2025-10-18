@@ -3,13 +3,14 @@ import BackButton from "@//components/reusable/BackButton";
 import AnimatedSearchInput from "@components/reusable/AnimatedSearchInput";
 import SourceImage from "@components/reusable/SourceImage";
 import { supportedLanguages } from "@constants/supportedLanguages";
+import { createTheme } from "@constants/themes";
 import { Source } from "@constants/types";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Link } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Toast from 'react-native-toast-message';
 
 export default function Sources() {
@@ -21,6 +22,10 @@ export default function Sources() {
     const [searchQuery, setSearchQuery] = useState<string>("")
     const [isSearching, setIsSearching] = useState<boolean>(false)
     const db = useSQLiteContext();
+
+    // add theme resolution
+    const colorScheme = useColorScheme();
+    const theme = createTheme(colorScheme === 'dark');
 
     // Extract unique categories from sources and count occurrences
     const categoryFilters = useMemo(() => {
@@ -139,26 +144,32 @@ export default function Sources() {
                 visible={showLanguageModal}
                 onRequestClose={() => setShowLanguageModal(false)}
             >
-                <View className="flex-1 justify-center items-center bg-black/50">
-                    <View className="bg-white rounded-lg w-4/5 p-6">
-                        <Text className="text-xl font-bold mb-4 text-center">Select Language</Text>
-                        <View className="border-t border-gray-200"></View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <View style={{ backgroundColor: theme.primaryBgColor, borderRadius: 12, width: '80%', padding: 24 }}>
+                        <Text style={{ color: theme.textColor, fontSize: 18, fontWeight: '700', marginBottom: 12, textAlign: 'center' }}>Select Language</Text>
+                        <View style={{ borderTopWidth: 1, borderTopColor: theme.borderColor, marginBottom: 8 }}></View>
                         {supportedLanguages.map((language) => (
                             <TouchableOpacity
                                 key={language.code}
-                                className={`py-4 px-2 border-b border-gray-200 ${selectedLanguage === language.code ? 'bg-indigo-50' : ''}`}
                                 onPress={() => handleLanguageSelect(language.code)}
+                                style={{
+                                    paddingVertical: 12,
+                                    paddingHorizontal: 8,
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: theme.borderColor,
+                                    backgroundColor: selectedLanguage === language.code ? theme.pillSelectedBg : 'transparent'
+                                }}
                             >
-                                <Text className={`text-base ${selectedLanguage === language.code ? 'text-indigo-600 font-medium' : ''}`}>
+                                <Text style={{ color: selectedLanguage === language.code ? theme.textColor : theme.textColor, fontSize: 16, fontWeight: selectedLanguage === language.code ? '600' : '400' }}>
                                     {language.name}
                                 </Text>
                             </TouchableOpacity>
                         ))}
                         <TouchableOpacity
-                            className="mt-4 bg-gray-200 py-2 rounded-lg"
+                            style={{ marginTop: 12, backgroundColor: theme.borderColor, paddingVertical: 10, borderRadius: 8, alignItems: 'center' }}
                             onPress={() => setShowLanguageModal(false)}
                         >
-                            <Text className="text-center font-medium">Cancel</Text>
+                            <Text style={{ color: theme.textColor, fontWeight: '600' }}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -169,7 +180,7 @@ export default function Sources() {
                 <BackButton />
 
                 {
-                    !isSearching &&  <Text className="text-center text-2xl">Sources</Text>
+                    !isSearching &&  <Text style={{ color: theme.textColor, fontSize: 20, textAlign: 'center' }}>Sources</Text>
                 }
                 <AnimatedSearchInput
                     headerName="Sources"
@@ -190,24 +201,30 @@ export default function Sources() {
                         <TouchableOpacity
                             key={category}
                             onPress={() => handleCategorySelect(category)}
-                            className={`px-4 py-2 rounded-full ${selectedCategory === category ? 'bg-indigo-500' : 'bg-gray-100'} flex-row items-center mr-2`}
+                            style={{
+                                paddingHorizontal: 16,
+                                paddingVertical: 8,
+                                borderRadius: 999,
+                                backgroundColor: selectedCategory === category ? theme.pillSelectedBg : theme.pillBg,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginRight: 8
+                            }}
                         >
                             {category === "Language" && (
                                 <>
-                                    <FontAwesome name="language" size={18} color={selectedCategory === category ? "white" : "#4b5563"} style={{ marginRight: 4 }} />
+                                    <FontAwesome name="language" size={18} color={selectedCategory === category ? theme.textColor : theme.mutedColor} style={{ marginRight: 6 }} />
                                     {selectedCategory === "Language" && (
-                                        <Text className={`${selectedCategory === category ? 'text-white' : 'text-gray-700'} font-medium ml-1`}>
+                                        <Text style={{ color: theme.textColor, fontWeight: '600', marginLeft: 4 }}>
                                             ({supportedLanguages.find(lang => lang.code === selectedLanguage)?.code.toUpperCase()})
                                         </Text>
                                     )}
                                 </>
                             )}
                             {category === "Recently Updated" && (
-                                <MaterialIcons name="update" size={18} color={selectedCategory === category ? "white" : "#4b5563"} style={{ marginRight: 4 }} />
+                                <MaterialIcons name="update" size={18} color={selectedCategory === category ? theme.textColor : theme.mutedColor} style={{ marginRight: 6 }} />
                             )}
-                            <Text
-                                className={`${selectedCategory === category ? 'text-white' : 'text-gray-700'} font-medium`}
-                            >
+                            <Text style={{ color: selectedCategory === category ? theme.textColor : theme.textColor, fontWeight: '600' }}>
                                 {category}
                             </Text>
                         </TouchableOpacity>
@@ -221,7 +238,7 @@ export default function Sources() {
                 {
                     filteredSources.length === 0 && (
                         <View className="flex-1 justify-center items-center h-[80vh]">
-                            <Text className="text-gray-500">No sources found.</Text>
+                            <Text style={{ color: theme.mutedColor }}>No sources found.</Text>
                         </View>
                     )
                 }
@@ -235,21 +252,19 @@ export default function Sources() {
                                     name={source.name}
                                     size={50}
                                 />
-                                <View className="p-4 ">
-                                    <Text className="text-lg font-semibold">{source.name}</Text>
-                                    <Text className="text-sm text-gray-500">{source.mainCategory}, {source.language}</Text>
+                                <View style={{ padding: 16 }}>
+                                    <Text style={{ color: theme.textColor, fontSize: 16, fontWeight: '600' }}>{source.name}</Text>
+                                    <Text style={{ color: theme.mutedColor, fontSize: 12 }}>{source.mainCategory}, {source.language}</Text>
                                 </View>
                             </View>
                         </Link>
 
-                        <View className="flex-row gap-4 items-center">
-                            <View className="h-8 w-px bg-gray-300"></View>
+                        <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
+                            <View style={{ height: 32, width: 1, backgroundColor: theme.borderColor }}></View>
                             <Pressable
                                 onPress={() => toggleSource(source.id, source.name, source.enabled)}
                             >
-                                <Text
-                                    className="text-gray-500 text-3xl w-6 text-center"
-                                >{source.enabled ? '-' : '+'}</Text>
+                                <Text style={{ color: theme.mutedColor, fontSize: 24, width: 24, textAlign: 'center' }}>{source.enabled ? '-' : '+'}</Text>
                             </Pressable>
                         </View>
                     </View>

@@ -18,7 +18,7 @@ const RandomNovel = ({
         setIsLoadingRandom(true);
 
         try {
-            const novel =  await findRandomNovel(className);
+            const novel = await findRandomNovel(className);
             if (novel) {
                 router.push({
                     pathname: "/novel/[novelLink]",
@@ -55,14 +55,14 @@ const RandomNovel = ({
             {isLoadingRandom ? (
                 <ActivityIndicator size="small" color="#4b5563" />
             ) : (
-                    <MaterialCommunityIcons
-                        name="dice-multiple-outline"
-                        size={24}
-                        color={isDark ? "#0369a1" : "#4b5563"}
-                    />
+                <MaterialCommunityIcons
+                    name="dice-multiple-outline"
+                    size={24}
+                    color={isDark ? "#9ca3af" : "#4b5563"}
+                />
             )}
             {
-                text && <Text className="font-medium dark:text-sky-700 dark:font-bold">Random</Text>
+                text && <Text className="font-medium text-gray-400">Random</Text>
             }
         </Pressable>
     );

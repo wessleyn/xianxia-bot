@@ -40,7 +40,7 @@ export default function Explore() {
   const isDark = colorScheme === 'dark';
 
   return (
-    <CustomView className="flex-1 gap-2 dark:bg-black">
+    <CustomView className="flex-1 gap-2">
 
       {/* Navigation Matrix */}
       <View className="px-4 text-center">
@@ -50,9 +50,10 @@ export default function Explore() {
               <FontAwesome5
                 name="folder"
                 size={24}
-                color={isDark ? "#0369a1" : "#4b5563"}
+                color={isDark ? "#9ca3af" : "#4b5563"}
+
               />
-              <Text className="font-medium dark:text-sky-700 dark:font-bold mt-1">Local Storage</Text>
+              <Text className="font-medium text-gray-400 mt-1">Local Storage</Text>
             </Pressable>
           </Link>
           <Link href={'/bookmarks'} asChild >
@@ -60,9 +61,10 @@ export default function Explore() {
               <MaterialIcons
                 name="bookmark-outline"
                 size={24}
-                color={isDark ? "#0369a1" : "#4b5563"}
+                color={isDark ? "#9ca3af" : "#4b5563"}
+
               />
-              <Text className="font-medium dark:text-sky-700 dark:font-bold mt-1">Bookmarks</Text>
+              <Text className="font-medium text-gray-400 mt-1">Bookmarks</Text>
             </Pressable>
           </Link>
         </View>
@@ -77,9 +79,10 @@ export default function Explore() {
               <MaterialCommunityIcons
                 name="download-outline"
                 size={24}
-                color={isDark ? "#0369a1" : "#4b5563"}
+                color={isDark ? "#9ca3af" : "#4b5563"}
+
               />
-              <Text className="font-medium dark:text-sky-700 dark:font-bold mt-1">Downloads</Text>
+              <Text className="font-medium text-gray-400 mt-1">Downloads</Text>
             </Pressable>
           </Link>
         </View>
@@ -92,7 +95,7 @@ export default function Explore() {
             <Text className="text-lg font-semibold dark:text-gray-400">Suggestions</Text>
             {suggestedNovels.length > 0 && <Link href={'/suggestions'} asChild>
               <TouchableOpacity>
-                <Text className="text-blue-500 dark:text-sky-700 dark:font-bold">More</Text>
+                <Text className="text-gray-400 dark:font-bold">More</Text>
               </TouchableOpacity>
             </Link>}
           </View>
@@ -142,7 +145,7 @@ export default function Explore() {
           <Text className="text-lg font-semibold dark:text-gray-400">Sources</Text>
           <Link href={'/sources'} asChild>
             <TouchableOpacity>
-              <Text className="text-blue-500 dark:text-sky-700 dark:font-bold">Catalog</Text>
+              <Text className="text-gray-400 dark:font-bold">Catalog</Text>
             </TouchableOpacity>
           </Link>
         </View>

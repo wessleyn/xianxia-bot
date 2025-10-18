@@ -1,7 +1,8 @@
 import { FilterOption } from '@constants/types';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React, { useState } from 'react';
-import { FlatList, Modal, Pressable, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { FlatList, Modal, Pressable, Text, TouchableWithoutFeedback, View, useColorScheme } from 'react-native';
+import { createTheme } from '../../constants/themes';
 
 
 interface FilterDropdownProps {
@@ -26,6 +27,9 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         setIsOpen(false);
     };
 
+    const scheme = useColorScheme();
+    const { mutedColor, activityColor, textColor, pillBg } = createTheme(scheme === 'dark');
+
     return (
         <View>
             {/* Dropdown trigger */}
@@ -36,13 +40,13 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                 <MaterialCommunityIcons
                     name="filter-menu-outline"
                     size={24}
-                    color="#3b82f6"
+                    color={activityColor}
                 />
-                <Text className="text-blue-500">{selectedOption.label}</Text>
+                <Text style={{ color: activityColor }}>{selectedOption.label}</Text>
                 <MaterialCommunityIcons
                     name={isOpen ? "chevron-up" : "chevron-down"}
                     size={20}
-                    color="#3b82f6"
+                    color={activityColor}
                 />
             </Pressable>
 
@@ -55,28 +59,32 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
             >
                 <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
                     <View className="flex-1">
-                        <View className="absolute right-4 top-36 bg-white rounded-lg shadow-md w-48 z-50">
+                        <View className="absolute right-4 top-36 rounded-lg shadow-md w-48 z-50" >
                             <FlatList
                                 data={options}
                                 keyExtractor={(item) => item.id}
                                 renderItem={({ item }) => (
                                     <Pressable
-                                        className={`p-3 flex-row items-center justify-between ${selectedOption.id === item.id ? 'bg-blue-50' : ''
-                                            }`}
+                                        style={{
+                                            padding: 12,
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                        }}
                                         onPress={() => handleSelect(item)}
                                     >
-                                        <View className="flex-row items-center gap-2">
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                             {item.icon && (
                                                 <MaterialCommunityIcons
                                                     name={item.icon as any}
                                                     size={18}
-                                                    color={selectedOption.id === item.id ? '#3b82f6' : '#4b5563'}
+                                                    color={selectedOption.id === item.id ? activityColor : mutedColor}
                                                 />
                                             )}
-                                            <Text
-                                                className={`${selectedOption.id === item.id ? 'text-blue-500 font-medium' : 'text-gray-700'
-                                                    }`}
-                                            >
+                                            <Text style={{
+                                                color: selectedOption.id === item.id ? activityColor : textColor,
+                                                fontWeight: selectedOption.id === item.id ? '600' : '400'
+                                            }}>
                                                 {item.label}
                                             </Text>
                                         </View>
@@ -84,7 +92,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                                             <MaterialCommunityIcons
                                                 name="check"
                                                 size={18}
-                                                color="#3b82f6"
+                                                color={activityColor}
                                             />
                                         )}
                                     </Pressable>

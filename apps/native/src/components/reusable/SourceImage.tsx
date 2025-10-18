@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image, Text, View, useColorScheme } from "react-native";
+import { createTheme } from '../../constants/themes';
 
 interface SourceImageProps {
     id?: string;
@@ -20,7 +21,6 @@ export default function SourceImage({ id, icon, name, size = 16 }: SourceImagePr
         setError(true);
     }, []);
 
-    // Calculate dynamic font size based on container size
     const fontSize = Math.max(Math.floor(size / 2.5), 12);
 
     const imageSize = { width: size, height: size };
@@ -38,8 +38,8 @@ export default function SourceImage({ id, icon, name, size = 16 }: SourceImagePr
             )}
             {(!loaded || error) && (
                 <Text
-                    className="font-bold text-gray-500"
-                    style={{ fontSize }}
+                    className="font-bold"
+                    style={{ fontSize, color: createTheme(useColorScheme() === 'dark').mutedColor }}
                 >
                     {name.charAt(0).toUpperCase()}
                 </Text>

@@ -37,7 +37,6 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
 
         let updated: ReadNovel[];
         if (index >= 0) {
-            // merge existing + new fields
             updated = [...current];
             updated[index] = {
                 ...updated[index],
@@ -47,7 +46,6 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
             updated = [
                 ...current,
                 {
-                    // TODO: novelink is sufficient as id!!
                     id: novel.novelLink,
                     lastReadChLink: novel.lastReadChLink ?? "",
                     isInLibrary: novel.isInLibrary ?? false,
