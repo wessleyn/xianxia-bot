@@ -10,6 +10,7 @@ export type ThemeColors = {
     badgeBg: string;
     badgeText: string;
     emptyIconColor: string;
+    iconColor: string;
 };
 
 export function createTheme(isDark: boolean): ThemeColors {
@@ -25,5 +26,6 @@ export function createTheme(isDark: boolean): ThemeColors {
         badgeBg: isDark ? '#06b6d4' : '#3b82f6', // teal for dark, blue for light
         badgeText: isDark ? '#000000' : '#ffffff',
         emptyIconColor: isDark ? '#475569' : '#d1d5db',
+        iconColor: isDark ? "#9ca3af" : "#4b5563",
     };
 }

@@ -1,6 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useEffect, useState } from "react";
-import { FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, Text, TextInput, View, useColorScheme } from "react-native";
+import { createTheme } from '../../constants/themes';
 import CustomModal from "../custom/CustomModal";
 
 
@@ -15,6 +16,7 @@ interface GenreFiltersModalProps {
 const GenreFiltersModal = ({ visible, onClose, onSelectGenre, selectedGenres, genres }: GenreFiltersModalProps) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredGenres, setFilteredGenres] = useState(genres);
+    const theme = createTheme(useColorScheme() === 'dark');
 
     useEffect(() => {
         if (searchQuery) {
@@ -36,20 +38,21 @@ const GenreFiltersModal = ({ visible, onClose, onSelectGenre, selectedGenres, ge
             className="p-4"
         >
             <View className="pt-6">
-                <Text className="text-xl font-bold mb-4 text-center">Select Genres</Text>
+                <Text style={{ fontSize: 20, fontWeight: '700', marginBottom: 12, textAlign: 'center', color: theme.textColor }}>Select Genres</Text>
 
                 {/* Search input */}
-                <View className="flex-row items-center text-gray-800 bg-gray-200 rounded-lg px-3 py-2 mb-4">
-                    <MaterialCommunityIcons name="magnify" size={20} color="#6b7280" />
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: theme.pillBg, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 12 }}>
+                    <MaterialCommunityIcons name="magnify" size={20} color={theme.mutedColor} />
                     <TextInput
-                        className="flex-1 ml-2  placeholder:text-gray-600"
+                        style={{ flex: 1, marginLeft: 8, color: theme.textColor }}
                         placeholder="Search genres..."
+                        placeholderTextColor={theme.mutedColor}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                     />
                     {searchQuery.length > 0 && (
                         <Pressable onPress={() => setSearchQuery("")}>
-                            <MaterialCommunityIcons name="close-circle" size={20} color="#6b7280" />
+                            <MaterialCommunityIcons name="close-circle" size={20} color={theme.mutedColor} />
                         </Pressable>
                     )}
                 </View>
@@ -62,22 +65,29 @@ const GenreFiltersModal = ({ visible, onClose, onSelectGenre, selectedGenres, ge
                     renderItem={({ item }) => (
                         <Pressable
                             onPress={() => onSelectGenre(item)}
-                            className={`p-3 rounded-lg mb-2 flex-row justify-between items-center ${selectedGenres.includes(item) ? "bg-blue-100" : "bg-gray-200"
-                                }`}
+                            style={{
+                                padding: 12,
+                                borderRadius: 8,
+                                marginBottom: 8,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                backgroundColor: selectedGenres.includes(item) ? theme.activityColor + '10' : theme.pillBg
+                            }}
                         >
-                            <Text className={`${selectedGenres.includes(item) ? "text-blue-700 font-medium" : "text-gray-800"}`}>
+                            <Text style={{ color: selectedGenres.includes(item) ? theme.activityColor : theme.textColor, fontWeight: selectedGenres.includes(item) ? '600' : '400' }}>
                                 {item}
                             </Text>
                             {selectedGenres.includes(item) && (
-                                <MaterialCommunityIcons name="check-circle" size={20} color="#3b82f6" />
+                                <MaterialCommunityIcons name="check-circle" size={20} color={theme.activityColor} />
                             )}
                         </Pressable>
-                    )}
-                />
-
-            </View>
-        </CustomModal>
-    );
-};
-
-export default GenreFiltersModal;
+                     )}
+                 />
+ 
+             </View>
+         </CustomModal>
+     );
+ };
+ 
+ export default GenreFiltersModal;

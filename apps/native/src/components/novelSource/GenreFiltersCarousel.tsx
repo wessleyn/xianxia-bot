@@ -1,6 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View, useColorScheme } from 'react-native';
+import { createTheme } from '../../constants/themes';
 
 interface GenreFilterChipProps {
     label: string;
@@ -9,12 +10,18 @@ interface GenreFilterChipProps {
 }
 
 export const GenreFilterChip = ({ label, selected, onPress }: GenreFilterChipProps) => {
+    const scheme = useColorScheme();
+    const { activityColor, textColor, mutedColor, pillBg } = createTheme(scheme === 'dark');
+
+    const backgroundColor = selected ? activityColor : pillBg;
+    const color = selected ? '#fff' : textColor;
+
     return (
         <Pressable
-            className={`mr-2 rounded-full px-4 py-2 ${selected ? 'bg-blue-500' : 'bg-gray-200'}`}
+            style={{ marginRight: 8, borderRadius: 999, paddingVertical: 8, paddingHorizontal: 16, backgroundColor }}
             onPress={onPress}
         >
-            <Text className={`${selected ? 'text-white' : 'text-gray-800'} font-medium`}>{label}</Text>
+            <Text style={{ color, fontWeight: '600' }}>{label}</Text>
         </Pressable>
     );
 };
@@ -32,8 +39,14 @@ const GenreFiltersCarousel = ({
     onOpenGenreModal,
     onSelectGenre
 }: GenreFiltersCarouselProps) => {
+    const colorScheme = useColorScheme();
+    const { activityColor, textColor, mutedColor, pillBg } = createTheme(colorScheme === 'dark');
+    const iconColor = activityColor;
+    const moreBgColor = activityColor + '10';
+    const moreTextColor = activityColor;
+
     return (
-        <View className="w-full px-4 py-2">
+        <View className={`w-full px-4 py-2 ${colorScheme === 'dark' ? 'bg-transparent' : ''}`}>
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -42,10 +55,10 @@ const GenreFiltersCarousel = ({
                 {/* First button - opens advanced genre filter modal */}
                 <Pressable
                     onPress={onOpenGenreModal}
-                    className="mr-2 rounded-full px-4 py-2 bg-blue-100 flex-row items-center"
+                    style={{ marginRight: 8, borderRadius: 999, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: moreBgColor, flexDirection: 'row', alignItems: 'center' }}
                 >
-                    <MaterialCommunityIcons name="filter-variant-plus" size={16} color="#3b82f6" />
-                    <Text className="text-blue-500 font-medium ml-1">More</Text>
+                    <MaterialCommunityIcons name="filter-variant-plus" size={16} color={iconColor} />
+                    <Text style={{ color: moreTextColor, fontWeight: '600', marginLeft: 6 }}>More</Text>
                 </Pressable>
 
                 {/* Display all genres that can be toggled directly from the carousel */}

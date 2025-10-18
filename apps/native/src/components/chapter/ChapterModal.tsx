@@ -3,7 +3,7 @@ import Slider from "@react-native-community/slider"
 import { useHistoryStore } from "@stores/history"
 import { Link } from "expo-router"
 import { useState } from "react"
-import { Pressable, Text, TouchableOpacity, View } from "react-native"
+import { Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native"
 import { useNovelStore } from "../../stores/novel"
 import CustomModal from "../custom/CustomModal"
 import NovelModal from "../NovelModal"
@@ -39,6 +39,19 @@ const ChapterModal = ({
     const { readNovels } = useHistoryStore();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
+    const colorScheme = useColorScheme()
+    const isDark = colorScheme === "dark"
+
+    // Colors that adapt to theme
+    const bgCard = isDark ? "#374151" : "#e5e7eb"        // dark: gray-700, light: gray-200
+    const textPrimary = isDark ? "#f3f4f6" : "#111827"   // light text on dark, dark text on light
+    const textMuted = isDark ? "#9ca3af" : "#6b7280"     // muted text
+    const iconColor = isDark ? "#e5e7eb" : "#4b5563"     // icon color
+    const disabledIcon = isDark ? "#1f2937" : "#ffffff"  // disabled icon color
+    const sliderMin = isDark ? "#a78bfa" : "#581c87"
+    const sliderThumb = isDark ? "#a78bfa" : "#581c87"
+    const sliderMax = isDark ? "#6b21a8" : "#c084fc"
+
     const handleChapterNav = (link: string) => {
         setIsModalVisible(false)
         handleAnonNav(link)
@@ -61,7 +74,7 @@ const ChapterModal = ({
             className="p-4 flex gap-2"
         >
             <View className="mt-4 flex">
-                <Text numberOfLines={1} ellipsizeMode="tail">
+                <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: textPrimary }}>
                     {Math.floor(readingProgress)}%, {chapterContent.title}
                 </Text>
                 <View className="flex-row items-center justify-between mt-4">
@@ -72,7 +85,7 @@ const ChapterModal = ({
                         <FontAwesome
                             name="chevron-left"
                             size={20}
-                            color={`${chapterContent.prevChapter ? '#4b5563' : 'white'}`} />
+                            color={chapterContent.prevChapter ? iconColor : disabledIcon} />
                     </Pressable>
                     <Slider
                         style={{ width: 300, height: 10 }}
@@ -80,9 +93,9 @@ const ChapterModal = ({
                         onSlidingComplete={handleSliderChange} // <- prevents feedback while dragging
                         minimumValue={0}
                         maximumValue={1}
-                        minimumTrackTintColor="#581c87"
-                        thumbTintColor="#581c87"
-                        maximumTrackTintColor="#c084fc"
+                        minimumTrackTintColor={sliderMin}
+                        thumbTintColor={sliderThumb}
+                        maximumTrackTintColor={sliderMax}
                     />
                     <Pressable
                         onPress={handleNextChapter}
@@ -91,7 +104,7 @@ const ChapterModal = ({
                         <FontAwesome
                             name="chevron-right"
                             size={18}
-                            color={`${chapterContent.nextChapter ? '#4b5563' : 'white'}`} />
+                            color={chapterContent.nextChapter ? iconColor : disabledIcon} />
                     </Pressable>
                 </View>
             </View>
@@ -100,11 +113,12 @@ const ChapterModal = ({
             <View className="flex-row  gap-2">
                 <Pressable
                     onPress={() => setIsModalVisible(true)}
-                    className="flex-row gap-3 items-center bg-gray-300 rounded-xl p-4 w-1/2">
-                    <Octicons name="three-bars" size={25} color="#4b5563" />
+                    className="flex-row gap-3 items-center rounded-xl p-4 w-1/2"
+                    style={{ backgroundColor: bgCard }}>
+                    <Octicons name="three-bars" size={25} color={iconColor} />
                     <View className="flex-col gap-2">
-                        <Text>Contents</Text>
-                        <Text className="text-gray-500 text-sm">
+                        <Text style={{ color: textPrimary }}>Contents</Text>
+                        <Text style={{ color: textMuted }} className="text-sm">
                             {currentNovel ? currentNovel.chapters : historyNovel!.chapters.length} Chapters
                         </Text>
                     </View>
@@ -115,28 +129,27 @@ const ChapterModal = ({
                         params: { novelLink: params.novelLink }
                     }}
                     asChild>
-                    <Pressable className="flex-row items-center bg-gray-300 rounded-xl p-4 flex-1">
+                    <Pressable className="flex-row items-center rounded-xl p-4 flex-1" style={{ backgroundColor: bgCard }}>
                         <NovelImage
                             image={novelImage}
                             size={50}
                         />
                         <View className="flex-col ml-3 flex-1">
-                            <Text >About this book</Text>
+                            <Text style={{ color: textPrimary }}>About this book</Text>
                         </View>
-                        <FontAwesome name="chevron-right" size={24} color="#4b5563" />
                     </Pressable>
                 </Link>
             </View>
 
             {/* Bottom buttons */}
             <View className="flex-row gap-2 w-full mt-2">
-                <TouchableOpacity className="bg-gray-300 p-6 flex-1 rounded-xl justify-center items-center">
-                    <MaterialIcons name="multitrack-audio" size={32} color="#4b5563" />
-                    <Text>Listen</Text>
+                <TouchableOpacity className="p-6 flex-1 rounded-xl justify-center items-center" style={{ backgroundColor: bgCard }}>
+                    <MaterialIcons name="multitrack-audio" size={32} color={iconColor} />
+                    <Text style={{ color: textPrimary }}>Listen</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="bg-gray-300 p-6 flex-1 rounded-xl justify-center items-center">
-                    <MaterialCommunityIcons name="download-outline" size={32} color="#4b5563" />
-                    <Text>Download</Text>
+                <TouchableOpacity className="p-6 flex-1 rounded-xl justify-center items-center" style={{ backgroundColor: bgCard }}>
+                    <MaterialCommunityIcons name="download-outline" size={32} color={iconColor} />
+                    <Text style={{ color: textPrimary }}>Download</Text>
                 </TouchableOpacity>
             </View>
             <NovelModal

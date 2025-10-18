@@ -1,6 +1,15 @@
 import { ChapterContent as ChapterContentType } from "@constants/types";
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Pressable,
+    ScrollView,
+    Text,
+    View,
+    useColorScheme
+} from 'react-native';
+import { createTheme } from '../../constants/themes';
 
 type ChapterContentProps = {
     chapterContent: ChapterContentType;
@@ -25,6 +34,16 @@ const ChapterContent = ({
     const [isRestoring, setIsRestoring] = useState<boolean>(true);
 
     const isMomentumScrollingRef = useRef<boolean>(false);
+
+    // Dark mode detection
+    const colorScheme = useColorScheme();
+    const isDarkMode = colorScheme === 'dark';
+
+    const { secondaryBgColor, primaryBgColor, textColor, mutedColor } = createTheme(isDarkMode);
+    const backgroundColor = secondaryBgColor;
+    const containerTextColor = mutedColor;
+    const titleColor = textColor;
+    const paragraphColor = mutedColor;
 
     const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
         if (!contentHeight || !scrollViewHeight) return;
@@ -77,11 +96,11 @@ const ChapterContent = ({
     }, [chapterContent, contentHeight, scrollViewHeight]);
 
     return (
-        <View>
+        <View style={{ backgroundColor }}>
             <ScrollView
                 ref={scrollViewRef}
                 showsVerticalScrollIndicator={false}
-                className="text-gray-500 px-2 text-center flex gap-2"
+                className="px-2 text-center flex gap-2"
                 onScroll={handleScroll}
                 scrollEventThrottle={32}
                 onMomentumScrollBegin={() => { isMomentumScrollingRef.current = true; }}
@@ -93,6 +112,8 @@ const ChapterContent = ({
                 onLayout={(event) => {
                     setScrollViewHeight(event.nativeEvent.layout.height);
                 }}
+                style={{ backgroundColor }}
+                contentContainerStyle={{ paddingBottom: 20 }}
             >
                 <View
                     onLayout={(event) => {
@@ -100,12 +121,12 @@ const ChapterContent = ({
                     }}
                 >
                     <Pressable onPress={onPressContent}>
-                        <Text className="font-bold text-lg  mt-2">{chapterContent.title}</Text>
+                        <Text style={{ color: titleColor }} className="font-bold text-lg mt-2">
+                            {chapterContent.title}
+                        </Text>
                         {chapterContent.content.map((item, index) => (
-                            <Text key={index} className="mb-4">
-                                {
-                                    item.includes(chapterContent.title) ? null : item
-                                }
+                            <Text key={index} style={{ color: paragraphColor }} className="mb-4">
+                                {item.includes(chapterContent.title) ? null : item}
                             </Text>
                         ))}
                     </Pressable>

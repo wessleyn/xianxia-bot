@@ -1,12 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Battery from "expo-battery";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, useColorScheme, View, ViewStyle } from "react-native";
+import { createTheme } from '../../constants/themes';
 
-const ChapterFooter = ({ readingProgress = 0 }) => {
+const ChapterFooter = ({ readingProgress = 0 }: { readingProgress?: number }) => {
     const [currentTime, setCurrentTime] = useState("");
     const [batteryLevel, setBatteryLevel] = useState(0);
     const [batteryState, setBatteryState] = useState<Battery.BatteryState | null>(null);
+
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === "dark";
+    const { primaryBgColor, textColor, mutedColor } = createTheme(isDark);
 
     useEffect(() => {
         updateTime();
@@ -58,30 +63,46 @@ const ChapterFooter = ({ readingProgress = 0 }) => {
         return "battery-dead";
     };
 
+    const containerStyle: ViewStyle = {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        width: '105%',
+        borderTopLeftRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: primaryBgColor,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+    };
+
+    const timeTextStyle = { color: textColor, marginRight: 8, fontSize: 12, fontFamily: 'Verdana' };
+    const progressTextStyle = { color: textColor, fontFamily: 'Verdana' };
+    const isBatteryGood = batteryLevel > 0.2;
+    const iconColor = isBatteryGood ? (isDark ? '#86efac' : '#16a34a') : (isDark ? '#fca5a5' : '#ef4444');
+    const batteryTextStyle = { color: isBatteryGood ? (isDark ? '#86efac' : '#16a34a') : (isDark ? '#fca5a5' : '#ef4444'), marginLeft: 6, fontSize: 12, fontFamily: 'Verdana' };
+
     return (
-        <View
-            className={`absolute bottom-0 left-0 py-2 px-5 w-full 
-            bg-white bg-opacity-80 rounded-tl-lg
-            flex-row items-center justify-between shadow-md`}
-        >
+        <View style={containerStyle}>
             {/* Current time */}
-            <Text className="text-gray-700 mr-2 text-sm" style={{ fontFamily: 'Verdana' }}>{currentTime}</Text>
+            <Text style={timeTextStyle}>
+                {currentTime}
+            </Text>
 
             {/* Reading progress */}
-            <Text style={{ fontFamily: 'Verdana' }}>{Math.floor(readingProgress).toFixed(1)}%</Text>
+            <Text style={progressTextStyle}>
+                {Number(readingProgress).toFixed(1)}%
+            </Text>
 
             {/* Battery info */}
-            <View className="flex-row items-center">
-                <Ionicons
-                    name={getBatteryIcon()}
-                    size={20}
-                    color={batteryLevel > 0.2 ? "#16a34a" : "#ef4444"}
-                />
-                <Text
-                    className={`ml-1 text-sm ${batteryLevel > 0.2 ? "text-green-600" : "text-red-500"
-                        }`}
-                    style={{ fontFamily: 'Verdana' }}
-                >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={getBatteryIcon()} size={20} color={iconColor} />
+                <Text style={batteryTextStyle}>
                     {Math.round(batteryLevel * 100)}%
                 </Text>
             </View>

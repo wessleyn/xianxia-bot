@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Image, View } from "react-native";
+import { Animated, Image, View, useColorScheme } from "react-native";
+import { createTheme } from '../../constants/themes';
 
 interface NovelImageProps {
     image: string;
@@ -13,6 +14,8 @@ export default function NovelImage({ image, size = 128, className, sizingMode = 
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(false);
     const blinkAnim = useRef(new Animated.Value(0)).current;
+    const colorScheme = useColorScheme();
+    const { borderColor } = createTheme(colorScheme === 'dark');
 
     const handleImageLoad = useCallback(() => {
         setLoaded(true);
@@ -22,7 +25,6 @@ export default function NovelImage({ image, size = 128, className, sizingMode = 
         setError(true);
     }, []);
 
-    // Set up blink animation
     useEffect(() => {
         if (!loaded && !error) {
             Animated.loop(
@@ -40,24 +42,21 @@ export default function NovelImage({ image, size = 128, className, sizingMode = 
                 ])
             ).start();
         } else {
-            // Stop animation when image is loaded or on error
             blinkAnim.stopAnimation();
         }
     }, [loaded, error, blinkAnim]);
 
     const imageSize = { width: size, height: size };
 
-    // Simple animated background
     const skeletonStyle = {
         backgroundColor: blinkAnim.interpolate({
             inputRange: [0, 1],
-            outputRange: ['rgba(255, 0, 0, 0.2)', 'rgba(255, 0, 0, 0.5)']
+            outputRange: [borderColor + '33', borderColor + '66']
         }),
     };
 
     return (
         <View style={[imageSize, { overflow: 'hidden' }]} className="relative rounded-[20%]">
-            {/* Blinking Skeleton */}
             {(!loaded || error) && (
                 <Animated.View
                     style={[imageSize, skeletonStyle]}

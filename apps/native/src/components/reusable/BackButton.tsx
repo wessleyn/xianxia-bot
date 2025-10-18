@@ -1,13 +1,27 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from "expo-router";
-import { Pressable } from "react-native";
+import { GestureResponderEvent, Pressable, useColorScheme } from "react-native";
+import { createTheme } from '../../constants/themes';
 
-const BackButton = ({ size = 30 }) => {
-    const router = useRouter()
+type Props = { size?: number; onPress?: (e: GestureResponderEvent) => void };
+
+const BackButton = ({ size = 30, onPress }: Props) => {
+    const router = useRouter();
+    const scheme = useColorScheme();
+    const { iconColor } = createTheme(scheme === 'dark');
+
     return (
-        <Pressable onPress={() => router.back()}>
-            <MaterialIcons name="arrow-back" size={size} color="#4b5563" />
-        </Pressable>)
-}
+        <Pressable
+            onPress={(e) => {
+                if (onPress) onPress(e);
+                else router.back();
+            }}
+            hitSlop={8}
+            accessibilityLabel="Back"
+        >
+            <MaterialIcons name="arrow-back" size={size} color={iconColor} />
+        </Pressable>
+    );
+};
 
-export default BackButton
+export default BackButton;
