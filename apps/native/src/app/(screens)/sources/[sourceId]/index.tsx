@@ -27,10 +27,10 @@ const NovelItem = memo(({ novel, selectedFilter }: { novel: Novel, selectedFilte
             }
         }
     } asChild>
-        <Pressable className="flex-row items-center gap-4 p-4 border-b border-gray-200">
+        <Pressable className="flex-row items-center gap-4 p-4 ">
             <NovelImage image={novel.image} size={120} sizingMode="cover"  />
             <View className="flex-1">
-                <Text className="text-lg font-semibold">{novel.title}</Text>
+                <Text className="text-lg font-semibold text-gray-400">{novel.title}</Text>
                 <View className="flex-row gap-2">
                     {novel.genres.slice(0, 2).map((g: string, index: number) => (
                         <Text key={index} className="text-gray-500">
@@ -263,7 +263,7 @@ export default function SourceDetail() {
                 (sourceDetails === null) ? (
                     <Text> Source Loading...</Text>
                 ) : <View className="w-full flex-row items-center justify-between px-4">
-                    <Text className="text-3xl font-medium">{sourceDetails?.name}</Text>
+                    <Text className="text-3xl font-medium dark:text-gray-400">{sourceDetails?.name}</Text>
 
                     <FilterDropdown
                         options={supportedFilters}

@@ -11,11 +11,13 @@ import { useNovelStore } from "@stores/novel";
 import { findNovelSource } from "@utils/sources/findNovelSource";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 
 export default function Chapter() {
     const params = useLocalSearchParams<{ chapterLink: string; novelLink: string }>();
     const router = useRouter();
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === "dark";
 
     const [sourceInstance, setSourceInstance] = useState<SourceDefinition | null>(null);
     const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
@@ -151,21 +153,27 @@ export default function Chapter() {
         setIsFetchingChapter(false)
     }
 
-    if (!chapterContent) return <CustomLoading position="center" className="bg-white" />;
+    const bgClass = isDark ? "bg-gray-900" : "bg-white";
+    const headerBorderClass = isDark ? "border-gray-700" : "border-gray-200";
+    const headerBtnBg = isDark ? "bg-gray-700" : "bg-gray-300";
+    const titleTextClass = isDark ? "text-white" : "text-gray-800";
+    const iconColor = isDark ? "#e5e7eb" : "#4b5563";
+
+    if (!chapterContent) return <CustomLoading position="center" className={bgClass} />;
 
     return (
-        <CustomView className="px-2">
+        <CustomView className={`px-2 ${bgClass}`}>
             {/* Header */}
-            <View className="flex-row items-center justify-between border-b border-gray-200">
+            <View className={`flex-row items-center justify-between border-b ${headerBorderClass}`}>
                 <Pressable
                     onPress={() => router.back()}
-                    className="flex items-center justify-center bg-gray-300 rounded-full -mt-1 p-1"
+                    className={`flex items-center justify-center ${headerBtnBg} rounded-full -mt-1 p-1`}
                 >
-                    <Ionicons name="chevron-back-sharp" size={17} color="#4b5563" />
+                    <Ionicons name="chevron-back-sharp" size={17} color={iconColor} />
                 </Pressable>
 
                 <Text
-                    className="font-bold text-lg mb-4 mt-2 w-2/3"
+                    className={`font-bold text-lg mb-4 mt-2 w-2/3 ${titleTextClass}`}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                 >
@@ -178,7 +186,7 @@ export default function Chapter() {
                     <MaterialIcons
                         name={isInLib ? "library-add-check" : "library-add"}
                         size={24}
-                        color="#4b5563"
+                        color={iconColor}
                     />
                 </TouchableOpacity>
             </View>
@@ -203,8 +211,8 @@ export default function Chapter() {
                                     </Text>
                                 </Pressable>
                             ) : (
-                                <View className="mt-6 mb-10 py-3 px-6 bg-gray-200 rounded-lg">
-                                    <Text className="text-gray-700 text-center font-bold">
+                                <View className={`${isDark ? 'bg-gray-800' : 'bg-gray-200'} mt-6 mb-10 py-3 px-6 rounded-lg`}>
+                                    <Text className={`${isDark ? 'text-gray-200' : 'text-gray-700'} text-center font-bold`}>
                                         {
                                             currentNovel?.status?.toLowerCase().includes('completed') ?
                                                 "Finished" : "You've reached the latest chapter"

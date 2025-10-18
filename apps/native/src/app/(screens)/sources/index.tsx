@@ -23,16 +23,12 @@ export default function Sources() {
     const [isSearching, setIsSearching] = useState<boolean>(false)
     const db = useSQLiteContext();
 
-    // add theme resolution
     const colorScheme = useColorScheme();
-    const theme = createTheme(colorScheme === 'dark');
+    const theme = createTheme(colorScheme === "dark");
 
-    // Extract unique categories from sources and count occurrences
     const categoryFilters = useMemo(() => {
-        // Start with "All" and static filters
         const staticFilters = ["Language", "Recently Updated"];
 
-        // Count category occurrences
         const categoryCounts: Record<string, number> = {};
 
         sourcesList.forEach(source => {
@@ -44,12 +40,10 @@ export default function Sources() {
             }
         });
 
-        // Sort categories by occurrence count (descending)
         const sortedCategories = Object.entries(categoryCounts)
             .sort(([, countA], [, countB]) => countB - countA)
             .map(([category]) => category);
 
-        // Combine static filters with dynamic categories
         return [...staticFilters, ...sortedCategories];
     }, [sourcesList]);
 
@@ -63,31 +57,25 @@ export default function Sources() {
         fetchSources()
     }, [])
 
-    // Filter sources when category selection changes or search query changes
     useEffect(() => {
         let filtered = [...sourcesList];
 
-        // Apply category filters first
         if (selectedCategory === "All") {
-            // Keep all sources
         } else if (selectedCategory === "Language") {
             filtered = filtered.filter(source => source.language === selectedLanguage);
         } else if (selectedCategory === "Recently Updated") {
-            // Sort by last_updated date
             filtered = [...filtered].sort((a, b) => {
                 const dateA = new Date(a.last_updated || 0);
                 const dateB = new Date(b.last_updated || 0);
-                return dateB.getTime() - dateA.getTime(); // Descending order
+                return dateB.getTime() - dateA.getTime();
             });
         } else {
-            // Filter by category
             filtered = filtered.filter(source =>
                 source.mainCategory &&
                 source.mainCategory.split(',').map(c => c.trim()).includes(selectedCategory)
             );
         }
 
-        // Then apply search filter if there's a query
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase().trim();
             filtered = filtered.filter(source =>
@@ -98,7 +86,6 @@ export default function Sources() {
         } setFilteredSources(filtered);
     }, [selectedCategory, selectedLanguage, sourcesList, searchQuery])
 
-    // Handle category selection
     const handleCategorySelect = useCallback((category: string) => {
         setSelectedCategory(category);
         if (category === "Language") {
@@ -106,7 +93,6 @@ export default function Sources() {
         }
     }, []);
 
-    // Handle language selection
     const handleLanguageSelect = useCallback((languageCode: string) => {
         setSelectedLanguage(languageCode);
         setShowLanguageModal(false);
@@ -147,7 +133,7 @@ export default function Sources() {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <View style={{ backgroundColor: theme.primaryBgColor, borderRadius: 12, width: '80%', padding: 24 }}>
                         <Text style={{ color: theme.textColor, fontSize: 18, fontWeight: '700', marginBottom: 12, textAlign: 'center' }}>Select Language</Text>
-                        <View style={{ borderTopWidth: 1, borderTopColor: theme.borderColor, marginBottom: 8 }}></View>
+                        <View style={{ borderTopWidth: 1, borderTopColor: theme.borderColor, marginBottom: 8 }} />
                         {supportedLanguages.map((language) => (
                             <TouchableOpacity
                                 key={language.code}
@@ -160,7 +146,7 @@ export default function Sources() {
                                     backgroundColor: selectedLanguage === language.code ? theme.pillSelectedBg : 'transparent'
                                 }}
                             >
-                                <Text style={{ color: selectedLanguage === language.code ? theme.textColor : theme.textColor, fontSize: 16, fontWeight: selectedLanguage === language.code ? '600' : '400' }}>
+                                <Text style={{ color: theme.textColor, fontSize: 16, fontWeight: selectedLanguage === language.code ? '600' : '400' }}>
                                     {language.name}
                                 </Text>
                             </TouchableOpacity>
@@ -180,7 +166,7 @@ export default function Sources() {
                 <BackButton />
 
                 {
-                    !isSearching &&  <Text style={{ color: theme.textColor, fontSize: 20, textAlign: 'center' }}>Sources</Text>
+                    !isSearching && <Text style={{ color: theme.textColor, textAlign: 'center', fontSize: 20 }}>Sources</Text>
                 }
                 <AnimatedSearchInput
                     headerName="Sources"
@@ -197,7 +183,7 @@ export default function Sources() {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ paddingHorizontal: 16 }}
                 >
-                    {categoryFilters.map((category, index) => (
+                    {categoryFilters.map((category) => (
                         <TouchableOpacity
                             key={category}
                             onPress={() => handleCategorySelect(category)}
@@ -229,12 +215,10 @@ export default function Sources() {
                             </Text>
                         </TouchableOpacity>
                     ))}
-
                 </ScrollView>
             </View>
 
             <ScrollView className="flex flex-col">
-
                 {
                     filteredSources.length === 0 && (
                         <View className="flex-1 justify-center items-center h-[80vh]">
@@ -260,7 +244,7 @@ export default function Sources() {
                         </Link>
 
                         <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
-                            <View style={{ height: 32, width: 1, backgroundColor: theme.borderColor }}></View>
+                            <View style={{ height: 32, width: 1, backgroundColor: theme.borderColor }} />
                             <Pressable
                                 onPress={() => toggleSource(source.id, source.name, source.enabled)}
                             >

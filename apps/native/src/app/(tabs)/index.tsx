@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native";
+import { createTheme } from "../../constants/themes";
 
 export default function Explore() {
   const [enabledSources, setEnabledSources] = useState<Source[]>([]);
@@ -39,6 +40,7 @@ export default function Explore() {
   const CARD_WIDTH = width * 0.40;
   const isDark = colorScheme === 'dark';
 
+  const {iconColor} = createTheme(isDark)
   return (
     <CustomView className="flex-1 gap-2">
 
@@ -50,7 +52,7 @@ export default function Explore() {
               <FontAwesome5
                 name="folder"
                 size={24}
-                color={isDark ? "#9ca3af" : "#4b5563"}
+                color={iconColor}
 
               />
               <Text className="font-medium text-gray-400 mt-1">Local Storage</Text>
@@ -61,7 +63,7 @@ export default function Explore() {
               <MaterialIcons
                 name="bookmark-outline"
                 size={24}
-                color={isDark ? "#9ca3af" : "#4b5563"}
+                color={iconColor}
 
               />
               <Text className="font-medium text-gray-400 mt-1">Bookmarks</Text>
@@ -79,7 +81,7 @@ export default function Explore() {
               <MaterialCommunityIcons
                 name="download-outline"
                 size={24}
-                color={isDark ? "#9ca3af" : "#4b5563"}
+                color={iconColor}
 
               />
               <Text className="font-medium text-gray-400 mt-1">Downloads</Text>
