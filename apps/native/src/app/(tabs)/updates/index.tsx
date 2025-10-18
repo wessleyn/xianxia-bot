@@ -299,9 +299,11 @@ export default function Updates() {
                   <Text className="text-xl font-medium mt-4" style={{ color: textColor }}>
                     {refreshing ? 'Updating' : latestNovels.length > 0 ? 'No More Updates' : 'No Updates'}
                   </Text>
-                  <Text className="text-sm mt-2 text-center px-8" style={{ color: mutedColor }}>
-                    {refreshing ? "..." : "Pull To Refresh"}
-                  </Text>
+                  {
+                    !refreshing && <Text className="text-sm mt-2 text-center px-8" style={{ color: mutedColor }}>
+                   Pull To Refresh
+                    </Text>
+                  }
                 </View>
               )}
             />

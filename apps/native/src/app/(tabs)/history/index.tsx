@@ -151,7 +151,7 @@ export default function History() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} >
           <View className="flex-row gap-4 py-4">
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
+              className={`flex-row gap-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('device')}
               style={{
                 backgroundColor: isTagSelected('device') ? pillSelectedBg : pillBg,
@@ -166,7 +166,7 @@ export default function History() {
               <Text style={{ color: textColor }}>On Device ({filterCounts.device})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
+              className={`flex-row gap-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('library')}
               style={{
                 backgroundColor: isTagSelected('library') ? pillSelectedBg : pillBg,
@@ -181,7 +181,7 @@ export default function History() {
               <Text style={{ color: textColor }}>Library ({filterCounts.library})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
+              className={`flex-row gap-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('new-chapters')}
               style={{
                 backgroundColor: isTagSelected('new-chapters') ? pillSelectedBg : pillBg,
@@ -196,7 +196,7 @@ export default function History() {
               <Text style={{ color: textColor }}>New Chapters ({filterCounts['new-chapters']})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
+              className={`flex-row gap-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('completed')}
               style={{
                 backgroundColor: isTagSelected('completed') ? pillSelectedBg : pillBg,
@@ -211,7 +211,7 @@ export default function History() {
               <Text style={{ color: textColor }}>Completed ({filterCounts.completed})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
+              className={`flex-row gap-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('favorites')}
               style={{
                 backgroundColor: isTagSelected('favorites') ? pillSelectedBg : pillBg,
@@ -264,7 +264,7 @@ export default function History() {
                       size={100}
                     />
                     <Text
-                      className="absolute top-1 right-1 p-2 border-2 rounded-full"
+                      className="absolute top-1 right-1 p-2 rounded-full"
                       style={{
                         backgroundColor: badgeBg,
                         color: badgeText,

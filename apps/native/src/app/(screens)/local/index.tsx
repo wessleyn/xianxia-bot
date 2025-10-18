@@ -1,14 +1,17 @@
 import CustomView from "@//components/custom/CustomView";
-import { Text, View } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
+import { createTheme } from "../../../constants/themes";
 
 export default function Local() {
+    const isDark = useColorScheme() === 'dark';
+    const { textColor, mutedColor, badgeBg, badgeText } = createTheme(isDark);
     return (
-        <CustomView className="items-center justify-center">
-            <Text className="font-bold mb-2 text-3xl">Local Novels</Text>
-            <View className="mb-3 px-3 py-1 bg-amber-500 rounded-full">
-                <Text className="text-xs text-white font-semibold">COMING SOON</Text>
+        <CustomView style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: textColor, fontWeight: '700', marginBottom: 8, fontSize: 24 }}>Local Novels</Text>
+            <View style={{ marginBottom: 12, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: badgeBg, borderRadius: 999 }}>
+                <Text style={{ color: badgeText, fontSize: 12, fontWeight: '600' }}>COMING SOON</Text>
             </View>
-            <Text className="text-gray-500 px-10 text-center">
+            <Text style={{ color: mutedColor, paddingHorizontal: 40, textAlign: 'center' }}>
                 This is where you'll manage your local novels, including their
                 downloads, reading progress, and more.
             </Text>
