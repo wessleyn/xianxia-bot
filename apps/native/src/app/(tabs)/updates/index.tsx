@@ -7,8 +7,9 @@ import fetchServerUpdates, { UpdateInfo } from "@utils/sources/fetchUpdates";
 import { formatDistance } from "date-fns";
 import { Link } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, RefreshControl, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, ScrollView, SectionList, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Toast from "react-native-toast-message";
+import { createTheme } from "../../../constants/themes";
 import { ReadNovel } from "../../../stores/history";
 
 
@@ -48,6 +49,9 @@ const groupUpdatesByDate = (updates: UpdateInfo[]) => {
 };
 
 export default function Updates() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+  const { secondaryBgColor, textColor, mutedColor, pillSelectedBg, pillBg, activityColor } = createTheme(isDark);
   const [latestNovels, setLatestNovels] = useState<any[]>([])
   const [updatedNovels, setUpdatedNovels] = useState<Section[]>([])
   const [refreshing, setRefreshing] = useState(false);
@@ -156,26 +160,29 @@ export default function Updates() {
   }, [selectedTab])
 
   return (
-    <CustomView className="flex gap-3 px-6">
+    <CustomView className="flex gap-3 px-6" style={{ backgroundColor: secondaryBgColor }}>
 
       <View className="flex-row gap-2 pr-4 justify-between">
         <Pressable
           onPress={() => setSelectedTab('all')}
-          className={`w-1/3 flex-row gap-4 border-2 border-[#6b7280]  p-3 rounded-xl items-center justify-center ${selectedTab === 'all' ? 'bg-gray-200' : ''}`}>
-          <MaterialIcons name="local-library" size={20} color="#6b7280" />
-          <Text>All</Text>
+          className={`w-1/3 flex-row gap-4  p-3 rounded-xl items-center justify-center`}
+          style={{  backgroundColor: selectedTab === 'all' ? pillSelectedBg : pillBg }}>
+          <MaterialIcons name="local-library" size={20} color={mutedColor} />
+          <Text style={{ color: textColor }}>All</Text>
         </Pressable>
         <Pressable
           onPress={() => setSelectedTab('library')}
-          className={`w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center ${selectedTab === 'library' ? 'bg-gray-200' : ''}`}>
-          <MaterialIcons name="library-books" size={20} color="#6b7280" />
-          <Text>Library</Text>
+          className={`w-1/3 flex-row gap-4  p-3 rounded-xl items-center justify-center`}
+          style={{  backgroundColor: selectedTab === 'library' ? pillSelectedBg : pillBg }}>
+          <MaterialIcons name="library-books" size={20} color={mutedColor} />
+          <Text style={{ color: textColor }}>Library</Text>
         </Pressable>
         <Pressable
           onPress={() => setSelectedTab('liked')}
-          className={`w-1/3 flex-row gap-4 border-2 border-[#6b7280] p-3 rounded-xl items-center justify-center ${selectedTab === 'liked' ? 'bg-gray-200' : ''}`}>
-          <Octicons name="heart" size={20} color="#6b7280" />
-          <Text>Liked</Text>
+          className={`w-1/3 flex-row gap-4  p-3 rounded-xl items-center justify-center`}
+          style={{  backgroundColor: selectedTab === 'liked' ? pillSelectedBg : pillBg }}>
+          <Octicons name="heart" size={20} color={mutedColor} />
+          <Text style={{ color: textColor }}>Liked</Text>
         </Pressable>
       </View>
 
@@ -211,30 +218,15 @@ export default function Updates() {
                         <View className="flex-col gap-1 w-[64%]">
                           <Text
                             numberOfLines={1}
-                            ellipsizeMode="tail">
+                            ellipsizeMode="tail"
+                            style={{ color: textColor }}>
                             {novel.name}
                           </Text>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            className="text-gray-700"
-                          >
-                            {novel.newChTitle}
-                          </Text>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            className="text-gray-700"
-                          >
-                            {formatDistance(novel.latestUpdateDate, new Date(), { addSuffix: true })}
-                          </Text>
+                          <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: mutedColor }}>{novel.newChTitle}</Text>
+                          <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: mutedColor }}>{formatDistance(novel.latestUpdateDate, new Date(), { addSuffix: true })}</Text>
                           <View className="flex-row gap-2 items-center">
                             <View className="w-3 h-3 bg-red-500 rounded-[100%]"></View>
-                            <Text
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                              className="text-sm text-gray-500"
-                            >
+                            <Text numberOfLines={1} ellipsizeMode="tail" className="text-sm" style={{ color: mutedColor }}>
                               {novel.newChCount} New {novel.newChCount > 1 ? "Chapters" : "Chapter"}
                             </Text>
                           </View>
@@ -256,7 +248,7 @@ export default function Updates() {
               sections={updatedNovels}
               keyExtractor={(item, index) => `${index}-${item.novelLink}`}
               renderSectionHeader={({ section }: { section: Section }) => (
-                <Text className="text-lg mb-4">{section.title}</Text>
+                <Text className="text-lg mb-4" style={{ color: textColor }}>{section.title}</Text>
               )}
               renderItem={({ item }) => (
                 <Link
@@ -279,28 +271,15 @@ export default function Updates() {
                       <Text
                         numberOfLines={1}
                         ellipsizeMode="tail"
+                        style={{ color: textColor }}
                       >
                         {item.name}
                       </Text>
-                      <Text
-                        className="text-gray-600"
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {item.author}
-                      </Text>
-                      <Text
-                        className="text-gray-600"
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}
-                      </Text>
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: mutedColor }}>{item.author}</Text>
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: mutedColor }}>{formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}</Text>
                       <View className="flex-row gap-2 items-center">
                         <View className="w-2 h-2 bg-red-500 rounded-full"></View>
-                        <Text
-                          className="text-sm text-gray-500"
-                        >
+                        <Text className="text-sm" style={{ color: mutedColor }}>
                           {item.newChCount} New {item.newChCount > 1 ? "Chapters" : "Chapter"}
                         </Text>
                       </View>
@@ -310,17 +289,17 @@ export default function Updates() {
               )}
               refreshControl={
                 <RefreshControl
-                  colors={["#6b7280"]}
+                  colors={[activityColor]}
                   refreshing={refreshing}
                   onRefresh={onRefresh} />
               }
               ListEmptyComponent={() => (
                 <View className="items-center justify-center h-[50vh]">
-                  <MaterialCommunityIcons name="timer-sync-outline" size={64} color="#6b7280" />
-                  <Text className="text-xl font-medium text-gray-500 mt-4">
+                  <MaterialCommunityIcons name="timer-sync-outline" size={64} color={mutedColor} />
+                  <Text className="text-xl font-medium mt-4" style={{ color: textColor }}>
                     {refreshing ? 'Updating' : latestNovels.length > 0 ? 'No More Updates' : 'No Updates'}
                   </Text>
-                  <Text className="text-sm text-gray-400 mt-2 text-center px-8">
+                  <Text className="text-sm mt-2 text-center px-8" style={{ color: mutedColor }}>
                     {refreshing ? "..." : "Pull To Refresh"}
                   </Text>
                 </View>
@@ -354,36 +333,22 @@ export default function Updates() {
                     <Text
                       numberOfLines={1}
                       ellipsizeMode="tail"
+                      style={{ color: textColor }}
                     >
                       {item.title}
                     </Text>
-                    <Text
-                      className="text-gray-600"
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {item.author}
-                    </Text>
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: mutedColor }}>{item.author}</Text>
 
                     {
                       item.latestUpdateDate &&
-                      <Text
-                        className="text-gray-600"
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}
-                      </Text>
-
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: mutedColor }}>{formatDistance(item.latestUpdateDate, new Date(), { addSuffix: true })}</Text>
                     }
 
                     {
                       item.newChCount &&
                       <View className="flex-row gap-2 items-center">
                         <View className="w-2 h-2 bg-red-500 rounded-full"></View>
-                        <Text
-                          className="text-sm text-gray-500"
-                        >
+                        <Text className="text-sm" style={{ color: mutedColor }}>
                           {item.newChCount} New {item.newChCount > 1 ? "Chapters" : "Chapter"}
                         </Text>
                       </View>
@@ -394,7 +359,7 @@ export default function Updates() {
             )}
             refreshControl={
               <RefreshControl
-                colors={["#6b7280"]}
+                colors={[activityColor]}
                 refreshing={refreshing}
                 onRefresh={tabData && onRefresh}
 
@@ -402,10 +367,10 @@ export default function Updates() {
             }
             ListEmptyComponent={() => (
               <View className="items-center justify-center h-[50vh]">
-                <MaterialCommunityIcons name="timer-sync-outline" size={64} color="#6b7280" />
-                <Text className="text-xl font-medium text-gray-500 mt-4">
+                <MaterialCommunityIcons name="timer-sync-outline" size={64} color={mutedColor} />
+                <Text className="text-xl font-medium mt-4" style={{ color: textColor }}>
                   {selectedTab == 'liked' ? 'No liked novels' : 'No novels in the library'}</Text>
-                <Text className="text-sm text-gray-400 mt-2 text-center px-8">
+                <Text className="text-sm mt-2 text-center px-8" style={{ color: mutedColor }}>
                   {
                     refreshing ? "Refreshing..." :
                       selectedTab == 'liked' ?

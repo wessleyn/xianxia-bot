@@ -9,7 +9,8 @@ import { ReadNovel, useHistoryStore } from '@stores/history';
 import { formatSectionDate } from "@utils/format";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, SectionList, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, SectionList, Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import { createTheme } from '../../../constants/themes';
 
 
 interface Section {
@@ -40,6 +41,22 @@ const groupReadingsByDate = (readings: ReadNovel[]) => {
 
 
 export default function History() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  const {
+    secondaryBgColor,
+    textColor,
+    mutedColor,
+    borderColor,
+    pillSelectedBg,
+    pillBg,
+    activityColor,
+    badgeBg,
+    badgeText,
+    emptyIconColor,
+  } = createTheme(isDark);
+
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const { readNovels } = useHistoryStore();
@@ -122,65 +139,91 @@ export default function History() {
   }, [readNovels, selectedTags]);
 
   return (
-    <CustomView className="px-5">
+    <CustomView
+      style={{
+        backgroundColor: secondaryBgColor,
+        flex: 1,
+        paddingLeft: 8,
+        paddingRight: 8,
+      }}>
       {/* filters */}
       <View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} >
           <View className="flex-row gap-4 py-4">
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('device') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
+              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('device')}
+              style={{
+                backgroundColor: isTagSelected('device') ? pillSelectedBg : pillBg,
+                borderColor,
+              }}
             >
               {isTagSelected('device') ? (
-                <Ionicons name="checkmark" size={24} color="black" />
+                <Ionicons name="checkmark" size={24} color={textColor} />
               ) : (
-                <FontAwesome5 name="folder" size={20} color="#6b7280" />
+                <FontAwesome5 name="folder" size={20} color={mutedColor} />
               )}
-              <Text>On Device ({filterCounts.device})</Text>
+              <Text style={{ color: textColor }}>On Device ({filterCounts.device})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('library') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
+              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('library')}
+              style={{
+                backgroundColor: isTagSelected('library') ? pillSelectedBg : pillBg,
+                borderColor,
+              }}
             >
               {isTagSelected('library') ? (
-                <Ionicons name="checkmark" size={24} color="black" />
+                <Ionicons name="checkmark" size={24} color={textColor} />
               ) : (
-                <MaterialIcons name="library-books" size={20} color="#6b7280" />
+                <MaterialIcons name="library-books" size={20} color={mutedColor} />
               )}
-              <Text>Library ({filterCounts.library})</Text>
+              <Text style={{ color: textColor }}>Library ({filterCounts.library})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('new-chapters') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
+              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('new-chapters')}
+              style={{
+                backgroundColor: isTagSelected('new-chapters') ? pillSelectedBg : pillBg,
+                borderColor,
+              }}
             >
               {isTagSelected('new-chapters') ? (
-                <Ionicons name="checkmark" size={24} color="black" />
+                <Ionicons name="checkmark" size={24} color={textColor} />
               ) : (
-                <MaterialCommunityIcons name="timer-sync-outline" size={20} color="#6b7280" />
+                <MaterialCommunityIcons name="timer-sync-outline" size={20} color={mutedColor} />
               )}
-              <Text>New Chapters ({filterCounts['new-chapters']})</Text>
+              <Text style={{ color: textColor }}>New Chapters ({filterCounts['new-chapters']})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('completed') ? 'bg-gray-300 border-gray-300' : ' border-gray-400  bg-none'}`}
+              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('completed')}
+              style={{
+                backgroundColor: isTagSelected('completed') ? pillSelectedBg : pillBg,
+                borderColor,
+              }}
             >
               {isTagSelected('completed') ? (
-                <Ionicons name="checkmark" size={24} color="black" />
+                <Ionicons name="checkmark" size={24} color={textColor} />
               ) : (
-                <Ionicons name="checkmark-done-outline" size={20} color="#6b7280" />
+                <Ionicons name="checkmark-done-outline" size={20} color={mutedColor} />
               )}
-              <Text>Completed ({filterCounts.completed})</Text>
+              <Text style={{ color: textColor }}>Completed ({filterCounts.completed})</Text>
             </Pressable>
             <Pressable
-              className={`flex-row gap-2 border-2 p-2 rounded-2xl ${isTagSelected('favorites') ? 'bg-gray-300 border-gray-300' : 'border-gray-400 bg-none'}`}
+              className={`flex-row gap-2 border-2 p-2 rounded-2xl`}
               onPress={() => toggleTag('favorites')}
+              style={{
+                backgroundColor: isTagSelected('favorites') ? pillSelectedBg : pillBg,
+                borderColor,
+              }}
             >
               {isTagSelected('favorites') ? (
-                <Ionicons name="checkmark" size={24} color="black" />
+                <Ionicons name="checkmark" size={24} color={textColor} />
               ) : (
-                <Octicons name="heart" size={20} color="#6b7280" />
+                <Octicons name="heart" size={20} color={mutedColor} />
               )}
-              <Text>Favorites ({filterCounts.favorites})</Text>
+              <Text style={{ color: textColor }}>Favorites ({filterCounts.favorites})</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -189,8 +232,8 @@ export default function History() {
       {/* history */}
       {loading ? (
         <View className="items-center justify-center h-[80%]">
-          <ActivityIndicator size="large" color="#6b7280" />
-          <Text className="text-gray-500 mt-4">Loading your reading history...</Text>
+          <ActivityIndicator size="large" color={activityColor} />
+          <Text style={{ color: mutedColor }} className="mt-4">Loading your reading history...</Text>
         </View>) : (
         <SectionList
           sections={sections}
@@ -220,14 +263,21 @@ export default function History() {
                       className="w-full"
                       size={100}
                     />
-                    <Text className="absolute top-1 right-1 bg-blue-500 p-2 border-2 border-gray-800 rounded-full">
+                    <Text
+                      className="absolute top-1 right-1 p-2 border-2 rounded-full"
+                      style={{
+                        backgroundColor: badgeBg,
+                        color: badgeText,
+                        borderColor: isDark ? '#0b1220' : '#111827',
+                      }}
+                    >
                       {`${Math.floor(item.progress)}%`}
                     </Text>
                   </View>
                   <View className="-mt-1 w-[70%]">
-                    <Text className="text-lg">{item.title}</Text>
-                    <Text numberOfLines={1}>{item.author}</Text>
-                    <Text className="text-gray-600 text-sm mt-2" numberOfLines={1}>
+                    <Text className="text-lg" style={{ color: textColor }}>{item.title}</Text>
+                    <Text numberOfLines={1} style={{ color: mutedColor }}>{item.author}</Text>
+                    <Text className="text-sm mt-2" numberOfLines={1} style={{ color: mutedColor }}>
 
                       {
                         item.lastReadChTitle?.includes("Unknown Title")
@@ -243,15 +293,15 @@ export default function History() {
 
           )}
           renderSectionHeader={({ section }: { section: Section }) => (
-            <Text className="ml-2 font-medium text-base mt-4 mb-2 text-gray-800">
+            <Text className="ml-2 font-medium text-base mt-4 mb-2" style={{ color: textColor }}>
               {section.title}
             </Text>
           )}
           ListEmptyComponent={() => (
             <View className="items-center justify-center h-[80%]">
-              <Ionicons name="book-outline" size={64} color="#d1d5db" />
-              <Text className="text-xl font-medium text-gray-500 mt-4">No Reading History</Text>
-              <Text className="text-sm text-gray-400 mt-2 text-center px-8">
+              <Ionicons name="book-outline" size={64} color={emptyIconColor} />
+              <Text className="text-xl font-medium mt-4" style={{ color: textColor }}>No Reading History</Text>
+              <Text className="text-sm mt-2 text-center px-8" style={{ color: mutedColor }}>
                 Start reading novels to see your history here.
               </Text>
             </View>

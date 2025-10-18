@@ -6,6 +6,7 @@ import { Tabs } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import { createTheme } from '../../constants/themes';
 
 export default function TabLayout() {
   const db = useSQLiteContext();
@@ -24,27 +25,24 @@ export default function TabLayout() {
   }, []);
 
   const isDark = colorScheme === 'dark';
+  const { primaryBgColor, textColor, mutedColor, badgeBg } = createTheme(isDark);
 
   return (
     <Tabs
       screenOptions={({ route }) => ({
-        tabBarActiveTintColor: '#0369a1',
-        tabBarInactiveTintColor: isDark ? '#aaa' : '#555',
+        tabBarActiveTintColor: badgeBg,
+        tabBarInactiveTintColor: mutedColor,
         borderTopWidth: 0,
         elevation: 5,
         tabBarStyle: {
           paddingTop: 10,
           paddingBottom: 10,
           height: 70,
-          backgroundColor: isDark ? '#1e293b' : '#fff',
+          backgroundColor: primaryBgColor,
           borderTopWidth: 0,
         },
-        headerStyle: {
-          backgroundColor: isDark ? '#1e293b' : '#fff',
-        },
-        headerTitleStyle: {
-          color: isDark ? '#fff' : '#1e293b',
-        },
+        headerStyle: { backgroundColor: primaryBgColor },
+        headerTitleStyle: { color: textColor },
         header: () => {
           return route.name.includes('account') ? null : (
             <HeaderBar tabName={route.name} />

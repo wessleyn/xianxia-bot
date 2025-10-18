@@ -1,9 +1,18 @@
-import React from "react"
-import { SafeAreaView, SafeAreaViewProps } from "react-native-safe-area-context"
+import { useColorScheme } from "react-native";
+import { SafeAreaView, SafeAreaViewProps } from "react-native-safe-area-context";
+import { createTheme } from "../../constants/themes";
 
-const CustomSafeArea = ({children, ...props}: SafeAreaViewProps) => {
+const CustomSafeArea = ({ children, ...props }: SafeAreaViewProps) => {
+  const colorScheme = useColorScheme()
+  const { secondaryBgColor } = createTheme(colorScheme === 'dark')
+
   return (
-      <SafeAreaView  {...props} className={"bg-white dark:bg-black " + props.className}>
+    <SafeAreaView
+      {...props}
+      style={{
+        backgroundColor: secondaryBgColor
+      }}
+    >
       {children}
     </SafeAreaView>
   )
