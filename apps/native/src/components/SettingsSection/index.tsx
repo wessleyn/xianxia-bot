@@ -10,8 +10,6 @@ import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 
-
-
 const SettingsSection = () => {
     const { isLoggedIn, user } = useAccountStore()
     const [updatedNovels, setUpdatedNovels] = useState<UpdateType>("Readings");
@@ -29,6 +27,9 @@ const SettingsSection = () => {
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const [isUpdateFromMenuOpen, setIsUpdateFromMenuOpen] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
+
+    // Determine effective scheme for styling decisions
+    const isDark = theme === 'dark' || (theme === 'system' && colorScheme === 'dark');
 
     const handlePullSettings = async () => {
         if (!user?.id) return;
@@ -148,7 +149,7 @@ const SettingsSection = () => {
         setAutoBackup(prev => !prev);
         await AsyncStorage.setItem('autoBackup', JSON.stringify(!autoBackup));
     };
-    const toggleUpdateFrom = async (val : UpdateType) => {
+    const toggleUpdateFrom = async (val: UpdateType) => {
         setUpdatedNovels(val);
         await AsyncStorage.setItem('updateFrom', JSON.stringify(val));
     };
@@ -178,8 +179,6 @@ const SettingsSection = () => {
             console.error("Error selecting download folder:", error);
         }
     };
-
-
 
     // TODO: Implement data backup logic
     const createBackup = () => {
@@ -260,13 +259,19 @@ const SettingsSection = () => {
         inAppSettings.forEach(loadSettings);
     }, []);
 
+    // helper for Switch colors depending on dark mode
+    const switchTrackFalse = isDark ? '#4b5563' : '#767577';
+    const switchTrackTrue = '#81b0ff';
+    const thumbFalse = isDark ? '#374151' : '#f4f3f4';
+    const thumbTrue = '#4287f5';
+
     return (
         <ScrollView
-            className="w-full px-5 mt-6  h-full"
+            className={`w-full px-5 mt-6 h-full `}
             showsVerticalScrollIndicator={false}
         >
             <View className='flex-row justify-between'>
-                <Text className='text-2xl font-bold text-gray-500 mb-4'>Settings</Text>
+                <Text className='text-2xl font-bold text-gray-500 dark:text-gray-200 mb-4'>Settings</Text>
                 {
                     isLoggedIn && (
                         <View className='flex-row h-10 space-x-2'>
@@ -274,7 +279,7 @@ const SettingsSection = () => {
                             <Pressable
                                 onPress={handlePullSettings}
                                 disabled={isSyncing}
-                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300' : 'bg-blue-500 active:bg-blue-600'}`}
+                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300 dark:bg-gray-700' : 'bg-blue-500 active:bg-blue-600'}`}
                             >
                                 {isSyncing ? (
                                     <ActivityIndicator size="small" color="#fff" />
@@ -286,7 +291,7 @@ const SettingsSection = () => {
                             <Pressable
                                 onPress={handlePushSettings}
                                 disabled={isSyncing}
-                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300' : 'bg-indigo-500 active:bg-indigo-600'}`}
+                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300 dark:bg-gray-700' : 'bg-indigo-500 active:bg-indigo-600'}`}
                             >
                                 {isSyncing ? (
                                     <ActivityIndicator size="small" color="#fff" />
@@ -301,17 +306,17 @@ const SettingsSection = () => {
 
             {/* Section Header: General */}
             <View className="mb-2">
-                <Text className="text-lg font-semibold text-gray-600">General</Text>
+                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">General</Text>
             </View>
 
             {/* Auto Sync Toggle */}
-            <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-                <Text className="text-lg">
+            <View className='w-full flex-row justify-between items-center py-3 '>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">
                     Auto Sync
                 </Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={isAutoSync ? '#4287f5' : '#f4f3f4'}
+                    trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
+                    thumbColor={isAutoSync ? thumbTrue : thumbFalse}
                     value={isAutoSync}
                     onValueChange={toggleSync}
                 />
@@ -319,22 +324,22 @@ const SettingsSection = () => {
 
             {/* Theme Selector */}
             <Pressable
-                className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'
+                className='w-full flex-row justify-between items-center py-3 '
                 onPress={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
             >
-                <Text className="text-lg">Theme</Text>
-                <Text className="text-gray-500">{theme.charAt(0).toUpperCase() + theme.slice(1)}</Text>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Theme</Text>
+                <Text className="text-gray-500 dark:text-gray-300">{theme.charAt(0).toUpperCase() + theme.slice(1)}</Text>
             </Pressable>
 
             {isThemeMenuOpen && (
-                <View className="bg-gray-100 rounded-md p-2 mb-2">
+                <View className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 mb-2">
                     {['light', 'dark', 'system'].map((themeOption) => (
                         <Pressable
                             key={themeOption}
-                            className={`py-3 px-2 rounded-md mb-1 ${theme === themeOption ? 'bg-blue-100' : ''}`}
+                            className={`py-3 px-2 rounded-md mb-1 ${theme === themeOption ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
                             onPress={() => selectTheme(themeOption as Theme)}
                         >
-                            <Text className={`${theme === themeOption ? 'text-blue-600 font-medium' : ''}`}>
+                            <Text className={`${theme === themeOption ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-800 dark:text-gray-200'}`}>
                                 {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
                             </Text>
                         </Pressable>
@@ -344,22 +349,22 @@ const SettingsSection = () => {
 
             {/* Language Selector */}
             <Pressable
-                className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'
+                className='w-full flex-row justify-between items-center py-3 '
                 onPress={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
             >
-                <Text className="text-lg">Language</Text>
-                <Text className="text-gray-500">{getSelectedLanguageName()}</Text>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Language</Text>
+                <Text className="text-gray-500 dark:text-gray-300">{getSelectedLanguageName()}</Text>
             </Pressable>
 
             {isLanguageMenuOpen && (
-                <View className="bg-gray-100 rounded-md p-2 mb-2">
+                <View className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 mb-2">
                     {supportedLanguages.map((languageOption) => (
                         <Pressable
                             key={languageOption.code}
-                            className={`py-3 px-2 rounded-md mb-1 ${language === languageOption.code ? 'bg-blue-100' : ''}`}
+                            className={`py-3 px-2 rounded-md mb-1 ${language === languageOption.code ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
                             onPress={() => selectLanguage(languageOption.code)}
                         >
-                            <Text className={`${language === languageOption.code ? 'text-blue-600 font-medium' : ''}`}>
+                            <Text className={`${language === languageOption.code ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-800 dark:text-gray-200'}`}>
                                 {languageOption.name}
                             </Text>
                         </Pressable>
@@ -369,15 +374,15 @@ const SettingsSection = () => {
 
             {/* Section Header: Download Settings */}
             <View className="mt-6 mb-2">
-                <Text className="text-lg font-semibold text-gray-600">Download Settings</Text>
+                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">Download Settings</Text>
             </View>
 
             {/* Download over WiFi only */}
-            <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-                <Text className="text-lg">Download over WiFi only</Text>
+            <View className='w-full flex-row justify-between items-center py-3 '>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Download over WiFi only</Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={downloadWifiOnly ? '#4287f5' : '#f4f3f4'}
+                    trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
+                    thumbColor={downloadWifiOnly ? thumbTrue : thumbFalse}
                     value={downloadWifiOnly}
                     onValueChange={toggleDownloadWifiOnly}
                 />
@@ -385,35 +390,35 @@ const SettingsSection = () => {
 
             {/* Download Folder */}
             <Pressable
-                className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'
+                className='w-full flex-row justify-between items-center py-3 '
                 onPress={selectDownloadFolder}
             >
-                <Text className="text-lg">Download Folder</Text>
-                <Text className="text-gray-500">Change</Text>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Download Folder</Text>
+                <Text className="text-gray-500 dark:text-gray-300">Change</Text>
             </Pressable>
 
             {/* Section Header: Notifications & Suggestions */}
             <View className="mt-6 mb-2">
-                <Text className="text-lg font-semibold text-gray-600">Notifications & Suggestions</Text>
+                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">Notifications & Suggestions</Text>
             </View>
 
             {/* Enable Notifications */}
-            <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-                <Text className="text-lg">Enable Notifications</Text>
+            <View className='w-full flex-row justify-between items-center py-3 '>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Enable Notifications</Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={enableNotifications ? '#4287f5' : '#f4f3f4'}
+                    trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
+                    thumbColor={enableNotifications ? thumbTrue : thumbFalse}
                     value={enableNotifications}
                     onValueChange={toggleNotifications}
                 />
             </View>
 
             {/* Show Suggestions */}
-            <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-                <Text className="text-lg">Show Suggestions</Text>
+            <View className='w-full flex-row justify-between items-center py-3 '>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Show Suggestions</Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={showSuggestions ? '#4287f5' : '#f4f3f4'}
+                    trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
+                    thumbColor={showSuggestions ? thumbTrue : thumbFalse}
                     value={showSuggestions}
                     onValueChange={toggleSuggestions}
                 />
@@ -421,15 +426,15 @@ const SettingsSection = () => {
 
             {/* Section Header: Updates & Backup */}
             <View className="mt-6 mb-2">
-                <Text className="text-lg font-semibold text-gray-600">Updates & Backup</Text>
+                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">Updates & Backup</Text>
             </View>
 
             {/* Auto Check Updates */}
-            <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-                <Text className="text-lg">Auto Check Updates</Text>
+            <View className='w-full flex-row justify-between items-center py-3 '>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Auto Check Updates</Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={autoCheckUpdates ? '#4287f5' : '#f4f3f4'}
+                    trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
+                    thumbColor={autoCheckUpdates ? thumbTrue : thumbFalse}
                     value={autoCheckUpdates}
                     onValueChange={toggleAutoCheckUpdates}
                 />
@@ -437,20 +442,19 @@ const SettingsSection = () => {
 
             {/* Selection: Readings, Favourites, Library */}
             <Pressable
-                className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'
+                className='w-full flex-row justify-between items-center py-3 '
                 onPress={() => setIsUpdateFromMenuOpen(!isUpdateFromMenuOpen)}
             >
-                <Text className="text-lg">Update From</Text>
-                <Text className="text-gray-500">{updatedNovels}</Text>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Update From</Text>
+                <Text className="text-gray-500 dark:text-gray-300">{updatedNovels}</Text>
             </Pressable>
 
             {isUpdateFromMenuOpen && (
-                <View className="bg-gray-100 rounded-md p-2 mb-2">
+                <View className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 mb-2">
                     {['Readings', 'Favourites', 'Library'].map(option => (
                         <Pressable
                             key={option}
-                            className={`py-3 px-2 rounded-md mb-1 ${updatedNovels === option ? 'bg-blue-100' : ''
-                                }`}
+                            className={`py-3 px-2 rounded-md mb-1 ${updatedNovels === option ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
                             onPress={() => {
                                 toggleUpdateFrom(option as UpdateType);
                                 setIsUpdateFromMenuOpen(false);
@@ -459,8 +463,8 @@ const SettingsSection = () => {
                             <Text
                                 className={
                                     updatedNovels === option
-                                        ? 'text-blue-600 font-medium'
-                                        : 'text-gray-600'
+                                        ? 'text-blue-600 dark:text-blue-300 font-medium'
+                                        : 'text-gray-600 dark:text-gray-200'
                                 }
                             >
                                 {option}
@@ -472,11 +476,11 @@ const SettingsSection = () => {
 
 
             {/* Auto Backup */}
-            <View className='w-full flex-row justify-between items-center py-3 border-b border-gray-200'>
-                <Text className="text-lg">Auto Backup</Text>
+            <View className='w-full flex-row justify-between items-center py-3 '>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Auto Backup</Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={autoBackup ? '#4287f5' : '#f4f3f4'}
+                    trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
+                    thumbColor={autoBackup ? thumbTrue : thumbFalse}
                     value={autoBackup}
                     onValueChange={toggleAutoBackup}
                 />
@@ -484,11 +488,11 @@ const SettingsSection = () => {
 
             {/* Create Backup */}
             <Pressable
-                className='w-full flex-row justify-between items-center py-3 border-b border-gray-200 mb-6'
+                className='w-full flex-row justify-between items-center py-3  mb-6'
                 onPress={createBackup}
             >
-                <Text className="text-lg">Create Backup</Text>
-                <Text className="text-blue-500">Backup Now</Text>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Create Backup</Text>
+                <Text className="text-blue-500 dark:text-blue-300">Backup Now</Text>
             </Pressable>
         </ScrollView>
     )

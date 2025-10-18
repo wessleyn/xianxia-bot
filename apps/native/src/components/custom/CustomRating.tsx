@@ -1,5 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { View } from "react-native";
+import { View, useColorScheme } from "react-native";
+import { createTheme } from '../../constants/themes';
 
 /**
  * @param param0 
@@ -8,6 +9,8 @@ import { View } from "react-native";
 const CustomRating = ({ val, outOf }: { val: number, outOf: number }) => {
     const newVal = outOf === 10 ? Math.round(val) / 2 : val;
     const newOutOf = outOf === 10 ? 5 : outOf;
+    const isDark = useColorScheme() === 'dark';
+    const { activityColor, mutedColor } = createTheme(isDark);
 
     return (
         <View className="flex-row gap-2 flex-wrap">
@@ -17,7 +20,7 @@ const CustomRating = ({ val, outOf }: { val: number, outOf: number }) => {
                         key={index}
                         name={`${index + 1 <= newVal ? 'star' : 'star-o'}`}
                         size={24}
-                        color={`${index + 1 <= newVal ? 'gold' : '#4b5563'}`}
+                        color={index + 1 <= newVal ? activityColor : mutedColor}
                     />
                 ))
             }

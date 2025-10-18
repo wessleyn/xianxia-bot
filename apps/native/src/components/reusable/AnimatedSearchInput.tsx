@@ -1,13 +1,14 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React, { useRef, useState } from 'react';
-import { Animated, Pressable, TextInput } from 'react-native';
+import { Animated, Pressable, TextInput, useColorScheme } from 'react-native';
+import { createTheme } from '../../constants/themes';
 
 interface AnimatedSearchInputProps {
     headerName: string;
     onSearch: (text: string) => void;
     onToggle?: (expanded: boolean) => void;
     placeholder?: string;
-    iconPosition?: 'left' | 'right'; 
+    iconPosition?: 'left' | 'right';
 }
 
 const AnimatedSearchInput = ({
@@ -15,20 +16,27 @@ const AnimatedSearchInput = ({
     onSearch,
     onToggle,
     placeholder = 'Search...',
-    iconPosition = 'left' 
+    iconPosition = 'left'
 }: AnimatedSearchInputProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [searchText, setSearchText] = useState('');
     const animatedWidth = useRef(new Animated.Value(40)).current;
     const textInputOpacity = useRef(new Animated.Value(0)).current;
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
+
+    const theme = createTheme(isDark);
+    const backgroundColor = theme.primaryBgColor;
+    const iconColor = theme.mutedColor;
+    const inputTextColor = theme.textColor;
+    const placeholderColor = theme.mutedColor;
 
     const handleToggle = () => {
         if (isExpanded) {
             if (searchText) {
-                setSearchText("")
-                return
+                setSearchText('');
+                return;
             }
-            // Collapse animation
             Animated.parallel([
                 Animated.timing(animatedWidth, {
                     toValue: 40,
@@ -47,7 +55,6 @@ const AnimatedSearchInput = ({
                 if (onSearch) onSearch('');
             });
         } else {
-            // Expand animation
             setIsExpanded(true);
             onToggle && onToggle(true);
             Animated.parallel([
@@ -70,34 +77,41 @@ const AnimatedSearchInput = ({
         if (onSearch) onSearch(text);
     };
 
-    // Render content based on iconPosition prop
-    const renderContent = () => {
-        const iconButton = (
-            <Pressable onPress={handleToggle} className="p-2">
-                <MaterialIcons name={isExpanded ? "clear" : "search"} size={24} color="#4b5563" />
-            </Pressable>
-        );
+    const iconButton = (
+        <Pressable onPress={handleToggle} className="p-2">
+            <MaterialIcons name={isExpanded ? "clear" : "search"} size={24} color={iconColor} />
+        </Pressable>
+    );
 
-        const inputField = isExpanded && (
-            <Animated.View
-                style={{
-                    opacity: textInputOpacity,
-                    flex: 1,
-                }}
-            >
-                <TextInput
-                    className={`flex-1 ${iconPosition === 'left' ? 'pr-4' : 'pl-4'}`}
-                    placeholder={placeholder || `Search ${headerName}...`}
-                    placeholderTextColor="#9ca3af"
-                    value={searchText}
-                    onChangeText={handleChangeText}
-                    autoFocus
-                />
-            </Animated.View>
-        );
+    const inputField = isExpanded && (
+        <Animated.View
+            style={{
+                opacity: textInputOpacity,
+                flex: 1,
+            }}
+        >
+            <TextInput
+                className={`flex-1 ${iconPosition === 'left' ? 'pr-4' : 'pl-4'}`}
+                placeholder={placeholder || `Search ${headerName}...`}
+                placeholderTextColor={placeholderColor}
+                value={searchText}
+                onChangeText={handleChangeText}
+                autoFocus
+                style={{ color: inputTextColor }}
+            />
+        </Animated.View>
+    );
 
-        return iconPosition === 'left'
-            ? (
+    return (
+        <Animated.View
+            className="flex-row items-center rounded-full overflow-hidden"
+            style={{
+                width: animatedWidth,
+                justifyContent: iconPosition === 'right' && !isExpanded ? 'flex-end' : 'flex-start',
+                backgroundColor,
+            }}
+        >
+            {iconPosition === 'left' ? (
                 <>
                     {iconButton}
                     {inputField}
@@ -107,18 +121,7 @@ const AnimatedSearchInput = ({
                     {inputField}
                     {iconButton}
                 </>
-            );
-    };
-
-    return (
-        <Animated.View
-            className="flex-row items-center bg-gray-100 rounded-full overflow-hidden"
-            style={{
-                width: animatedWidth,
-                justifyContent: iconPosition === 'right' && !isExpanded ? 'flex-end' : 'flex-start',
-            }}
-        >
-            {renderContent()}
+            )}
         </Animated.View>
     );
 };

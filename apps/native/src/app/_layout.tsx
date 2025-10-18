@@ -8,6 +8,7 @@ import { SQLiteProvider } from 'expo-sqlite';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import 'react-native-url-polyfill/auto';
 
@@ -26,8 +27,8 @@ const RootLayout = () => {
       });
     }
 
-     async function checkColorTheme() {
-       const theme = await AsyncStorage.getItem('theme')
+    async function checkColorTheme() {
+      const theme = await AsyncStorage.getItem('theme')
       if (theme) {
         setColorScheme(theme as 'light' | 'dark' | 'system')
       }
@@ -56,16 +57,18 @@ const RootLayout = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SQLiteProvider databaseName='xianxu.db'>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name='(tabs)' />
-          <Stack.Screen name='(screens)' />
+        <SafeAreaProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name='(tabs)' />
+            <Stack.Screen name='(screens)' />
 
-        </Stack>
-        <Toast />
+          </Stack>
+          <Toast />
+        </SafeAreaProvider>
       </SQLiteProvider>
     </GestureHandlerRootView>
   )

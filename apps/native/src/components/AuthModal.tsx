@@ -1,9 +1,10 @@
-import { Button, Text, TextInput, View } from 'react-native';
+import { Button, Text, TextInput, View, useColorScheme } from 'react-native';
 
 import { useAccountStore } from '@stores/account';
 import { supabase } from '@utils/supabase';
 import React, { useState } from 'react';
 import Toast from 'react-native-toast-message';
+import { createTheme } from '../constants/themes';
 import CustomModal from './custom/CustomModal';
 
 const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
@@ -97,6 +98,10 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
         setOtpSent(false)
     }
 
+    const scheme = useColorScheme();
+    const isDark = scheme === 'dark';
+    const { primaryBgColor, textColor, mutedColor, activityColor } = createTheme(isDark);
+
     return (
         <CustomModal
             visible={showModal}
@@ -108,14 +113,14 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
             blur
             bar
         >
-            <View className='px-6 w-full'>
-                <Text className="text-2xl font-bold mb-6 text-center">
+            <View className='px-6 w-full' style={{ backgroundColor: primaryBgColor }}>
+                <Text style={{ fontSize: 20, fontWeight: '700', marginBottom: 12, textAlign: 'center', color: textColor }}>
                     {otpSent ? 'Enter Verification Code' : 'Sign In'}
                 </Text>
 
                 {error && (
-                    <View className="bg-red-50 p-3 rounded-md mb-4">
-                        <Text className="text-red-600">{error}</Text>
+                    <View style={{ backgroundColor: isDark ? '#4b1e1e' : '#fee2e2', padding: 12, borderRadius: 8, marginBottom: 12 }}>
+                        <Text style={{ color: isDark ? '#fca5a5' : '#b91c1c' }}>{error}</Text>
                     </View>
                 )}
 
@@ -125,12 +130,13 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                             onChangeText={setEmail}
                             value={email}
                             placeholder="Enter your email"
+                            placeholderTextColor={mutedColor}
                             autoCapitalize="none"
                             keyboardType="email-address"
-                            className='border border-gray-300 rounded-md p-3 mb-4 w-full placeholder:text-gray-400'
+                            style={{ borderWidth: 1, borderColor: mutedColor, borderRadius: 8, padding: 12, marginBottom: 12, color: textColor, width: '100%' }}
                         />
                         <Text className="text-gray-500 mb-4 text-sm">
-                            We'll send you a one-time code to verify your email.
+                            <Text style={{ color: mutedColor }}>We'll send you a one-time code to verify your email.</Text>
                         </Text>
                     </>
                 ) : (
@@ -148,17 +154,17 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                     </>
                 )}
 
-                <View className='flex-row justify-between gap-2 mt-2'>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
                     <Button
                         title="Cancel"
                         onPress={toggleModal}
-                        color="#6366f1"
+                        color={activityColor}
                     />
                     <Button
                         title={otpSent ? "Verify Code" : "Send Code"}
                         onPress={otpSent ? handleOtp : handleEmail}
                         disabled={loading}
-                        color="#6366f1"
+                        color={activityColor}
                     />
                 </View>
 
@@ -170,7 +176,7 @@ const AuthModal = ({ showModal = false, toggleModal = () => { } }) => {
                                 setOtpSent(false);
                                 handleEmail();
                             }}
-                            color="#4287f5"
+                            color={activityColor}
                         />
                     </View>
                 )}

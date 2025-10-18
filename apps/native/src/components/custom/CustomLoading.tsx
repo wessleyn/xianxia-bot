@@ -1,10 +1,25 @@
-import { ActivityIndicator, View } from "react-native"
+import React from "react"
+import { ActivityIndicator, View, useColorScheme } from "react-native"
+import { createTheme } from '../../constants/themes';
 
-const CustomLoading = ({ position, className }: { position: 'center' | 'top', className?: string }) => {
+const CustomLoading = ({
+    position,
+    className,
+}: {
+    position: "center" | "top"
+    className?: string
+}) => {
+    const colorScheme = useColorScheme()
+    const { secondaryBgColor, activityColor } = createTheme(colorScheme === 'dark')
+
     return (
-        <View className={`flex justify-center item-center  
-        ${position == 'center' ? 'h-full' : ''} ${className}`}>
-            <ActivityIndicator size="large" color="#3b82f6" />
+        <View
+            className={`flex justify-center items-center ${position === "center" ? "h-full" : ""} ${
+                className ?? ""
+            }`}
+            style={{ backgroundColor: secondaryBgColor }}
+        >
+            <ActivityIndicator size="large" color={activityColor} />
         </View>
     )
 }
