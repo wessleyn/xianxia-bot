@@ -1,5 +1,6 @@
+import { createTheme } from '@constants/themes';
 import { useCallback, useEffect, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { Dimensions, View, useColorScheme } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
     runOnJS,
@@ -21,7 +22,7 @@ interface Props {
     children: React.ReactNode;
     position?: keyof typeof POSITIONS; // default: bottom
     fixedPosition?: boolean;           // if true, modal snaps back to initial position
-    visible?: boolean;                
+    visible?: boolean;
 }
 
 const CustomMovableModal = ({
@@ -31,6 +32,9 @@ const CustomMovableModal = ({
     fixedPosition = false,
     visible = true,
 }: Props) => {
+    const colorScheme = useColorScheme();
+    const theme = createTheme(colorScheme === 'dark');
+
     const [currentPosition, setCurrentPosition] = useState<
         keyof typeof POSITIONS
     >(position);
@@ -127,12 +131,22 @@ const CustomMovableModal = ({
                     {/* Drag handle (only draggable part) */}
                     <GestureDetector gesture={gesture}>
                         <View className="absolute top-2 left-0 right-0 flex justify-center items-center z-10">
-                            <View className="bg-gray-400 dark:bg-gray-300 rounded-lg w-14 h-2" />
+                            <View style={{
+                                backgroundColor: theme.pillSelectedBg,
+                                borderRadius: 6,
+                                width: 56,
+                                height: 8
+                            }} />
                         </View>
                     </GestureDetector>
 
-                    {/* Content (not draggable, can scroll freely) */}
-                    <View className="w-full h-full pt-6 px-4">{children}</View>
+                    <View
+                        style={{
+                            backgroundColor: theme.primaryBgColor
+                        }}
+                        className="w-full h-full pt-6 px-4">
+                        {children}
+                    </View>
                 </Animated.View>
             </Animated.View>
         </View>

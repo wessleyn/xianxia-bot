@@ -1,13 +1,14 @@
-import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons"
-import Slider from "@react-native-community/slider"
-import { useHistoryStore } from "@stores/history"
-import { Link } from "expo-router"
-import { useState } from "react"
-import { Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native"
-import { useNovelStore } from "../../stores/novel"
-import CustomModal from "../custom/CustomModal"
-import NovelModal from "../NovelModal"
-import NovelImage from "../reusable/NovelImage"
+import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
+import { useHistoryStore } from "@stores/history";
+import { Link } from "expo-router";
+import { useState } from "react";
+import { Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native";
+import { createTheme } from "../../constants/themes";
+import { useNovelStore } from "../../stores/novel";
+import CustomModal from "../custom/CustomModal";
+import NovelModal from "../NovelModal";
+import NovelImage from "../reusable/NovelImage";
 
 type ChapterModalProps = {
     visible: boolean;
@@ -63,6 +64,7 @@ const ChapterModal = ({
     }
     const historyNovel = readNovels.find(n => n.novelLink === params.novelLink);
 
+    const theme = createTheme(isDark);
     return (
         <CustomModal
             visible={visible}
@@ -71,9 +73,9 @@ const ChapterModal = ({
             bar
             blur
             animationType="slide"
-            className="p-4 flex gap-2"
+            className="p-4 flex gap-2" 
         >
-            <View className="mt-4 flex">
+            <View className="mt-4 flex ">
                 <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: textPrimary }}>
                     {Math.floor(readingProgress)}%, {chapterContent.title}
                 </Text>

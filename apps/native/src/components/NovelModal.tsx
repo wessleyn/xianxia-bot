@@ -1,4 +1,5 @@
 import { novelDetailTabs, novelDetailTabType } from '@constants/tabs';
+import { createTheme } from '@constants/themes';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -7,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDistance } from 'date-fns';
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { ReadNovel, useHistoryStore } from '../stores/history';
 import { useNovelStore } from '../stores/novel';
 import { findNovelSource } from '../utils/sources/findNovelSource';
@@ -55,6 +56,9 @@ const NovelModal = ({
     visible = true,
     handleNav
 }: Props) => {
+    const colorScheme = useColorScheme();
+    const theme = createTheme(colorScheme === 'dark');
+
     const [navigationTab, setNavigationTab] = useState<novelDetailTabType>('chapters');
     const { lastReadChapterLink, setLastReadChapterLink } = useNovelStore();
     const { upsertNovel, readNovels } = useHistoryStore()
@@ -180,10 +184,10 @@ const NovelModal = ({
                             disabled={isDisabled}
                             asChild
                         >
-                            <TouchableOpacity className='bg-gray-300 py-3 flex justify-center items-center px-10 rounded-3xl rounded-r-none'>
+                            <TouchableOpacity className='bg-gray-300 dark:bg-gray-500 py-3 flex justify-center items-center px-10 rounded-3xl rounded-r-none'>
                                 {
-                                    isDisabled ? <ActivityIndicator size='small' color="#4b5563" /> :
-                                        <Text className="">
+                                    isDisabled ? <ActivityIndicator size='small' color={theme.iconColor} /> :
+                                        <Text className="text-black dark:text-gray-100">
                                             {
                                                 lastReadChapterLink ? 'Continue' : 'Read'
                                             }
@@ -191,11 +195,11 @@ const NovelModal = ({
                                 }
                             </TouchableOpacity>
                         </Link>
-                        <View className="py-3 px-5 rounded-3xl bg-gray-300 rounded-l-none flex justify-center">
+                        <View className="py-3 px-5 rounded-3xl bg-gray-300 dark:bg-gray-500 rounded-l-none flex justify-center">
                             <Octicons
                                 name="chevron-down"
                                 size={18}
-                                color="#4b5563"
+                                color={theme.iconColor}
                             />
                         </View>
                     </View>
@@ -215,7 +219,7 @@ const NovelModal = ({
                                     position='center' />
                                 : chapters.length === 0 ? (
                                     <View className="py-8 flex items-center justify-center">
-                                        <MaterialCommunityIcons name="format-list-bulleted-square" size={48} color="#9ca3af" />
+                                        <MaterialCommunityIcons name="format-list-bulleted-square" size={48} color={theme.emptyIconColor} />
                                         <Text className="text-gray-500 mt-4">No chapters available</Text>
                                         <Text className="text-gray-400 text-sm text-center mt-1">
                                             Check back later for new chapters
@@ -237,7 +241,7 @@ const NovelModal = ({
                                                         <View className="flex-row justify-between items-center w-full">
                                                             <View className="flex-row items-center">
                                                                 {isActiveChapter && (
-                                                                    <MaterialIcons name="play-arrow" size={24} color="#16a34a" style={{ marginRight: 4 }} />
+                                                                    <MaterialIcons name="play-arrow" size={24} color={theme.activityColor} style={{ marginRight: 4 }} />
                                                                 )}
                                                                 <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
                                                                     {item.title}
@@ -259,7 +263,7 @@ const NovelModal = ({
                     <View>
                         {volumes.length === 0 ? (
                             <View className="py-8 flex items-center justify-center">
-                                <MaterialCommunityIcons name="view-grid-outline" size={48} color="#9ca3af" />
+                                <MaterialCommunityIcons name="view-grid-outline" size={48} color={theme.emptyIconColor} />
                                 <Text className="text-gray-500 mt-4">No volumes available</Text>
                                 <Text className="text-gray-400 text-sm text-center mt-1">
                                     This novel doesn't have volume divisions yet
@@ -275,7 +279,7 @@ const NovelModal = ({
                                         <View className="flex-row justify-between items-center py-3">
                                             <View className="flex-row items-center">
                                                 {!item.isComplete && index > 0 && volumes[index - 1].isComplete && (
-                                                    <MaterialIcons name="play-arrow" size={24} color="#16a34a" style={{ marginRight: 4 }} />
+                                                    <MaterialIcons name="play-arrow" size={24} color={theme.activityColor} style={{ marginRight: 4 }} />
                                                 )}
                                                 <Text className={`${item.isComplete ? 'text-gray-500' : 'text-gray-800'}`}>
                                                     Volume {item.number}: {item.title}
@@ -296,7 +300,7 @@ const NovelModal = ({
                     <View>
                         {bookmarks.length === 0 ? (
                             <View className="py-8 flex items-center justify-center">
-                                <FontAwesome name="bookmark-o" size={48} color="#9ca3af" />
+                                <FontAwesome name="bookmark-o" size={48} color={theme.emptyIconColor} />
                                 <Text className="text-gray-500 mt-4">No bookmarks yet</Text>
                                 <Text className="text-gray-400 text-sm text-center mt-1">
                                     Bookmarks will appear here as you add them while reading
