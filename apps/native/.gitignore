@@ -24,3 +24,8 @@ expo-env.d.ts
 
 # Service Account JSON
 service-account.json
+credentials.json
+apk.sh
+app-release.apks
+toc.pb
+universal.apk

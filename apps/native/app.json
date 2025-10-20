@@ -10,7 +10,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true,
@@ -18,7 +20,8 @@
         "dark": "./assets/ios-dark.png",
         "light": "./assets/ios-light.png",
         "tinted": "./assets/ios-tinted.png"
-      }
+      },
+      "bundleIdentifier": "app.xianxu"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +29,11 @@
         "monochromeImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "app.xianxu"
+      "package": "app.xianxu",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "experiments": {
       "typedRoutes": true
@@ -45,10 +52,10 @@
           "image": "./assets/splash-icon-light-1024.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark":{
-            "image": "./assets/splash-icon-dark-1024.png",
-            "backgroundColor": "#151515"
+          "backgroundColor": "#ebeced",
+          "dark": {
+            "image": "./assets/adaptive-icon.png",
+            "backgroundColor": "#15152b"
           }
         }
       ],
