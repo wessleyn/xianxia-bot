@@ -13,12 +13,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import 'react-native-url-polyfill/auto';
 
+import { StatusBar } from 'expo-status-bar';
+import { useColorScheme as useTheme } from 'react-native';
+import { createTheme } from '../constants/themes';
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { setSession } = useAccountStore();
   const [appLoaded, setAppLoaded] = useState(false);
   const { setColorScheme } = useColorScheme();
+  const theme = useTheme();
 
   useEffect(() => {
     async function loadApp() {
@@ -60,8 +65,11 @@ export default function RootLayout() {
     return null;
   }
 
+  const isDark = theme === 'dark';
+  const { secondaryBgColor } = createTheme(isDark);
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView>
       <SQLiteProvider databaseName='xianxu.db'>
         <SafeAreaProvider>
           <Stack
@@ -74,6 +82,9 @@ export default function RootLayout() {
 
           </Stack>
           <Toast />
+          <StatusBar
+            backgroundColor={secondaryBgColor}
+            style={isDark ? 'light' : 'dark'} />
         </SafeAreaProvider>
       </SQLiteProvider>
     </GestureHandlerRootView>
