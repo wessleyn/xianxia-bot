@@ -123,10 +123,10 @@ const CustomMovableModal = ({
         <View
             style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 1000 }}
         >
-            <Animated.View className="flex-1 relative">
+            <Animated.View className="flex-1 relative ">
                 <Animated.View
                     style={animatedStyle}
-                    className={`bg-gray-100 relative w-full rounded-t-3xl overflow-hidden ${className}`}
+                    className={`relative w-full rounded-t-3xl overflow-hidden ${className}`}
                 >
                     {/* Drag handle (only draggable part) */}
                     <GestureDetector gesture={gesture}>

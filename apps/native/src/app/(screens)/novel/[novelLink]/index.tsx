@@ -24,7 +24,6 @@ export default function NovelDetail() {
     const [sourceFound, setSourceFound] = useState(false)
     const novelLink = params.novelLink
 
-    // color scheme / dark mode
     const scheme = useColorScheme()
     const isDark = scheme === 'dark'
     const bgMain = isDark ? 'bg-gray-900' : 'bg-white'
@@ -35,7 +34,6 @@ export default function NovelDetail() {
     const iconColor = isDark ? "#D1D5DB" : "#4b5563"
     const libraryActiveBg = isDark ? 'bg-gray-700 border-gray-500' : 'bg-gray-300 border-gray-500'
 
-    // Get liked and library status from history store
     const novelInHistory = readNovels.find(n => n.novelLink === novelLink)
     const [isInLibrary, setIsInLibrary] = useState(novelInHistory?.isInLibrary || false)
     const [isLiked, setIsLiked] = useState(novelInHistory?.isLiked || false)
@@ -82,7 +80,7 @@ export default function NovelDetail() {
     if (!sourceFound) return <Text className={primaryText}>Novel Source Not Found/Supported</Text>
 
     return (
-        <CustomSafeArea className={`flex gap-4 px-4 ${bgMain}`}>
+        <CustomSafeArea className={`flex flex-1 gap-4 px-4 ${bgMain}`}>
 
             <View className="flex-row items-center justify-between">
                 <BackButton />

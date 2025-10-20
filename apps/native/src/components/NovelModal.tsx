@@ -154,7 +154,6 @@ const NovelModal = ({
             fixedPosition={fixedPosition}
             visible={visible}
         >
-            {/* Bottom Navigation section - always visible */}
             <View className="flex-row justify-between items-center mt-6 mb-6">
                 <View className="flex-row gap-3 p-2">
                     {novelDetailTabs.map(tab => {
@@ -163,7 +162,7 @@ const NovelModal = ({
                             <Pressable
                                 key={tab.key}
                                 onPress={() => handleTabPress(tab.key)}
-                                className={`p-2 rounded-lg ${isActive ? 'bg-gray-200' : ''}`}
+                                className={`p-2 rounded-lg ${isActive ? 'bg-gray-200 dark:bg-stone-500' : ''}`}
                             >
                                 {tab.renderIcon(isActive)}
                             </Pressable>
@@ -206,67 +205,18 @@ const NovelModal = ({
                 }
             </View>
 
-            {/* Content revealed when modal expands - based on selected tab */}
-            <View className="mt-4 pb-20">
 
-                {/* Tab content based on selected tab */}
-                {navigationTab === 'chapters' && (
-                    <View>
-                        {
-                            chapters === undefined ?
-                                <CustomLoading
-                                    className='bg-transparent'
-                                    position='center' />
-                                : chapters.length === 0 ? (
-                                    <View className="py-8 flex items-center justify-center">
-                                        <MaterialCommunityIcons name="format-list-bulleted-square" size={48} color={theme.emptyIconColor} />
-                                        <Text className="text-gray-500 mt-4">No chapters available</Text>
-                                        <Text className="text-gray-400 text-sm text-center mt-1">
-                                            Check back later for new chapters
-                                        </Text>
-                                    </View>
-                                ) : (
-                                    <ScrollView
-                                        showsVerticalScrollIndicator={false}
-                                        contentContainerStyle={{ paddingBottom: 20 }}
-                                    >
-                                        {
-                                            chapters.map((item, index) => {
-                                                const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
-                                                return (
-                                                    <Pressable
-                                                        onPress={() => handleNav ? handleNav(item.link) : handleChapterNav(item.link)}
-                                                        key={item.id}
-                                                        className="flex-col items-start py-3">
-                                                        <View className="flex-row justify-between items-center w-full">
-                                                            <View className="flex-row items-center">
-                                                                {isActiveChapter && (
-                                                                    <MaterialIcons name="play-arrow" size={24} color={theme.activityColor} style={{ marginRight: 4 }} />
-                                                                )}
-                                                                <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
-                                                                    {item.title}
-                                                                </Text>
-                                                            </View>
-                                                        </View>
-                                                        <Text className={`${isActiveChapter ? 'text-gray-800' : 'text-gray-500'}`}>
-                                                            # {item.number}
-                                                        </Text>
-                                                    </Pressable>
-                                                );
-                                            })}
-                                    </ScrollView>
-                                )}
-                    </View>
-                )}
-
-                {navigationTab === 'volumes' && (
-                    <View>
-                        {volumes.length === 0 ? (
-                            <View className="py-8 flex items-center justify-center">
-                                <MaterialCommunityIcons name="view-grid-outline" size={48} color={theme.emptyIconColor} />
-                                <Text className="text-gray-500 mt-4">No volumes available</Text>
+            {/* Tab content based on selected tab */}
+            {
+                navigationTab === 'chapters'
+                    ? chapters === undefined ?
+                        <CustomLoading transparent position='center' />
+                        : chapters.length === 0 ? (
+                            <View className="p-8 flex items-center justify-center">
+                                <MaterialCommunityIcons name="format-list-bulleted-square" size={48} color={theme.emptyIconColor} />
+                                <Text className="text-gray-500 mt-4">No chapters available</Text>
                                 <Text className="text-gray-400 text-sm text-center mt-1">
-                                    This novel doesn't have volume divisions yet
+                                    Check back later for new chapters
                                 </Text>
                             </View>
                         ) : (
@@ -274,66 +224,108 @@ const NovelModal = ({
                                 showsVerticalScrollIndicator={false}
                                 contentContainerStyle={{ paddingBottom: 20 }}
                             >
-                                {volumes.map((item, index) => (
-                                    <Pressable key={item.id}>
-                                        <View className="flex-row justify-between items-center py-3">
-                                            <View className="flex-row items-center">
-                                                {!item.isComplete && index > 0 && volumes[index - 1].isComplete && (
-                                                    <MaterialIcons name="play-arrow" size={24} color={theme.activityColor} style={{ marginRight: 4 }} />
-                                                )}
-                                                <Text className={`${item.isComplete ? 'text-gray-500' : 'text-gray-800'}`}>
-                                                    Volume {item.number}: {item.title}
+                                {
+                                    chapters.map((item, index) => {
+                                        const isActiveChapter = !item.isRead && index > 0 && chapters[index - 1]?.isRead;
+                                        return (
+                                            <Pressable
+                                                onPress={() => handleNav ? handleNav(item.link) : handleChapterNav(item.link)}
+                                                key={item.id}
+                                                className="flex-col items-start py-3">
+                                                <View className="flex-row justify-between items-center w-full">
+                                                    <View className="flex-row items-center">
+                                                        {isActiveChapter && (
+                                                            <MaterialIcons name="play-arrow" size={24} color={theme.activityColor} style={{ marginRight: 4 }} />
+                                                        )}
+                                                        <Text className={`${item.isRead ? 'text-gray-500' : 'text-gray-800'}`}>
+                                                            {item.title}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <Text className={`${isActiveChapter ? 'text-gray-800' : 'text-gray-500'}`}>
+                                                    # {item.number}
                                                 </Text>
-                                            </View>
-                                            <Text className={`text-sm mr-2 ${item.isComplete ? 'text-gray-500' : 'text-gray-800'}`}>
-                                                Ch {item.startingChapter} - {item.startingChapter + item.chapterCount - 1}
+                                            </Pressable>
+                                        );
+                                    })}
+                            </ScrollView>
+                        ) : <> </>
+            }
+
+            {navigationTab === 'volumes' && (
+                <View>
+                    {volumes.length === 0 ? (
+                        <View className="py-8 flex items-center justify-center">
+                            <MaterialCommunityIcons name="view-grid-outline" size={48} color={theme.emptyIconColor} />
+                            <Text className="text-gray-500 mt-4">No volumes available</Text>
+                            <Text className="text-gray-400 text-sm text-center mt-1">
+                                This novel doesn't have volume divisions yet
+                            </Text>
+                        </View>
+                    ) : (
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 20 }}
+                        >
+                            {volumes.map((item, index) => (
+                                <Pressable key={item.id}>
+                                    <View className="flex-row justify-between items-center py-3">
+                                        <View className="flex-row items-center">
+                                            {!item.isComplete && index > 0 && volumes[index - 1].isComplete && (
+                                                <MaterialIcons name="play-arrow" size={24} color={theme.activityColor} style={{ marginRight: 4 }} />
+                                            )}
+                                            <Text className={`${item.isComplete ? 'text-gray-500' : 'text-gray-800'}`}>
+                                                Volume {item.number}: {item.title}
                                             </Text>
                                         </View>
-                                    </Pressable>
-                                ))}
-                            </ScrollView>
-                        )}
-                    </View>
-                )}
+                                        <Text className={`text-sm mr-2 ${item.isComplete ? 'text-gray-500' : 'text-gray-800'}`}>
+                                            Ch {item.startingChapter} - {item.startingChapter + item.chapterCount - 1}
+                                        </Text>
+                                    </View>
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                    )}
+                </View>
+            )}
 
-                {navigationTab === 'bookmarks' && (
-                    <View>
-                        {bookmarks.length === 0 ? (
-                            <View className="py-8 flex items-center justify-center">
-                                <FontAwesome name="bookmark-o" size={48} color={theme.emptyIconColor} />
-                                <Text className="text-gray-500 mt-4">No bookmarks yet</Text>
-                                <Text className="text-gray-400 text-sm text-center mt-1">
-                                    Bookmarks will appear here as you add them while reading
-                                </Text>
-                            </View>
-                        ) : (
-                            <ScrollView
-                                showsVerticalScrollIndicator={false}
-                                contentContainerStyle={{ paddingBottom: 20 }}
-                            >
-                                {bookmarks.map((item) => (
-                                    <Pressable key={item.id}>
-                                        <View className="flex-row justify-between items-center py-3 ">
-                                            <View>
-                                                <Text className="font-medium">{item.chapterTitle}</Text>
-                                                {item.notes && (
-                                                    <Text className="text-gray-500 text-sm mt-1" numberOfLines={1} ellipsizeMode="tail">
-                                                        {item.notes}
-                                                    </Text>
-                                                )}
-                                                <Text className="text-gray-400 text-xs mt-1">
-                                                    Added {formatDistance(new Date(item.createdAt), new Date(), { addSuffix: true })}
+            {navigationTab === 'bookmarks' && (
+                <View>
+                    {bookmarks.length === 0 ? (
+                        <View className="py-8 flex items-center justify-center">
+                            <FontAwesome name="bookmark-o" size={48} color={theme.emptyIconColor} />
+                            <Text className="text-gray-500 mt-4">No bookmarks yet</Text>
+                            <Text className="text-gray-400 text-sm text-center mt-1">
+                                Bookmarks will appear here as you add them while reading
+                            </Text>
+                        </View>
+                    ) : (
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 20 }}
+                        >
+                            {bookmarks.map((item) => (
+                                <Pressable key={item.id}>
+                                    <View className="flex-row justify-between items-center py-3 ">
+                                        <View>
+                                            <Text className="font-medium">{item.chapterTitle}</Text>
+                                            {item.notes && (
+                                                <Text className="text-gray-500 text-sm mt-1" numberOfLines={1} ellipsizeMode="tail">
+                                                    {item.notes}
                                                 </Text>
-                                            </View>
+                                            )}
+                                            <Text className="text-gray-400 text-xs mt-1">
+                                                Added {formatDistance(new Date(item.createdAt), new Date(), { addSuffix: true })}
+                                            </Text>
                                         </View>
-                                    </Pressable>
-                                ))}
-                            </ScrollView>
-                        )}
-                    </View>
-                )}
-            </View>
-        </CustomMovableModal>
+                                    </View>
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                    )}
+                </View>
+            )}
+        </CustomMovableModal >
     )
 }
 

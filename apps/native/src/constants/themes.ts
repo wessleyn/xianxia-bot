@@ -15,17 +15,26 @@ export type ThemeColors = {
 
 export function createTheme(isDark: boolean): ThemeColors {
     return {
-        secondaryBgColor: isDark ? '#0f172a' : '#ffffff', // slate-900 / white
-        primaryBgColor: isDark ? '#1e293b' : '#fff', 
-        textColor: isDark ? '#e5e7eb' : '#111827', // gray-200 / gray-900
-        mutedColor: isDark ? '#9ca3af' : '#6b7280', // gray-400 / gray-500
-        borderColor: isDark ? '#374151' : '#d1d5db', // gray-700 / gray-300
-        pillSelectedBg: isDark ? '#374151' : '#d1d5db', // selected pill bg
-        pillBg: 'transparent',
-        activityColor: isDark ? '#a78bfa' : '#6b7280', // purple-ish for dark, default for light
-        badgeBg: isDark ? '#06b6d4' : '#3b82f6', // teal for dark, blue for light
-        badgeText: isDark ? '#000000' : '#ffffff',
-        emptyIconColor: isDark ? '#475569' : '#d1d5db',
-        iconColor: isDark ? "#9ca3af" : "#4b5563",
+        secondaryBgColor: isDark ? '#0f172a' : '#ffffff', // dark: slate-900 - light: white 
+    
+        primaryBgColor: isDark ? '#1e293b' : '#ffffff', // dark: slate-800 - light: white 
+    
+        textColor: isDark ? '#e5e7eb' : '#111827', // dark: gray-200 - light: gray-900 
+    
+        mutedColor: isDark ? '#9ca3af' : '#6b7280', // dark: gray-400 - light: gray-500 
+    
+        borderColor: isDark ? '#374151' : '#d1d5db', // dark: gray-700 - light: gray-300 
+    
+        pillSelectedBg: isDark ? '#374151' : '#d1d5db', // selected pill bg — dark: gray-700, light: gray-300
+        pillBg: 'transparent', // transparent
+        activityColor: isDark ? '#a78bfa' : '#6b7280', // dark: violet-300 - light: gray-500 
+    
+        badgeBg: isDark ? '#c084fc' : '#a855f7', // dark: purple-400 - light: purple-500 
+    
+        badgeText: isDark ? '#000000' : '#ffffff', // dark: black - light: white 
+    
+        emptyIconColor: isDark ? '#475569' : '#d1d5db', // dark: slate-600 - light: gray-300 
+    
+        iconColor: isDark ? '#9ca3af' : '#4b5563', // dark: gray-400 - light: gray-600 
     };
 }
