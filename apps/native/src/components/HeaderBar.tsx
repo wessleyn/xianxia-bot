@@ -25,7 +25,7 @@ export default function HeaderBar({ tabName }: { tabName: string }) {
             style={{
                 backgroundColor: secondaryBgColor
             }}
-            className="flex-row py-2 px-4 items-center"
+            className="flex-row py-4 px-2 items-center"
         >
             <View
                 style={{

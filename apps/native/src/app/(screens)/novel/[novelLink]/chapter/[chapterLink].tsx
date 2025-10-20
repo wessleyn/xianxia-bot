@@ -12,6 +12,7 @@ import { findNovelSource } from "@utils/sources/findNovelSource";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import CustomSafeArea from "@components/custom/CustomSafeArea";
 
 export default function Chapter() {
     const params = useLocalSearchParams<{ chapterLink: string; novelLink: string }>();
@@ -162,7 +163,7 @@ export default function Chapter() {
     if (!chapterContent) return <CustomLoading position="center" className={bgClass} />;
 
     return (
-        <CustomView className={`px-2 ${bgClass}`}>
+        <CustomSafeArea className={`px-2 ${bgClass}`}>
             {/* Header */}
             <View className={`flex-row items-center justify-between border-b ${headerBorderClass}`}>
                 <Pressable
@@ -239,6 +240,6 @@ export default function Chapter() {
                 handleAnonNav={handleAnonNav}
                 novelImage={novelImage}
             />
-        </CustomView>
+        </CustomSafeArea>
     );
 }

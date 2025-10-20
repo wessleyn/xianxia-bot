@@ -10,7 +10,7 @@ const CustomSafeArea = ({ children, ...props }: SafeAreaViewProps) => {
     <SafeAreaView
       {...props}
       style={{
-        backgroundColor: secondaryBgColor
+        backgroundColor: secondaryBgColor,
       }}
     >
       {children}

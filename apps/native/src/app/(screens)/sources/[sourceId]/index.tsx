@@ -16,6 +16,7 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { memo, useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
+import CustomSafeArea from "../../../../components/custom/CustomSafeArea";
 
 
 const NovelItem = memo(({ novel, selectedFilter }: { novel: Novel, selectedFilter: FilterOption }) => (
@@ -233,7 +234,7 @@ export default function SourceDetail() {
     ), [selectedFilter]);
 
     return (
-        <CustomView className="flex gap-6">
+        <CustomSafeArea className="flex gap-6">
 
             <View className="w-full flex-row items-center justify-between px-4">
                 <BackButton />
@@ -350,6 +351,6 @@ export default function SourceDetail() {
                 onSelectGenre={handleSelectGenre}
                 selectedGenres={selectedSourceGenres}
             />
-        </CustomView>
+        </CustomSafeArea>
     );
 }

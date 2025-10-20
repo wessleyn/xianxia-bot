@@ -1,6 +1,6 @@
 import CustomLoading from "@components/custom/CustomLoading";
 import CustomRating from "@components/custom/CustomRating";
-import CustomView from "@components/custom/CustomView";
+import CustomSafeArea from "@components/custom/CustomSafeArea";
 import NovelModal from "@components/NovelModal";
 import BackButton from "@components/reusable/BackButton";
 import NovelImage from "@components/reusable/NovelImage";
@@ -82,7 +82,7 @@ export default function NovelDetail() {
     if (!sourceFound) return <Text className={primaryText}>Novel Source Not Found/Supported</Text>
 
     return (
-        <CustomView className={`flex gap-4 px-4 ${bgMain}`}>
+        <CustomSafeArea className={`flex gap-4 px-4 ${bgMain}`}>
 
             <View className="flex-row items-center justify-between">
                 <BackButton />
@@ -189,6 +189,6 @@ export default function NovelDetail() {
             </View>
 
             <NovelModal novelLink={novelLink} />
-        </CustomView>
+        </CustomSafeArea>
     );
 }

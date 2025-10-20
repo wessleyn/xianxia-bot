@@ -7,26 +7,15 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link } from "expo-router";
 
 import { createTheme } from "@constants/themes";
-import { Novel, Source } from "@constants/types";
+import { Novel } from "@constants/types";
 import { useSettingsStore } from "@stores/settings";
-import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useState } from "react";
+import { useSourceStore } from "@stores/sources";
 import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 
 export default function Explore() {
-  const [enabledSources, setEnabledSources] = useState<Source[]>([]);
   const { showSuggestions } = useSettingsStore()
   const colorScheme = useColorScheme();
-  const db = useSQLiteContext();
-
-  useEffect(() => {
-    const fetchSources = async () => {
-      const sources = await db.getAllAsync<Source>('SELECT * FROM sources WHERE enabled = 1;')
-      setEnabledSources(sources);
-    }
-    
-    fetchSources();
-  }, []);
+  const { enabledSources } = useSourceStore();
 
   const suggestedNovels = [] as Novel[];
 
@@ -37,8 +26,8 @@ export default function Explore() {
   const {iconColor} = createTheme(isDark)
   return (
     <CustomView className="flex-1 gap-2">
-      <View className="px-4 text-center">
-        <View className="flex-row mb-4">
+      <View className="px-2 text-center">
+        <View className="flex-row mb-2">
           <Link href={'/local'} push asChild>
             <Pressable className="flex-1 flex-row align gap-4 bg-gray-200 dark:bg-gray-800 p-4 mr-4 rounded-xl shadow-sm">
               <FontAwesome5
