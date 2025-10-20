@@ -1,5 +1,4 @@
 import CustomLoading from "@components/custom/CustomLoading";
-import CustomView from "@components/custom/CustomView";
 import FilterDropdown from "@components/novelSource/FilterDropdown";
 import GenreFiltersCarousel from "@components/novelSource/GenreFiltersCarousel";
 import GenreFiltersModal from "@components/novelSource/GenreFiltersModal";
@@ -234,9 +233,9 @@ export default function SourceDetail() {
     ), [selectedFilter]);
 
     return (
-        <CustomSafeArea className="flex gap-6">
+        <CustomSafeArea className="flex flex-1  gap-6">
 
-            <View className="w-full flex-row items-center justify-between px-4">
+            <View className="w-full mt-4 flex-row items-center justify-between px-4">
                 <BackButton />
                 <View className="flex-row items-center gap-4">
                     {/* 

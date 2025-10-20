@@ -1,16 +1,18 @@
 import HeaderBar from '@components/HeaderBar';
 import initializeDatabase from '@constants/database';
 import { bottomNavTabs } from '@constants/tabs';
+import { createTheme } from '@constants/themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSourceStore } from '@stores/sources';
 import { Tabs } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
-import { createTheme } from '../../constants/themes';
 
 export default function TabLayout() {
   const db = useSQLiteContext();
   const colorScheme = useColorScheme();
+  const { fetchEnabledSources, fetchAllSources, initDB } = useSourceStore();
 
   useEffect(() => {
     const checkFirstLaunch = async () => {
@@ -20,9 +22,14 @@ export default function TabLayout() {
         await AsyncStorage.setItem('hasLaunched', 'true');
       }
     };
-
-    checkFirstLaunch();
+    
+    initDB(db);
+    checkFirstLaunch().then(() => {
+      fetchAllSources()
+      fetchEnabledSources();
+    });
   }, []);
+
 
   const isDark = colorScheme === 'dark';
   const { primaryBgColor, textColor, mutedColor, badgeBg } = createTheme(isDark);

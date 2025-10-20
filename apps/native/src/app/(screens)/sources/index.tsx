@@ -1,4 +1,3 @@
-import CustomView from "@//components/custom/CustomView";
 import BackButton from "@//components/reusable/BackButton";
 import AnimatedSearchInput from "@components/reusable/AnimatedSearchInput";
 import SourceImage from "@components/reusable/SourceImage";
@@ -8,21 +7,21 @@ import { Source } from "@constants/types";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Link } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Toast from 'react-native-toast-message';
+import CustomSafeArea from "../../../components/custom/CustomSafeArea";
+import { useSourceStore } from "../../../stores/sources";
 
 export default function Sources() {
-    const [sourcesList, setSourcesList] = useState<Source[]>([])
+    const { allSources, toggleSource } = useSourceStore();
     const [filteredSources, setFilteredSources] = useState<Source[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>("All")
     const [selectedLanguage, setSelectedLanguage] = useState<string>("en")
     const [showLanguageModal, setShowLanguageModal] = useState<boolean>(false)
     const [searchQuery, setSearchQuery] = useState<string>("")
     const [isSearching, setIsSearching] = useState<boolean>(false)
-    const db = useSQLiteContext();
-
+    
     const colorScheme = useColorScheme();
     const theme = createTheme(colorScheme === "dark");
 
@@ -31,7 +30,7 @@ export default function Sources() {
 
         const categoryCounts: Record<string, number> = {};
 
-        sourcesList.forEach(source => {
+        allSources.forEach(source => {
             if (source.mainCategory) {
                 const categories = source.mainCategory.split(',').map(c => c.trim());
                 categories.forEach(category => {
@@ -45,20 +44,10 @@ export default function Sources() {
             .map(([category]) => category);
 
         return [...staticFilters, ...sortedCategories];
-    }, [sourcesList]);
+    }, [allSources]);
 
     useEffect(() => {
-        const fetchSources = async () => {
-            const sources = await db.getAllAsync<Source>('SELECT * FROM sources;')
-            setSourcesList(sources);
-            setFilteredSources(sources);
-        }
-
-        fetchSources()
-    }, [])
-
-    useEffect(() => {
-        let filtered = [...sourcesList];
+        let filtered = [...allSources];
 
         if (selectedCategory === "All") {
         } else if (selectedCategory === "Language") {
@@ -84,7 +73,7 @@ export default function Sources() {
                 (source.language && source.language.toLowerCase().includes(query))
             );
         } setFilteredSources(filtered);
-    }, [selectedCategory, selectedLanguage, sourcesList, searchQuery])
+    }, [selectedCategory, selectedLanguage, searchQuery, allSources])
 
     const handleCategorySelect = useCallback((category: string) => {
         setSelectedCategory(category);
@@ -98,11 +87,9 @@ export default function Sources() {
         setShowLanguageModal(false);
     }, []);
 
-    const toggleSource = async (sourceId: string, name: string, isEnabled: boolean) => {
-        console.log(sourceId)
+    const handleSourceToggle = (sourceId: string, name: string, isEnabled: boolean) => {
         try {
-            await db.execAsync(`UPDATE sources SET enabled = ${Number(!isEnabled)} WHERE id = '${sourceId}';`)
-            setSourcesList(sourcesList.map(source => source.id === sourceId ? { ...source, enabled: !isEnabled } : source))
+            toggleSource(sourceId, !isEnabled);
             Toast.show({
                 type: 'success',
                 text1: isEnabled ? `${name} Disabled` : `${name} Enabled`,
@@ -122,7 +109,7 @@ export default function Sources() {
     }
 
     return (
-        <CustomView>
+        <CustomSafeArea className="flex-1">
             {/* Language Modal */}
             <Modal
                 animationType="slide"
@@ -246,7 +233,7 @@ export default function Sources() {
                         <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
                             <View style={{ height: 32, width: 1, backgroundColor: theme.borderColor }} />
                             <Pressable
-                                onPress={() => toggleSource(source.id, source.name, source.enabled)}
+                                onPress={() => handleSourceToggle(source.id, source.name, source.enabled)}
                             >
                                 <Text style={{ color: theme.mutedColor, fontSize: 24, width: 24, textAlign: 'center' }}>{source.enabled ? '-' : '+'}</Text>
                             </Pressable>
@@ -254,6 +241,6 @@ export default function Sources() {
                     </View>
                 ))}
             </ScrollView>
-        </CustomView>
+        </CustomSafeArea>
     );
 }
