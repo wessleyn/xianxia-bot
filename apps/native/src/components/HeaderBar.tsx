@@ -25,16 +25,15 @@ export default function HeaderBar({ tabName }: { tabName: string }) {
             style={{
                 backgroundColor: secondaryBgColor
             }}
-            className="flex-row p-2 items-center"
+            className="flex-row py-2 px-4 items-center"
         >
             <View
                 style={{
                     backgroundColor: primaryBgColor,
-                    borderRadius: 100
                 }}
                 className={cn(
                     'flex-1 flex-row items-center',
-                    'px-3 py-3',
+                    'px-6 py-3 rounded-xl',
                 )}>
                 <MaterialIcons
                     name="search"

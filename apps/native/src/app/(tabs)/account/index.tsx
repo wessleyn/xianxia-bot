@@ -4,7 +4,7 @@ import SettingsSection from "@components/SettingsSection";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAccountStore } from '@stores/account';
 import { useState } from "react";
-import { Image, Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Toast from 'react-native-toast-message';
 import { createTheme } from '../../../constants/themes';
 
@@ -41,46 +41,48 @@ export default function Account() {
 
   return (
     <CustomSafeArea className="items-center gap-5 h-full">
-      <View className="font-bold text-3xl items-center gap-4">
-        <View className="w-32 h-32 rounded-full overflow-hidden items-center justify-center">
-          {isLoggedIn ? (
-            <Image
-              source={{ uri: user?.user_metadata?.avatar_url || "https://www.gstatic.com/images/branding/product/1x/avatar_circle_blue_512dp.png" }}
-              className="w-32 h-32"
-            />
-          ) : (
-            <View style={{ backgroundColor: borderColor }} className="w-32 h-32 rounded-full items-center justify-center">
-              <MaterialIcons name="account-circle" size={96} color={mutedColor} />
-            </View>
-          )}
-        </View>
+      <ScrollView
+        className="w-full px-5 mt-6"
+        showsVerticalScrollIndicator={false}
+      >
 
-        <View className="items-center">
-          <Text style={{ color: textColor, fontSize: 18, fontWeight: '700' }}>
-            {isLoggedIn ? (user?.user_metadata?.full_name || 'User') : 'Guest User'}
-          </Text>
-          {isLoggedIn && <Text style={{ color: mutedColor }}>{user?.email}</Text>}
-
-          <TouchableOpacity
-            onPress={isLoggedIn ? handleSignOut : () => setIsAuthModalVisible(true)}
-            style={{
-              marginTop: 16,
-              paddingHorizontal: 20,
-              paddingVertical: 8,
-              borderRadius: 8,
-              backgroundColor: isLoggedIn ? pillSelectedBg : badgeBg,
-            }}
-          >
-            <Text style={{ color: isLoggedIn ? textColor : badgeText }}>
-              {isLoggedIn ? 'Sign Out' : 'Sign in to your account'}
+        <View className="items-center gap-4">
+          <View className="w-32 h-32 rounded-full overflow-hidden items-center justify-center">
+            {isLoggedIn ? (
+              <Image
+                source={{ uri: user?.user_metadata?.avatar_url || "https://www.gstatic.com/images/branding/product/1x/avatar_circle_blue_512dp.png" }}
+                className="w-32 h-32"
+              />
+            ) : (
+              <View style={{ backgroundColor: borderColor }} className="w-32 h-32 rounded-full items-center justify-center">
+                <MaterialIcons name="account-circle" size={96} color={mutedColor} />
+              </View>
+            )}
+          </View>
+          <View className="items-center">
+            <Text style={{ color: textColor, fontSize: 18, fontWeight: '700' }}>
+              {isLoggedIn ? (user?.user_metadata?.full_name || 'User') : 'Guest User'}
             </Text>
-          </TouchableOpacity>
+            {isLoggedIn && <Text style={{ color: mutedColor }}>{user?.email}</Text>}
+            <TouchableOpacity
+              onPress={isLoggedIn ? handleSignOut : () => setIsAuthModalVisible(true)}
+              style={{
+                marginTop: 16,
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+                borderRadius: 8,
+                backgroundColor: isLoggedIn ? pillSelectedBg : badgeBg,
+              }}
+            >
+              <Text style={{ color: isLoggedIn ? textColor : badgeText }}>
+                {isLoggedIn ? 'Sign Out' : 'Sign in to your account'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-
-      <AuthModal showModal={isAuthModalVisible} toggleModal={toggleModal} />
-
-      <SettingsSection />
+        <AuthModal showModal={isAuthModalVisible} toggleModal={toggleModal} />
+        <SettingsSection />
+      </ScrollView>
 
     </CustomSafeArea>
   );
