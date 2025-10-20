@@ -1,74 +1,62 @@
 import { supportedLanguages } from '@//constants/supportedLanguages';
-import { inAppSettings, Theme } from '@constants/inAppSettings';
+import { Theme } from '@constants/inAppSettings';
 import { UpdateType } from '@constants/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAccountStore } from '@stores/account';
+import { useSettingsStore } from '@stores/settings';
 import { pullSettings } from '@utils/pullSettings';
 import { pushSettings } from '@utils/pushSettings';
 import * as FileSystem from 'expo-file-system';
 import { useColorScheme } from 'nativewind';
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Alert, Pressable, Switch, Text, View } from "react-native";
 
 const SettingsSection = () => {
-    const { isLoggedIn, user } = useAccountStore()
-    const [updatedNovels, setUpdatedNovels] = useState<UpdateType>("Readings");
+    const { isLoggedIn, user } = useAccountStore();
+    const {
+        theme, setTheme,
+        language, setLanguage,
+        autoSync, setAutoSync,
+        downloadWifiOnly, setDownloadWifiOnly,
+        enableNotifications, setEnableNotifications,
+        showSuggestions, setShowSuggestions,
+        autoCheckUpdates, setAutoCheckUpdates,
+        autoBackup, setAutoBackup,
+        updateFrom, setUpdateFrom,
+        downloadPath, setDownloadPath
+    } = useSettingsStore();
+
     const { colorScheme, setColorScheme } = useColorScheme();
-    const [isAutoSync, setIsAutoSync] = useState(false);
-    const [theme, setTheme] = useState<Theme>('system');
-    const [language, setLanguage] = useState('en');
-    const [downloadWifiOnly, setDownloadWifiOnly] = useState(true);
-    const [enableNotifications, setEnableNotifications] = useState(true);
-    const [showSuggestions, setShowSuggestions] = useState(true);
-    const [autoCheckUpdates, setAutoCheckUpdates] = useState(true);
-    const [autoBackup, setAutoBackup] = useState(false);
-    const [downloadPath, setDownloadPath] = useState('');
     const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const [isUpdateFromMenuOpen, setIsUpdateFromMenuOpen] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
-    // Determine effective scheme for styling decisions
     const isDark = theme === 'dark' || (theme === 'system' && colorScheme === 'dark');
 
     const handlePullSettings = async () => {
         if (!user?.id) return;
-        console.log("pulling")
         try {
             setIsSyncing(true);
             const serverSettings = await pullSettings(user.id);
-
-            // Update local state with server settings
-            if (serverSettings !== null) {
+            if (serverSettings) {
                 setTheme(serverSettings.theme as Theme);
                 setLanguage(serverSettings.language);
-                setIsAutoSync(serverSettings.autoSync);
+                setAutoSync(serverSettings.autoSync);
                 setAutoCheckUpdates(serverSettings.autoCheckUpdates);
 
-                // Apply theme
                 if (serverSettings.theme === 'system') {
                     setColorScheme('system');
                 } else {
                     setColorScheme(serverSettings.theme as 'light' | 'dark');
                 }
 
-                Alert.alert(
-                    "Settings Synced",
-                    "Settings have been pulled from the server successfully."
-                );
+                Alert.alert("Settings Synced", "Settings pulled from server successfully.");
             } else {
-                Alert.alert(
-                    "No Settings Found",
-                    "No settings found on the server. Please push your local settings first."
-                );
-                return;
+                Alert.alert("No Settings Found", "No settings found on the server.");
             }
         } catch (error) {
-            console.error("Error pulling settings:", error);
-            Alert.alert(
-                "Sync Failed",
-                "Failed to pull settings from the server. Please try again."
-            );
+            console.error(error);
+            Alert.alert("Sync Failed", "Failed to pull settings from the server.");
         } finally {
             setIsSyncing(false);
         }
@@ -76,111 +64,41 @@ const SettingsSection = () => {
 
     const handlePushSettings = async () => {
         if (!user?.id) return;
-
         try {
             setIsSyncing(true);
             await pushSettings(user.id);
-            Alert.alert(
-                "Settings Synced",
-                "Settings have been pushed to the server successfully."
-            );
+            Alert.alert("Settings Synced", "Settings pushed to the server successfully.");
         } catch (error) {
-            console.error("Error pushing settings:", error);
-            Alert.alert(
-                "Sync Failed",
-                "Failed to push settings to the server. Please try again."
-            );
+            console.error(error);
+            Alert.alert("Sync Failed", "Failed to push settings to the server.");
         } finally {
             setIsSyncing(false);
         }
     };
 
-    const toggleSync = async () => {
-        setIsAutoSync(prev => !prev);
-        await AsyncStorage.setItem('autoSync', JSON.stringify(!isAutoSync));
-    };
+    const toggleUpdateFrom = (val: UpdateType) => setUpdateFrom(val);
 
-    const selectTheme = async (selectedTheme: Theme) => {
-        setTheme(selectedTheme);
-        await AsyncStorage.setItem('theme', selectedTheme);
-
-        // Apply the theme to the app
-        if (selectedTheme === 'system') {
-            setColorScheme('system');
-        } else {
-            setColorScheme(selectedTheme);
-        }
-
-        setIsThemeMenuOpen(false);
-    };
-
-    const selectLanguage = async (langCode: string) => {
-        setLanguage(langCode);
-        await AsyncStorage.setItem('language', langCode);
-        setIsLanguageMenuOpen(false);
-    };
-
-    const getSelectedLanguageName = () => {
-        const selectedLang = supportedLanguages.find(lang => lang.code === language);
-        return selectedLang ? selectedLang.name : 'English';
-    };
-
-    const toggleDownloadWifiOnly = async () => {
-        setDownloadWifiOnly(prev => !prev);
-        await AsyncStorage.setItem('downloadWifiOnly', JSON.stringify(!downloadWifiOnly));
-    };
-
-    const toggleNotifications = async () => {
-        setEnableNotifications(prev => !prev);
-        await AsyncStorage.setItem('enableNotifications', JSON.stringify(!enableNotifications));
-    };
-
-    const toggleSuggestions = async () => {
-        setShowSuggestions(prev => !prev);
-        await AsyncStorage.setItem('showSuggestions', JSON.stringify(!showSuggestions));
-    };
-
-    const toggleAutoCheckUpdates = async () => {
-        setAutoCheckUpdates(prev => !prev);
-        await AsyncStorage.setItem('autoCheckUpdates', JSON.stringify(!autoCheckUpdates));
-    };
-
-    const toggleAutoBackup = async () => {
-        setAutoBackup(prev => !prev);
-        await AsyncStorage.setItem('autoBackup', JSON.stringify(!autoBackup));
-    };
-    const toggleUpdateFrom = async (val: UpdateType) => {
-        setUpdatedNovels(val);
-        await AsyncStorage.setItem('updateFrom', JSON.stringify(val));
-    };
-
-    // TODO: Implement folder picker
     const selectDownloadFolder = async () => {
         try {
             Alert.alert(
                 "Select Download Location",
-                "This should open a folder picker ",
+                "This should open a folder picker",
                 [
                     {
                         text: "Use Default",
-                        onPress: async () => {
+                        onPress: () => {
                             const defaultPath = FileSystem.documentDirectory + 'Downloads';
                             setDownloadPath(defaultPath);
-                            await AsyncStorage.setItem('downloadPath', defaultPath);
-                        }
+                        },
                     },
-                    {
-                        text: "Cancel",
-                        style: "cancel"
-                    }
+                    { text: "Cancel", style: "cancel" }
                 ]
             );
         } catch (error) {
-            console.error("Error selecting download folder:", error);
+            console.error(error);
         }
     };
 
-    // TODO: Implement data backup logic
     const createBackup = () => {
         Alert.alert(
             "Create Backup",
@@ -190,10 +108,7 @@ const SettingsSection = () => {
                     text: "OK",
                     onPress: () => {
                         setTimeout(() => {
-                            Alert.alert(
-                                "Backup Created",
-                                "Your data has been successfully backed up."
-                            );
+                            Alert.alert("Backup Created", "Your data has been successfully backed up.");
                         }, 1000);
                     }
                 }
@@ -201,146 +116,75 @@ const SettingsSection = () => {
         );
     };
 
-    useEffect(() => {
-        const loadSettings = async (setting: string) => {
-            const value = await AsyncStorage.getItem(setting);
-            if (value !== null) {
-                switch (setting) {
-                    case "autoSync":
-                        setIsAutoSync(JSON.parse(value));
-                        break;
-                    case "theme":
-                        setTheme(value as Theme);
-                        if (value === 'system') {
-                            setColorScheme('system');
-                        } else {
-                            setColorScheme(value as 'light' | 'dark');
-                        }
-                        break;
-                    case "language":
-                        setLanguage(value);
-                        break;
-                    case "downloadWifiOnly":
-                        setDownloadWifiOnly(JSON.parse(value));
-                        break;
-                    case "enableNotifications":
-                        setEnableNotifications(JSON.parse(value));
-                        break;
-                    case "showSuggestions":
-                        setShowSuggestions(JSON.parse(value));
-                        break;
-                    case "autoCheckUpdates":
-                        setAutoCheckUpdates(JSON.parse(value));
-                        break;
-                    case "autoBackup":
-                        setAutoBackup(JSON.parse(value));
-                        break;
-                    case "downloadPath":
-                        setDownloadPath(value);
-                        break;
-                    case "updateFrom":
-                        setUpdatedNovels(value as UpdateType);
-                        break;
-                }
-            } else {
-                if (setting === 'autoSync') setIsAutoSync(false);
-                if (setting === 'theme') setTheme('system');
-                if (setting === 'language') setLanguage('en');
-                if (setting === 'downloadWifiOnly') setDownloadWifiOnly(true);
-                if (setting === 'enableNotifications') setEnableNotifications(true);
-                if (setting === 'showSuggestions') setShowSuggestions(true);
-                if (setting === 'autoCheckUpdates') setAutoCheckUpdates(true);
-                if (setting === 'autoBackup') setAutoBackup(false);
-                if (setting === 'updatedNovels') setUpdatedNovels("Readings");
-                if (setting === 'downloadPath') setDownloadPath(FileSystem.documentDirectory + 'Downloads');
-            }
-        };
-
-        inAppSettings.forEach(loadSettings);
-    }, []);
-
-    // helper for Switch colors depending on dark mode
+    // Switch colors
     const switchTrackFalse = isDark ? '#4b5563' : '#767577';
     const switchTrackTrue = '#81b0ff';
     const thumbFalse = isDark ? '#374151' : '#f4f3f4';
     const thumbTrue = '#4287f5';
 
+    const getSelectedLanguageName = () => {
+        const selectedLang = supportedLanguages.find(lang => lang.code === language);
+        return selectedLang ? selectedLang.name : 'English';
+    };
+
     return (
-        <ScrollView
-            className={`w-full px-5 mt-6 h-full `}
-            showsVerticalScrollIndicator={false}
-        >
+        <View className="flex-1 px-4 py-6">
+            {/* Header */}
             <View className='flex-row justify-between'>
                 <Text className='text-2xl font-bold text-gray-500 dark:text-gray-200 mb-4'>Settings</Text>
-                {
-                    isLoggedIn && (
-                        <View className='flex-row h-10 space-x-2'>
-                            {/* Prefer the server changes */}
-                            <Pressable
-                                onPress={handlePullSettings}
-                                disabled={isSyncing}
-                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300 dark:bg-gray-700' : 'bg-blue-500 active:bg-blue-600'}`}
-                            >
-                                {isSyncing ? (
-                                    <ActivityIndicator size="small" color="#fff" />
-                                ) : (
-                                    <Text className="text-white font-medium">Pull</Text>
-                                )}
-                            </Pressable>
-                            {/* Prefer local changes */}
-                            <Pressable
-                                onPress={handlePushSettings}
-                                disabled={isSyncing}
-                                className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300 dark:bg-gray-700' : 'bg-indigo-500 active:bg-indigo-600'}`}
-                            >
-                                {isSyncing ? (
-                                    <ActivityIndicator size="small" color="#fff" />
-                                ) : (
-                                    <Text className="text-white font-medium">Push</Text>
-                                )}
-                            </Pressable>
-                        </View>
-                    )
-                }
+                {isLoggedIn && (
+                    <View className='flex-row h-10 space-x-2'>
+                        <Pressable
+                            onPress={handlePullSettings}
+                            disabled={isSyncing}
+                            className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300 dark:bg-gray-700' : 'bg-blue-500 active:bg-blue-600'}`}
+                        >
+                            {isSyncing ? <ActivityIndicator size="small" color="#fff" /> : <Text className="text-white font-medium">Pull</Text>}
+                        </Pressable>
+                        <Pressable
+                            onPress={handlePushSettings}
+                            disabled={isSyncing}
+                            className={`px-4 py-2 rounded-md flex-row items-center justify-center ${isSyncing ? 'bg-gray-300 dark:bg-gray-700' : 'bg-indigo-500 active:bg-indigo-600'}`}
+                        >
+                            {isSyncing ? <ActivityIndicator size="small" color="#fff" /> : <Text className="text-white font-medium">Push</Text>}
+                        </Pressable>
+                    </View>
+                )}
             </View>
 
-            {/* Section Header: General */}
-            <View className="mb-2">
-                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">General</Text>
-            </View>
+            {/* General */}
+            <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200 mb-2">General</Text>
 
-            {/* Auto Sync Toggle */}
-            <View className='w-full flex-row justify-between items-center py-3 '>
-                <Text className="text-lg text-gray-800 dark:text-gray-100">
-                    Auto Sync
-                </Text>
+            <View className='w-full flex-row justify-between items-center py-3'>
+                <Text className="text-lg text-gray-800 dark:text-gray-100">Auto Sync</Text>
                 <Switch
                     trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
-                    thumbColor={isAutoSync ? thumbTrue : thumbFalse}
-                    value={isAutoSync}
-                    onValueChange={toggleSync}
+                    thumbColor={autoSync ? thumbTrue : thumbFalse}
+                    value={autoSync}
+                    onValueChange={() => setAutoSync(!autoSync)}
                 />
             </View>
 
             {/* Theme Selector */}
-            <Pressable
-                className='w-full flex-row justify-between items-center py-3 '
-                onPress={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
-            >
+            <Pressable className='w-full flex-row justify-between items-center py-3' onPress={() => setIsThemeMenuOpen(!isThemeMenuOpen)}>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Theme</Text>
                 <Text className="text-gray-500 dark:text-gray-300">{theme.charAt(0).toUpperCase() + theme.slice(1)}</Text>
             </Pressable>
-
             {isThemeMenuOpen && (
                 <View className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 mb-2">
-                    {['light', 'dark', 'system'].map((themeOption) => (
+                    {['light', 'dark', 'system'].map(option => (
                         <Pressable
-                            key={themeOption}
-                            className={`py-3 px-2 rounded-md mb-1 ${theme === themeOption ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
-                            onPress={() => selectTheme(themeOption as Theme)}
+                            key={option}
+                            className={`py-3 px-2 rounded-md mb-1 ${theme === option ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
+                            onPress={() => {
+                                setTheme(option as Theme);
+                                if (option === 'system') setColorScheme('system');
+                                else setColorScheme(option as 'light' | 'dark');
+                                setIsThemeMenuOpen(false);
+                            }}
                         >
-                            <Text className={`${theme === themeOption ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-800 dark:text-gray-200'}`}>
-                                {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+                            <Text className={`${theme === option ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-800 dark:text-gray-200'}`}>
+                                {option.charAt(0).toUpperCase() + option.slice(1)}
                             </Text>
                         </Pressable>
                     ))}
@@ -348,125 +192,92 @@ const SettingsSection = () => {
             )}
 
             {/* Language Selector */}
-            <Pressable
-                className='w-full flex-row justify-between items-center py-3 '
-                onPress={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-            >
+            <Pressable className='w-full flex-row justify-between items-center py-3' onPress={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Language</Text>
                 <Text className="text-gray-500 dark:text-gray-300">{getSelectedLanguageName()}</Text>
             </Pressable>
-
             {isLanguageMenuOpen && (
                 <View className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 mb-2">
-                    {supportedLanguages.map((languageOption) => (
+                    {supportedLanguages.map(lang => (
                         <Pressable
-                            key={languageOption.code}
-                            className={`py-3 px-2 rounded-md mb-1 ${language === languageOption.code ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
-                            onPress={() => selectLanguage(languageOption.code)}
+                            key={lang.code}
+                            className={`py-3 px-2 rounded-md mb-1 ${language === lang.code ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
+                            onPress={() => {
+                                setLanguage(lang.code);
+                                setIsLanguageMenuOpen(false);
+                            }}
                         >
-                            <Text className={`${language === languageOption.code ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-800 dark:text-gray-200'}`}>
-                                {languageOption.name}
+                            <Text className={`${language === lang.code ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-800 dark:text-gray-200'}`}>
+                                {lang.name}
                             </Text>
                         </Pressable>
                     ))}
                 </View>
             )}
 
-            {/* Section Header: Download Settings */}
-            <View className="mt-6 mb-2">
-                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">Download Settings</Text>
-            </View>
+            {/* Download Settings */}
+            <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200 mt-6 mb-2">Download Settings</Text>
 
-            {/* Download over WiFi only */}
-            <View className='w-full flex-row justify-between items-center py-3 '>
+            <View className='w-full flex-row justify-between items-center py-3'>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Download over WiFi only</Text>
                 <Switch
                     trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
                     thumbColor={downloadWifiOnly ? thumbTrue : thumbFalse}
                     value={downloadWifiOnly}
-                    onValueChange={toggleDownloadWifiOnly}
+                    onValueChange={() => setDownloadWifiOnly(!downloadWifiOnly)}
                 />
             </View>
 
-            {/* Download Folder */}
-            <Pressable
-                className='w-full flex-row justify-between items-center py-3 '
-                onPress={selectDownloadFolder}
-            >
+            <Pressable className='w-full flex-row justify-between items-center py-3' onPress={selectDownloadFolder}>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Download Folder</Text>
                 <Text className="text-gray-500 dark:text-gray-300">Change</Text>
             </Pressable>
 
-            {/* Section Header: Notifications & Suggestions */}
-            <View className="mt-6 mb-2">
-                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">Notifications & Suggestions</Text>
-            </View>
+            {/* Notifications & Suggestions */}
+            <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200 mt-6 mb-2">Notifications & Suggestions</Text>
 
-            {/* Enable Notifications */}
-            <View className='w-full flex-row justify-between items-center py-3 '>
+            <View className='w-full flex-row justify-between items-center py-3'>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Enable Notifications</Text>
                 <Switch
                     trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
                     thumbColor={enableNotifications ? thumbTrue : thumbFalse}
                     value={enableNotifications}
-                    onValueChange={toggleNotifications}
+                    onValueChange={() => setEnableNotifications(!enableNotifications)}
                 />
             </View>
 
-            {/* Show Suggestions */}
-            <View className='w-full flex-row justify-between items-center py-3 '>
+            <View className='w-full flex-row justify-between items-center py-3'>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Show Suggestions</Text>
                 <Switch
                     trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
                     thumbColor={showSuggestions ? thumbTrue : thumbFalse}
                     value={showSuggestions}
-                    onValueChange={toggleSuggestions}
+                    onValueChange={() => setShowSuggestions(!showSuggestions)}
                 />
             </View>
 
-            {/* Section Header: Updates & Backup */}
-            <View className="mt-6 mb-2">
-                <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200">Updates & Backup</Text>
-            </View>
+            {/* Updates & Backup */}
+            <Text className="text-lg font-semibold text-gray-600 dark:text-gray-200 mt-6 mb-2">Updates & Backup</Text>
 
-            {/* Auto Check Updates */}
-            <View className='w-full flex-row justify-between items-center py-3 '>
+            <View className='w-full flex-row justify-between items-center py-3'>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Auto Check Updates</Text>
                 <Switch
                     trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
                     thumbColor={autoCheckUpdates ? thumbTrue : thumbFalse}
                     value={autoCheckUpdates}
-                    onValueChange={toggleAutoCheckUpdates}
+                    onValueChange={() => setAutoCheckUpdates(!autoCheckUpdates)}
                 />
             </View>
 
-            {/* Selection: Readings, Favourites, Library */}
-            <Pressable
-                className='w-full flex-row justify-between items-center py-3 '
-                onPress={() => setIsUpdateFromMenuOpen(!isUpdateFromMenuOpen)}
-            >
+            <Pressable className='w-full flex-row justify-between items-center py-3' onPress={() => setIsUpdateFromMenuOpen(!isUpdateFromMenuOpen)}>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Update From</Text>
-                <Text className="text-gray-500 dark:text-gray-300">{updatedNovels}</Text>
+                <Text className="text-gray-500 dark:text-gray-300">{updateFrom}</Text>
             </Pressable>
-
             {isUpdateFromMenuOpen && (
                 <View className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 mb-2">
                     {['Readings', 'Favourites', 'Library'].map(option => (
-                        <Pressable
-                            key={option}
-                            className={`py-3 px-2 rounded-md mb-1 ${updatedNovels === option ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
-                            onPress={() => {
-                                toggleUpdateFrom(option as UpdateType);
-                                setIsUpdateFromMenuOpen(false);
-                            }}
-                        >
-                            <Text
-                                className={
-                                    updatedNovels === option
-                                        ? 'text-blue-600 dark:text-blue-300 font-medium'
-                                        : 'text-gray-600 dark:text-gray-200'
-                                }
-                            >
+                        <Pressable key={option} className={`py-3 px-2 rounded-md mb-1 ${updateFrom === option ? 'bg-blue-100 dark:bg-blue-900' : ''}`} onPress={() => { toggleUpdateFrom(option as UpdateType); setIsUpdateFromMenuOpen(false); }}>
+                            <Text className={updateFrom === option ? 'text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-600 dark:text-gray-200'}>
                                 {option}
                             </Text>
                         </Pressable>
@@ -474,28 +285,22 @@ const SettingsSection = () => {
                 </View>
             )}
 
-
-            {/* Auto Backup */}
-            <View className='w-full flex-row justify-between items-center py-3 '>
+            <View className='w-full flex-row justify-between items-center py-3'>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Auto Backup</Text>
                 <Switch
                     trackColor={{ false: switchTrackFalse, true: switchTrackTrue }}
                     thumbColor={autoBackup ? thumbTrue : thumbFalse}
                     value={autoBackup}
-                    onValueChange={toggleAutoBackup}
+                    onValueChange={() => setAutoBackup(!autoBackup)}
                 />
             </View>
 
-            {/* Create Backup */}
-            <Pressable
-                className='w-full flex-row justify-between items-center py-3  mb-6'
-                onPress={createBackup}
-            >
+            <Pressable className='w-full flex-row justify-between items-center py-3 mb-6' onPress={createBackup}>
                 <Text className="text-lg text-gray-800 dark:text-gray-100">Create Backup</Text>
                 <Text className="text-blue-500 dark:text-blue-300">Backup Now</Text>
             </Pressable>
-        </ScrollView>
-    )
-}
+        </View>
+    );
+};
 
-export default SettingsSection
+export default SettingsSection;

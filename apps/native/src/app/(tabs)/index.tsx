@@ -6,16 +6,16 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link } from "expo-router";
 
+import { createTheme } from "@constants/themes";
 import { Novel, Source } from "@constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSettingsStore } from "@stores/settings";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, Pressable, Text, TouchableOpacity, useColorScheme, View } from "react-native";
-import { createTheme } from "../../constants/themes";
 
 export default function Explore() {
   const [enabledSources, setEnabledSources] = useState<Source[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
+  const { showSuggestions } = useSettingsStore()
   const colorScheme = useColorScheme();
   const db = useSQLiteContext();
 
@@ -24,13 +24,7 @@ export default function Explore() {
       const sources = await db.getAllAsync<Source>('SELECT * FROM sources WHERE enabled = 1;')
       setEnabledSources(sources);
     }
-    const checkSettings = async () => {
-      const setting = await AsyncStorage.getItem('showSuggestions')
-      const parsedSettings = JSON.parse(setting ?? 'true') as boolean
-      setShowSuggestions(parsedSettings)
-    }
-
-    checkSettings();
+    
     fetchSources();
   }, []);
 
@@ -43,8 +37,6 @@ export default function Explore() {
   const {iconColor} = createTheme(isDark)
   return (
     <CustomView className="flex-1 gap-2">
-
-      {/* Navigation Matrix */}
       <View className="px-4 text-center">
         <View className="flex-row mb-4">
           <Link href={'/local'} push asChild>
